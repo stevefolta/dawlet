@@ -14,11 +14,12 @@ CFLAGS += -std=c++11 -pthread
 LINK_FLAGS += -pthread
 
 CPP := g++
+CFLAGS += -MMD
 CFLAGS += -g
 CFLAGS += $(foreach switch,$(SWITCHES),-D$(switch))
 
 $(OBJECTS_DIR)/%.o: %.cpp
-	$(CPP) -c $^ -g $(CFLAGS) -o $@
+	$(CPP) -c $< -g $(CFLAGS) -o $@
 
 $(PROGRAM): $(OBJECTS_DIR) $(OBJECTS)
 	$(CPP) $(filter-out $(OBJECTS_DIR),$^) -g $(LINK_FLAGS) -o $@
@@ -27,6 +28,8 @@ $(PROGRAM): $(OBJECTS_DIR) $(OBJECTS)
 
 $(OBJECTS_DIR):
 	mkdir $(OBJECTS_DIR)
+
+-include $(OBJECTS_DIR)/*.d
 
 
 .PHONY: runnit
