@@ -1,5 +1,5 @@
 PROGRAM := daw
-SOURCES := main.cpp BufferManager.cpp
+SOURCES := main.cpp BufferManager.cpp MessageBuffer.cpp
 OBJECTS_DIR := objects
 
 -include Makefile.local
@@ -11,6 +11,8 @@ OBJECTS = $(foreach source,$(SOURCES),$(OBJECTS_DIR)/$(source:.cpp=.o))
 all: runnit
 
 CPP := g++
+CFLAGS += -std=c++11
+CFLAGS += -g
 CFLAGS += $(foreach switch,$(SWITCHES),-D$(switch))
 
 $(OBJECTS_DIR)/%.o: %.cpp
