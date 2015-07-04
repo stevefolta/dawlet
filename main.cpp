@@ -1,10 +1,9 @@
-#include "BufferManager.h"
+#include "AudioEngine.h"
 
 
 int main(int argc, char* argv[])
 {
-	BufferManager bufferManager;
-	bufferManager.set_buffer_size(64);
+	AudioEngine engine;
 	return 0;
 }
 

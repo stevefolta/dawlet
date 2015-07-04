@@ -1,4 +1,5 @@
 #include "BufferManager.h"
+#include "AudioEngine.h"
 #include <stdlib.h>
 
 enum {
@@ -12,7 +13,6 @@ BufferManager::BufferManager()
 	// Will not be usable until set_buffer_size() is called.
 	first_free_buffer = NULL;
 	num_free_buffers = 0;
-	global_buffer_size = 0;
 	had_overrun = false;
 
 	needed_new_buffers = num_new_buffers = 0;
@@ -26,18 +26,16 @@ BufferManager::~BufferManager()
 }
 
 
-void BufferManager::set_buffer_size(int new_buffer_size)
+void BufferManager::reset()
 {
 	// The engine must be stopped when this is called.
 
 	clear();
 
-	global_buffer_size = new_buffer_size;
-
 	// Allocate new free buffers.
 	FreeAudioBuffer* prev_buffer = NULL;
 	for (int buffers_left = initial_num_buffers; buffers_left > 0; --buffers_left) {
-		FreeAudioBuffer* buffer = (FreeAudioBuffer*) malloc(global_buffer_size);
+		FreeAudioBuffer* buffer = (FreeAudioBuffer*) malloc(audioEngine->buffer_size());
 		buffer->next = prev_buffer;
 		prev_buffer = buffer;
 		}
@@ -76,11 +74,12 @@ void BufferManager::tick()
 		num_new_buffers = 0;
 		int buffers_to_build = needed_new_buffers;
 		int buffers_left = buffers_to_build;
-		last_new_buffer = (FreeAudioBuffer*) malloc(global_buffer_size);
+		last_new_buffer = (FreeAudioBuffer*) malloc(audioEngine->buffer_size());
 		FreeAudioBuffer* prev_buffer = last_new_buffer;
 		buffers_left -= 1;
 		for (; buffers_left > 0; buffers_left -= 1) {
-			FreeAudioBuffer* new_buffer = (FreeAudioBuffer*) malloc(global_buffer_size);
+			FreeAudioBuffer* new_buffer =
+				(FreeAudioBuffer*) malloc(audioEngine->buffer_size());
 			new_buffer->next = prev_buffer;
 			prev_buffer = new_buffer;
 			}

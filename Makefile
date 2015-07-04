@@ -1,5 +1,5 @@
 PROGRAM := daw
-SOURCES := main.cpp BufferManager.cpp MessageBuffer.cpp
+SOURCES := main.cpp BufferManager.cpp MessageQueue.cpp AudioEngine.cpp
 OBJECTS_DIR := objects
 
 -include Makefile.local
@@ -10,8 +10,10 @@ OBJECTS = $(foreach source,$(SOURCES),$(OBJECTS_DIR)/$(source:.cpp=.o))
 
 all: runnit
 
+CFLAGS += -std=c++11 -pthread
+LINK_FLAGS += -pthread
+
 CPP := g++
-CFLAGS += -std=c++11
 CFLAGS += -g
 CFLAGS += $(foreach switch,$(SWITCHES),-D$(switch))
 
@@ -19,7 +21,7 @@ $(OBJECTS_DIR)/%.o: %.cpp
 	$(CPP) -c $^ -g $(CFLAGS) -o $@
 
 $(PROGRAM): $(OBJECTS_DIR) $(OBJECTS)
-	$(CPP) $(filter-out $(OBJECTS_DIR),$^) -g -o $@
+	$(CPP) $(filter-out $(OBJECTS_DIR),$^) -g $(LINK_FLAGS) -o $@
 	@echo "---------------------------------------------"
 	@echo
 
@@ -34,5 +36,5 @@ runnit: $(PROGRAM)
 
 .PHONY: clean
 clean:
-	rm -r $(PROGRAM) $(OBJECTS_DIR)
+	rm -rf $(PROGRAM) $(OBJECTS_DIR)
 

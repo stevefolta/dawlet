@@ -1,5 +1,5 @@
-#ifndef MessageBuffer_h
-#define MessageBuffer_h
+#ifndef MessageQueue_h
+#define MessageQueue_h
 
 #include "Message.h"
 #include <atomic>
@@ -7,29 +7,29 @@
 // A ring buffer for sending messages to or from the realtime thread.
 
 
-class MessageBuffer {
+class MessageQueue {
 	public:
-		MessageBuffer();
-		~MessageBuffer();
+		MessageQueue();
+		~MessageQueue();
 
 		// Sending.
 		Message*	back();
 		void	push();
+		void	send(int message); 	// Send a simple message with no parameters.
 
 		// Receiving.
 		Message*	front();
 		void	pop();
 
-		bool is_empty() { return !available(head, tail); }
+		bool	is_empty();
+		bool	is_full();
 
 	protected:
 		Message*	ring;
 		int	capacity;
 		std::atomic_uint head, tail;
-
-		bool 	available(unsigned int head, unsigned int tail);
 	};
 
 
-#endif 	// !MessageBuffer_h
+#endif 	// !MessageQueue_h
 

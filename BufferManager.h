@@ -13,8 +13,7 @@ class BufferManager {
 		BufferManager();
 		~BufferManager();
 
-		void	set_buffer_size(int new_buffer_size);
-		int	buffer_size() { return global_buffer_size; }
+		void	reset();
 		bool	overran() { return had_overrun; }
 
 		AudioBuffer*	get_buffer();
@@ -28,7 +27,6 @@ class BufferManager {
 			FreeAudioBuffer* next;
 			};
 
-		int	global_buffer_size;
 		FreeAudioBuffer*	first_free_buffer;
 		int	num_free_buffers;
 		bool	had_overrun;
