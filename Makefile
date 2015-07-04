@@ -26,3 +26,8 @@ $(OBJECTS_DIR):
 runnit: $(PROGRAM)
 	@./$(PROGRAM)
 
+
+.PHONY: clean
+clean:
+	rm -r $(PROGRAM) $(OBJECTS_DIR)
+
