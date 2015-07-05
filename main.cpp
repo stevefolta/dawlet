@@ -1,5 +1,6 @@
 #include "AudioEngine.h"
 #include "Logger.h"
+#include "tests/Tests.h"
 #include <string.h>
 
 
@@ -15,6 +16,8 @@ int main(int argc, char* argv[])
 			logger = new StdoutLogger();
 			}
 		}
+
+	RunTests();
 
 	AudioEngine engine;
 	return 0;

@@ -1,10 +1,15 @@
 PROGRAM := daw
-SOURCES := main.cpp Logger.cpp
+SOURCES := main.cpp JSONParser.cpp Logger.cpp tests/Tests.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 OBJECTS_DIR := objects
 
 -include Makefile.local
+
+ifdef TEST_JSON_PARSER
+	SOURCES += tests/JSONParser.cpp
+	SWITCHES += TEST_JSON_PARSER
+endif
 
 ######
 
@@ -30,6 +35,7 @@ $(PROGRAM): $(OBJECTS_DIR) $(OBJECTS)
 
 $(OBJECTS_DIR):
 	mkdir $(OBJECTS_DIR)
+	mkdir -p $(OBJECTS_DIR)/tests
 
 -include $(OBJECTS_DIR)/*.d
 
