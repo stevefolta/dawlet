@@ -1,0 +1,15 @@
+#!/bin/bash
+
+classes=(Project Track Playlist Send AudioEngine BufferManager AudioBuffer MessageQueue Logger)
+files=()
+files+=(main.cpp)
+
+for class in "${classes[@]}"; do
+	files+=(${class}.h)
+	files+=(${class}.cpp)
+	done
+
+files+=(Message.h AudioTypes.h Amp.h)
+
+$EDITOR "${files[@]}"
+
