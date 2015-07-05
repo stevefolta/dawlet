@@ -1,5 +1,7 @@
 PROGRAM := daw
-SOURCES := main.cpp BufferManager.cpp MessageQueue.cpp AudioEngine.cpp Logger.cpp
+SOURCES := main.cpp Logger.cpp
+SOURCES += Project.cpp Track.cpp Send.cpp
+SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 OBJECTS_DIR := objects
 
 -include Makefile.local

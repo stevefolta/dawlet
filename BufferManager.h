@@ -2,11 +2,8 @@
 #define BufferManager_h
 
 #include "AudioTypes.h"
+#include "AudioBuffer.h"
 
-
-struct AudioBuffer {
-	AudioSample	samples[];
-	};
 
 class BufferManager {
 	public:

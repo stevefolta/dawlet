@@ -1,4 +1,5 @@
 #include "BufferManager.h"
+#include "AudioBuffer.h"
 #include "AudioEngine.h"
 #include <stdlib.h>
 
