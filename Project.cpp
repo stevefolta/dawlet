@@ -11,17 +11,13 @@ Project::Project()
 
 Project::~Project()
 {
-	while (!tracks.empty()) {
-		delete tracks.back();
-		tracks.pop_back();
-		}
 	delete master;
 }
 
 
-void Project::run(AudioBuffer* bufferOut)
+void Project::run(AudioBuffer* buffer_out)
 {
-	/***/
+	master->run(buffer_out);
 }
 
 

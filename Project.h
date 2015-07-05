@@ -11,13 +11,12 @@ class Project {
 		Project();
 		~Project();
 
-		void	run(AudioBuffer* bufferOut);
+		void	run(AudioBuffer* buffer_out);
 
 		int	new_id();
 
 	protected:
 		Track*	master;
-		std::vector<Track*>	tracks;
 		int	next_new_id;
 	};
 

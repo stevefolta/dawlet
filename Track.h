@@ -13,7 +13,7 @@ class Track {
 		Track(Project* project, int id = -1);
 		~Track();
 
-		void	run(AudioBuffer* bufferOut);
+		void	run(AudioBuffer* buffer_out);
 
 		int	id;
 
@@ -24,6 +24,7 @@ class Track {
 		std::vector<Send*>	sends;
 		std::vector<Send*>	receives;
 		float	gain;
+		bool	sends_to_parent;
 	};
 
 

@@ -12,6 +12,7 @@ Track::Track(Project* projectIn, int idIn)
 {
 	id = idIn >=0 ? idIn : project->new_id();
 	gain = 1.0;
+	sends_to_parent = true;
 }
 
 
@@ -29,7 +30,7 @@ Track::~Track()
 }
 
 
-void Track::run(AudioBuffer* bufferOut)
+void Track::run(AudioBuffer* buffer_out)
 {
 	// Get a buffer for the track.
 	int buffer_size = audioEngine->buffer_size();
@@ -52,11 +53,13 @@ void Track::run(AudioBuffer* bufferOut)
 	/***/
 
 	// Mix the track into the output buffer.
-	AudioSample* in = track_buffer->samples;
-	AudioSample* out = bufferOut->samples;
-	for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
-		*out += amp(gain, *in++);
-		++out;
+	if (sends_to_parent) {
+		AudioSample* in = track_buffer->samples;
+		AudioSample* out = buffer_out->samples;
+		for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
+			*out += amp(gain, *in++);
+			++out;
+			}
 		}
 }
 
