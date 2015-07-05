@@ -5,7 +5,7 @@
 
 void AudioBuffer::clear()
 {
-	memset(samples, 0, audioEngine->buffer_size() * sizeof(AudioSample));
+	memset(samples, 0, engine->buffer_size() * sizeof(AudioSample));
 }
 
 

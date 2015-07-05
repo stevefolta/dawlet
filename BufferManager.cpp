@@ -36,7 +36,7 @@ void BufferManager::reset()
 	// Allocate new free buffers.
 	FreeAudioBuffer* prev_buffer = NULL;
 	for (int buffers_left = initial_num_buffers; buffers_left > 0; --buffers_left) {
-		FreeAudioBuffer* buffer = (FreeAudioBuffer*) malloc(audioEngine->buffer_size());
+		FreeAudioBuffer* buffer = (FreeAudioBuffer*) malloc(engine->buffer_size());
 		buffer->next = prev_buffer;
 		prev_buffer = buffer;
 		}
@@ -75,12 +75,12 @@ void BufferManager::tick()
 		num_new_buffers = 0;
 		int buffers_to_build = needed_new_buffers;
 		int buffers_left = buffers_to_build;
-		last_new_buffer = (FreeAudioBuffer*) malloc(audioEngine->buffer_size());
+		last_new_buffer = (FreeAudioBuffer*) malloc(engine->buffer_size());
 		FreeAudioBuffer* prev_buffer = last_new_buffer;
 		buffers_left -= 1;
 		for (; buffers_left > 0; buffers_left -= 1) {
 			FreeAudioBuffer* new_buffer =
-				(FreeAudioBuffer*) malloc(audioEngine->buffer_size());
+				(FreeAudioBuffer*) malloc(engine->buffer_size());
 			new_buffer->next = prev_buffer;
 			prev_buffer = new_buffer;
 			}

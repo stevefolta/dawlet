@@ -33,8 +33,8 @@ Track::~Track()
 void Track::run(AudioBuffer* buffer_out)
 {
 	// Get a buffer for the track.
-	int buffer_size = audioEngine->buffer_size();
-	AudioBuffer* track_buffer = audioEngine->get_buffer();
+	int buffer_size = engine->buffer_size();
+	AudioBuffer* track_buffer = engine->get_buffer();
 	track_buffer->clear();
 
 	// Playlist.
@@ -61,6 +61,8 @@ void Track::run(AudioBuffer* buffer_out)
 			++out;
 			}
 		}
+
+	engine->free_buffer(track_buffer);
 }
 
 

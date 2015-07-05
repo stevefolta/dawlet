@@ -35,7 +35,7 @@ class AudioEngine {
 		static void*	thread_start(void* arg);
 	};
 
-extern AudioEngine* audioEngine;
+extern AudioEngine* engine;
 
 
 #endif 	// !AudioEngine_h

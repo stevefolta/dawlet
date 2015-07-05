@@ -4,12 +4,12 @@
 #include <pthread.h>
 #include <unistd.h>
 
-AudioEngine* audioEngine = nullptr;
+AudioEngine* engine = nullptr;
 
 
 AudioEngine::AudioEngine()
 {
-	audioEngine = this;
+	engine = this;
 
 	cur_sample_rate = 44100;
 	cur_buffer_size = 128;
