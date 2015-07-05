@@ -1,5 +1,5 @@
 PROGRAM := daw
-SOURCES := main.cpp BufferManager.cpp MessageQueue.cpp AudioEngine.cpp
+SOURCES := main.cpp BufferManager.cpp MessageQueue.cpp AudioEngine.cpp Logger.cpp
 OBJECTS_DIR := objects
 
 -include Makefile.local

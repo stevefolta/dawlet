@@ -1,5 +1,6 @@
 #include "AudioEngine.h"
 #include "MessageQueue.h"
+#include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
 
@@ -70,6 +71,7 @@ void AudioEngine::run()
 		Message* message = to->front();
 		switch (message->type) {
 			case Message::EngineKill:
+				log("Engine dying.");
 				from->send(Message::EngineDied);
 				return;
 				break;
