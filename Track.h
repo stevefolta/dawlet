@@ -3,6 +3,7 @@
 
 #include <vector>
 class Project;
+class Playlist;
 class Send;
 class AudioBuffer;
 
@@ -18,6 +19,7 @@ class Track {
 
 	protected:
 		Project*	project;
+		Playlist*	playlist;
 		std::vector<Track*>	children;
 		std::vector<Send*>	sends;
 		std::vector<Send*>	receives;

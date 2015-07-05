@@ -1,6 +1,7 @@
 #include "Track.h"
 #include "BufferManager.h"
 #include "Project.h"
+#include "Playlist.h"
 #include "Send.h"
 #include "AudioEngine.h"
 #include "Amp.h"
@@ -30,12 +31,15 @@ Track::~Track()
 
 void Track::run(AudioBuffer* bufferOut)
 {
+	// Get a buffer for the track.
 	int buffer_size = audioEngine->buffer_size();
 	AudioBuffer* track_buffer = audioEngine->get_buffer();
 	track_buffer->clear();
 
-	/***/
+	// Playlist.
+	playlist->run(track_buffer);
 
+	// Children.
 	if (!children.empty()) {
 		for (auto it = children.begin(); it != children.end(); ++it) {
 			// Run the child track.
@@ -44,9 +48,10 @@ void Track::run(AudioBuffer* bufferOut)
 			}
 		}
 
+	// Receives.
 	/***/
 
-	// Mix it in to the output buffer.
+	// Mix the track into the output buffer.
 	AudioSample* in = track_buffer->samples;
 	AudioSample* out = bufferOut->samples;
 	for (int samples_left = buffer_size; samples_left > 0; --samples_left) {

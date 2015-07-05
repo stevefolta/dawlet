@@ -1,6 +1,6 @@
 PROGRAM := daw
 SOURCES := main.cpp Logger.cpp
-SOURCES += Project.cpp Track.cpp Send.cpp
+SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 OBJECTS_DIR := objects
 
