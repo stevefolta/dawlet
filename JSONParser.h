@@ -15,6 +15,10 @@ class JSONParser {
 		void	start_array();
 		bool	array_is_done();
 		void	ignore_value();
+		int	next_int();
+		double	next_double();
+		std::string	next_string();
+		bool	next_bool();
 
 		/* How to use the object parsing:
 			parser.start_object();

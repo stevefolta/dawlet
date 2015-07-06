@@ -74,6 +74,56 @@ void JSONParser::ignore_value()
 }
 
 
+int JSONParser::next_int()
+{
+	string token = next_token();
+	const char* str = token.c_str();
+	char* end_ptr = nullptr;
+	int result = strtol(str, &end_ptr, 0);
+	if (end_ptr == str || *end_ptr != 0)
+		throw Exception("json-bad-int");
+	return result;
+}
+
+
+double JSONParser::next_double()
+{
+	string token = next_token();
+	switch (token[0]) {
+		case '0':  case '1':  case '2':  case '3':  case '4':
+		case '5':  case '6':  case '7':  case '8':  case '9':
+		case '-':  case '+':
+			// Okay.
+			break;
+		default:
+			throw Exception("json-bad-double");
+			break;
+		}
+	return strtod(token.c_str(), nullptr);
+}
+
+
+std::string JSONParser::next_string()
+{
+	string token = next_token();
+	if (token[0] != '"')
+		throw Exception("json-bad-string");
+	return string(token.begin() + 1, token.end() - 1);
+}
+
+
+bool JSONParser::next_bool()
+{
+	string token = next_token();
+	if (token == "true")
+		return true;
+	else if (token != "false")
+		throw Exception("json-bad-bool");
+	return false;
+}
+
+
+
 std::string JSONParser::next_token()
 {
 	if (!peeked_token.empty()) {
