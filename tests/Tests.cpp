@@ -7,5 +7,9 @@ void RunTests()
 	extern void TestJSONParser();
 	TestJSONParser();
 #endif
+#ifdef TEST_READ_PROJECT
+	extern void TestReadProject();
+	TestReadProject();
+#endif
 }
 

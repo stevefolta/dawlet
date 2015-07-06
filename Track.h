@@ -6,6 +6,7 @@ class Project;
 class Playlist;
 class Send;
 class AudioBuffer;
+class JSONParser;
 
 
 class Track {
@@ -13,9 +14,12 @@ class Track {
 		Track(Project* project, int id = -1);
 		~Track();
 
+		void	read_json(JSONParser* parser);
+
 		void	run(AudioBuffer* buffer_out);
 
 		int	id;
+		int	max_used_id();
 
 	protected:
 		Project*	project;

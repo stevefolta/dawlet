@@ -5,10 +5,12 @@
 #include "Send.h"
 #include "AudioEngine.h"
 #include "Amp.h"
+#include "JSONParser.h"
+#include "Exception.h"
 
 
 Track::Track(Project* projectIn, int idIn)
-	: project(projectIn)
+	: project(projectIn), playlist(nullptr)
 {
 	id = idIn >=0 ? idIn : project->new_id();
 	gain = 1.0;
@@ -27,6 +29,51 @@ Track::~Track()
 		delete children.back();
 		children.pop_back();
 		}
+	delete playlist;
+}
+
+
+void Track::read_json(JSONParser* parser)
+{
+	parser->start_object();
+	while (true) {
+		std::string field_name = parser->next_field();
+		if (field_name.empty())
+			break;
+		if (field_name == "id")
+			id = parser->next_int();
+		else if (field_name == "playlist") {
+			if (!playlist)
+				playlist = new Playlist();
+			playlist->read_json(parser);
+			}
+		else if (field_name == "children") {
+			parser->start_array();
+			while (!parser->array_is_done()) {
+				Track* track = new Track(project);
+				try {
+					track->read_json(parser);
+					}
+				catch (Exception e) {
+					delete track;
+					throw e;
+					}
+				children.push_back(track);
+				}
+			}
+		else if (field_name == "sends") {
+			// TODO: We don't know how to deal with this yet...
+			parser->ignore_value();
+			}
+		else if (field_name == "gain")
+			gain = parser->next_double();
+		else if (field_name == "sends_to_parent")
+			sends_to_parent = parser->next_bool();
+		else {
+			// This is something from the future; ignore it.
+			parser->ignore_value();
+			}
+		}
 }
 
 
@@ -38,7 +85,8 @@ void Track::run(AudioBuffer* buffer_out)
 	track_buffer->clear();
 
 	// Playlist.
-	playlist->run(track_buffer);
+	if (playlist)
+		playlist->run(track_buffer);
 
 	// Children.
 	if (!children.empty()) {
@@ -63,6 +111,18 @@ void Track::run(AudioBuffer* buffer_out)
 		}
 
 	engine->free_buffer(track_buffer);
+}
+
+
+int Track::max_used_id()
+{
+	int max_id = id;
+	for (auto it = children.begin(); it != children.end(); ++it) {
+		int child_id = (*it)->id;
+		if (child_id > max_id)
+			max_id = child_id;
+		}
+	return max_id;
 }
 
 

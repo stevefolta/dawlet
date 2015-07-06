@@ -10,6 +10,10 @@ ifdef TEST_JSON_PARSER
 	SOURCES += tests/JSONParser.cpp
 	SWITCHES += TEST_JSON_PARSER
 endif
+ifdef TEST_READ_PROJECT
+	SOURCES += tests/ReadProject.cpp
+	SWITCHES += TEST_READ_PROJECT
+endif
 
 ######
 

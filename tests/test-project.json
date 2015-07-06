@@ -1,0 +1,44 @@
+{
+	"master": {
+		"id": 1,
+		"name": "Master",
+		"playlist": {},
+		"children": [
+			{
+				"id": 2,
+				"name": "Drums",
+				"playlist": {},
+				"children": [],
+				"gain": 1.0,
+				"sends_to_parent": true
+			},
+			{
+				"id": 3,
+				"name": "Bass",
+				"playlist": {},
+				"children": [],
+				"gain": 1.0,
+				"sends_to_parent": true
+			},
+			{
+				"id": 4,
+				"name": "Guitar",
+				"playlist": {},
+				"children": [],
+				"gain": 1.0,
+				"sends_to_parent": true
+			},
+			{
+				"id": 5,
+				"name": "Vocal",
+				"playlist": {},
+				"children": [],
+				"gain": 1.0,
+				"sends_to_parent": true
+			}
+			],
+		"gain": 1.0,
+		"sends_to_parent": false
+		}
+}
+
