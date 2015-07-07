@@ -11,6 +11,7 @@ for class in "${classes[@]}"; do
 	done
 
 files+=(Message.h AudioTypes.h Amp.h)
+files+=(Makefile)
 
 $EDITOR "${files[@]}"
 

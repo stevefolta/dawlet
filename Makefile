@@ -2,7 +2,9 @@ PROGRAM := daw
 SOURCES := main.cpp JSONParser.cpp Logger.cpp tests/Tests.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
+SOURCES += web/Server.cpp web/Connection.cpp
 OBJECTS_DIR := objects
+SUBDIRS := web tests
 
 -include Makefile.local
 
@@ -18,6 +20,7 @@ endif
 ######
 
 OBJECTS = $(foreach source,$(SOURCES),$(OBJECTS_DIR)/$(source:.cpp=.o))
+OBJECTS_SUBDIRS = $(foreach dir,$(SUBDIRS),$(OBJECTS_DIR)/$(dir))
 
 ifndef VERBOSE_MAKE
 	QUIET := @
@@ -29,6 +32,7 @@ CFLAGS += -std=c++11 -pthread
 LINK_FLAGS += -pthread
 
 CPP := g++
+CFLAGS += -I.
 CFLAGS += -MMD
 CFLAGS += -g
 CFLAGS += $(foreach switch,$(SWITCHES),-D$(switch))
@@ -45,15 +49,14 @@ $(PROGRAM): $(OBJECTS_DIR) $(OBJECTS)
 
 $(OBJECTS_DIR):
 	@echo "Making $@..."
-	$(QUIET) mkdir $(OBJECTS_DIR)
-	$(QUIET) mkdir -p $(OBJECTS_DIR)/tests
+	$(QUIET) mkdir -p $(OBJECTS_DIR) $(OBJECTS_SUBDIRS)
 
 -include $(OBJECTS_DIR)/*.d
 
 
 .PHONY: runnit
 runnit: $(PROGRAM)
-	@./$(PROGRAM)
+	@./$(PROGRAM) $(RUN_ARGS)
 
 
 .PHONY: clean
