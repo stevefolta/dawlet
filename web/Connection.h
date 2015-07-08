@@ -1,8 +1,12 @@
 #ifndef Connection_h
 #define Connection_h
 
+#include <string>
+
 
 namespace Web {
+
+	class Request;
 
 	class Connection {
 		public:
@@ -14,11 +18,38 @@ namespace Web {
 		protected:
 			enum {
 				buffer_size = 1024,
+				compaction_point = buffer_size / 2,
+				};
+
+			enum {
+				StartingRequest,
+				ReadingHeaders,
+				};
+
+			struct Buffer {
+				int	read, filled;
+				char	data[buffer_size];
+
+				Buffer()
+					: read(0), filled(0) {}
 				};
 
 			int	socket;
+			int	state;
+			Buffer*	buffer;
+			Request*	cur_request;
 
-			void	process_buffer(char* buffer, int size);
+			void	process_buffer();
+			void	compact_buffer();
+			void	start_request();
+			void	read_headers();
+
+			struct LineResult {
+				bool	ok;
+				std::string	line;
+				};
+
+			LineResult	next_line();
 		};
 
 	}

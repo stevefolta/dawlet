@@ -17,12 +17,15 @@ Server::Server(int port)
 	listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listen_socket == -1)
 		throw Exception("socket-open-fail");
+	int yes = 1;
+	int result =
+		setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	int result = bind(listen_socket, (struct sockaddr*) &addr, sizeof(addr));
+	result = bind(listen_socket, (struct sockaddr*) &addr, sizeof(addr));
 	if (result == -1)
 		throw Exception("socket-bind-fail");
 	result = listen(listen_socket, 10);
@@ -65,6 +68,10 @@ bool Server::tick()
 			throw Exception("accept-fail");
 		connections.push_back(new Connection(connection_socket));
 		}
+
+	// Handle connections.
+	for (auto it = connections.begin(); it != connections.end(); ++it)
+		did_something |=  (*it)->tick();
 
 	return did_something;
 }

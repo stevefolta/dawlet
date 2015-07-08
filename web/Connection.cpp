@@ -1,15 +1,22 @@
 #include "Connection.h"
+#include "Request.h"
+#include "FieldParser.h"
 #include "Exception.h"
+#include "Logger.h"
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 using namespace Web;
+using namespace std;
 
 
 Connection::Connection(int socket_in)
-	: socket(socket_in)
+	: socket(socket_in), cur_request(nullptr)
 {
+	buffer = new Buffer();
+	state = StartingRequest;
 }
 
 
@@ -17,6 +24,8 @@ Connection::~Connection()
 {
 	shutdown(socket, SHUT_RDWR);
 	close(socket);
+	delete buffer;
+	delete cur_request;
 }
 
 
@@ -35,13 +44,12 @@ bool Connection::tick()
 	if (result == -1)
 		throw Exception("select-fail");
 	if (result > 0) {
-		char* buffer = (char*) malloc(buffer_size);
-		result = read(socket, buffer, buffer_size);
-		if (result == -1) {
-			free(buffer);
+		result = read(socket, buffer->data, buffer_size - buffer->filled);
+		if (result == -1)
 			throw Exception("read-fail");
-			}
-		process_buffer(buffer, result);
+		buffer->filled += result;
+		process_buffer();
+		compact_buffer();
 		did_something = true;
 		}
 
@@ -49,10 +57,86 @@ bool Connection::tick()
 }
 
 
-void Connection::process_buffer(char* buffer, int size)
+void Connection::process_buffer()
+{
+	switch (state) {
+		case StartingRequest:
+			start_request();
+			break;
+		case ReadingHeaders:
+			read_headers();
+			break;
+		}
+}
+
+
+void Connection::compact_buffer()
+{
+	if (buffer->read >= buffer->filled) {
+		buffer->read = buffer->filled = 0;
+		return;
+		}
+
+	int bytes_left_in_buffer = buffer_size - buffer->read;
+	if (bytes_left_in_buffer > compaction_point)
+		return;
+
+	int bytes_remaining = buffer->filled - buffer->read;
+	memmove(
+		buffer->data,
+		&buffer->data[buffer->read],
+		bytes_remaining);
+	buffer->read = 0;
+	buffer->filled = bytes_remaining;
+}
+
+
+void Connection::start_request()
+{
+	LineResult result = next_line();
+	if (!result.ok)
+		return;
+
+	FieldParser fields(result.line);
+	string type = fields.next_field();
+	string path = fields.next_field();
+	string http_version = fields.next_field();
+	cur_request = new Request(type, path);
+	log(
+		"Request: \"%s\" \"%s\" \"%s\".",
+		type.c_str(), path.c_str(), http_version.c_str());
+
+	// Continue by reading the headers.
+	state = ReadingHeaders;
+	read_headers();
+}
+
+
+void Connection::read_headers()
 {
 	/***/
-	free(buffer);
+}
+
+
+Connection::LineResult Connection::next_line()
+{
+	const char* p = &buffer->data[buffer->read];
+	const char* line_start = p;
+	const char* stopper = &buffer->data[buffer->filled];
+	LineResult result;
+	result.ok = false;
+	while (p < stopper) {
+		char c = *p++;
+		if (c == '\r' && p < stopper && *p == '\n') {
+			const char* line_end = p - 1;
+			++p;
+			buffer->read = p - buffer->data;
+			result.ok = true;
+			result.line = string(line_start, line_end);
+			break;
+			}
+		}
+	return result;
 }
 
 

@@ -1,8 +1,8 @@
 PROGRAM := daw
-SOURCES := main.cpp JSONParser.cpp Logger.cpp tests/Tests.cpp
+SOURCES := main.cpp JSONParser.cpp FieldParser.cpp Logger.cpp tests/Tests.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
-SOURCES += web/Server.cpp web/Connection.cpp
+SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 OBJECTS_DIR := objects
 SUBDIRS := web tests
 

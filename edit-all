@@ -1,7 +1,8 @@
 #!/bin/bash
 
 classes=(Project Track Playlist Send AudioEngine BufferManager AudioBuffer MessageQueue)
-classes+=(JSONParser Logger)
+classes+=(web/Server web/Connection web/Request)
+classes+=(JSONParser FieldParser Logger)
 files=()
 files+=(main.cpp)
 
@@ -11,7 +12,7 @@ for class in "${classes[@]}"; do
 	done
 
 files+=(Message.h AudioTypes.h Amp.h)
-files+=(Makefile)
+files+=(Makefile edit-all)
 
 $EDITOR "${files[@]}"
 

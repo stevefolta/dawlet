@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
 
 		RunTests();
 
-		AudioEngine engine;
+		AudioEngine engine();
 		Web::Server server(port);
-		printf("Listening on http://127.0.0.1:%d/\n", port);
+		printf("Listening on http://localhost:%d/\n", port);
 
 		// The event loop.
 		while (true) {
