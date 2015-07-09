@@ -148,6 +148,11 @@ void Connection::handle_request()
 {
 	/***/
 	//*** error_out("501 Not Implemented");
+
+	error_out("404 Not Found");
+	state = StartingRequest;
+	return;
+
 	const char* html =
 		"<html><head><title>Test</title></head><body>Hello, world.</body></html>\r\n";
 	int html_length = strlen(html);
@@ -156,7 +161,6 @@ void Connection::handle_request()
 	char content_length_header[64];
 	sprintf(content_length_header, "Content-Length: %d", html_length);
 	send_line(content_length_header);
-	send_line("Connection: close");
 	send_line("");
 	send_line(html);
 	send_reply();
@@ -168,6 +172,7 @@ void Connection::error_out(string code)
 {
 	send_buffer->clear();
 	send_line("HTTP/1.1 " + code);
+	send_line("Content-Length: 0");
 	send_line("");
 	send_reply();
 	state = Closed;
