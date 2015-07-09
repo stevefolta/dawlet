@@ -10,6 +10,7 @@ class FieldParser {
 			: line(line_in) {}
 
 		std::string	next_field();
+		std::string	remainder();
 
 	protected:
 		std::string	line;

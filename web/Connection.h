@@ -24,6 +24,7 @@ namespace Web {
 			enum {
 				StartingRequest,
 				ReadingHeaders,
+				ReportingError,
 				};
 
 			struct Buffer {
@@ -43,6 +44,8 @@ namespace Web {
 			void	compact_buffer();
 			void	start_request();
 			void	read_headers();
+			void	handle_request();
+			void	error_out(std::string code);
 
 			struct LineResult {
 				bool	ok;

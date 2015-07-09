@@ -56,4 +56,19 @@ std::string FieldParser::next_field()
 }
 
 
+std::string FieldParser::remainder()
+{
+	// Skip whitespace.
+	auto p = line.begin();
+	auto stopper = line.end();
+	for (; p < stopper; ++p) {
+		char c = *p;
+		if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+			break;
+		}
+
+	return std::string(p, stopper);
+}
+
+
 

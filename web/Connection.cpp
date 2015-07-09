@@ -114,7 +114,42 @@ void Connection::start_request()
 
 void Connection::read_headers()
 {
+	while (true) {
+		LineResult line_result = next_line();
+		if (!line_result.ok)
+			break;
+		string line = line_result.line;
+
+		// End of headers?
+		if (line.empty()) {
+			// Headers are done.
+			handle_request();
+			break;
+			}
+
+		// Header name.
+		FieldParser fields(line);
+		string header_name = fields.next_field();
+		if (header_name.back() != ':')
+			error_out("400 Bad Request");
+		header_name.pop_back();
+
+		// Add the header.
+		cur_request->add_header(header_name, fields.remainder());
+		}
+}
+
+
+void Connection::handle_request()
+{
 	/***/
+}
+
+
+void Connection::error_out(string code)
+{
+	/***/
+	state = ReportingError;
 }
 
 
