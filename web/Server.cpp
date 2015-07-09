@@ -70,8 +70,18 @@ bool Server::tick()
 		}
 
 	// Handle connections.
-	for (auto it = connections.begin(); it != connections.end(); ++it)
-		did_something |=  (*it)->tick();
+	for (auto it = connections.begin(); it != connections.end(); ++it) {
+		Connection* connection = *it;
+		if (connection->is_closed()) {
+			connections.erase(it);
+			delete connection;
+			// The iterator went bad, we'll just have to get to the rest of the
+			// connections on the next tick.
+			break;
+			}
+		else
+			did_something |=  connection->tick();
+		}
 
 	return did_something;
 }

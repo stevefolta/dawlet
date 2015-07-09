@@ -14,6 +14,7 @@ namespace Web {
 			~Connection();
 
 			bool	tick();
+			bool	is_closed() { return state == Closed; }
 
 		protected:
 			enum {
@@ -24,7 +25,7 @@ namespace Web {
 			enum {
 				StartingRequest,
 				ReadingHeaders,
-				ReportingError,
+				Closed,
 				};
 
 			struct Buffer {
@@ -33,12 +34,18 @@ namespace Web {
 
 				Buffer()
 					: read(0), filled(0) {}
+
+				void	clear()
+					{ read = filled = 0; }
+				int	bytes_left()
+					{ return buffer_size - filled; }
 				};
 
 			int	socket;
 			int	state;
 			Buffer*	buffer;
 			Request*	cur_request;
+			Buffer*	send_buffer;
 
 			void	process_buffer();
 			void	compact_buffer();
@@ -53,6 +60,11 @@ namespace Web {
 				};
 
 			LineResult	next_line();
+
+			void	send_line(std::string line);
+			void	send_line_fragment(std::string text);
+			void	send_reply();
+			void	flush_send_buffer();
 		};
 
 	}

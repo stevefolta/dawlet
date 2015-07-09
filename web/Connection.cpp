@@ -16,6 +16,7 @@ Connection::Connection(int socket_in)
 	: socket(socket_in), cur_request(nullptr)
 {
 	buffer = new Buffer();
+	send_buffer = new Buffer();
 	state = StartingRequest;
 }
 
@@ -24,6 +25,7 @@ Connection::~Connection()
 {
 	shutdown(socket, SHUT_RDWR);
 	close(socket);
+	delete send_buffer;
 	delete buffer;
 	delete cur_request;
 }
@@ -73,7 +75,7 @@ void Connection::process_buffer()
 void Connection::compact_buffer()
 {
 	if (buffer->read >= buffer->filled) {
-		buffer->read = buffer->filled = 0;
+		buffer->clear();
 		return;
 		}
 
@@ -145,13 +147,17 @@ void Connection::read_headers()
 void Connection::handle_request()
 {
 	/***/
+	error_out("501 Not Implemented");
 }
 
 
 void Connection::error_out(string code)
 {
-	/***/
-	state = ReportingError;
+	send_buffer->clear();
+	send_line("HTTP/1.1 " + code);
+	send_line("");
+	send_reply();
+	state = Closed;
 }
 
 
@@ -174,6 +180,54 @@ Connection::LineResult Connection::next_line()
 			}
 		}
 	return result;
+}
+
+
+void Connection::send_line(string line)
+{
+	// Adds the line to the send buffer.
+
+	int length = line.length();
+	if (length + 2 > buffer_size)
+		throw Exception("line-overflow");
+	if (send_buffer->bytes_left() < length + 2)
+		flush_send_buffer();
+
+	memcpy(&send_buffer->data[send_buffer->filled], line.data(), length);
+	send_buffer->filled += length;
+	send_buffer->data[send_buffer->filled++] = '\r';
+	send_buffer->data[send_buffer->filled++] = '\n';
+}
+
+
+void Connection::send_line_fragment(std::string text)
+{
+	// Adds the text to the send buffer.
+	int length = text.length();
+	if (length > buffer_size)
+		throw Exception("line-overflow");
+	if (send_buffer->bytes_left() < length)
+		flush_send_buffer();
+
+	memcpy(&send_buffer->data[send_buffer->filled], text.data(), length);
+	send_buffer->filled += length;
+}
+
+
+void Connection::send_reply()
+{
+	// Finishes sending the reply.
+
+	flush_send_buffer();
+}
+
+
+void Connection::flush_send_buffer()
+{
+	int result = write(socket, send_buffer->data, send_buffer->filled);
+	if (result == -1)
+		throw Exception("send-fail");
+	send_buffer->clear();
 }
 
 
