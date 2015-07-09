@@ -147,7 +147,20 @@ void Connection::read_headers()
 void Connection::handle_request()
 {
 	/***/
-	error_out("501 Not Implemented");
+	//*** error_out("501 Not Implemented");
+	const char* html =
+		"<html><head><title>Test</title></head><body>Hello, world.</body></html>\r\n";
+	int html_length = strlen(html);
+	send_line("HTTP/1.1 200 OK");
+	send_line("Content-Type: text/html");
+	char content_length_header[64];
+	sprintf(content_length_header, "Content-Length: %d", html_length);
+	send_line(content_length_header);
+	send_line("Connection: close");
+	send_line("");
+	send_line(html);
+	send_reply();
+	state = StartingRequest;
 }
 
 
