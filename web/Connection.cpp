@@ -135,7 +135,9 @@ void Connection::read_headers()
 		header_name.pop_back();
 
 		// Add the header.
-		cur_request->add_header(header_name, fields.remainder());
+		string value = fields.remainder();
+		cur_request->add_header(header_name, value);
+		log("Header: \"%s\": \"%s\".", header_name.c_str(), value.c_str());
 		}
 }
 
