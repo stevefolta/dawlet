@@ -51,6 +51,10 @@ bool Connection::tick()
 		result = read(socket, buffer->data, buffer_size - buffer->filled);
 		if (result == -1)
 			throw Exception("read-fail");
+		else if (result == 0) {
+			// EOF: The client closed the connection.
+			state = Closed;
+			}
 		buffer->filled += result;
 		process_buffer();
 		compact_buffer();
