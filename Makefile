@@ -3,8 +3,10 @@ SOURCES := main.cpp JSONParser.cpp FieldParser.cpp Logger.cpp tests/Tests.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
+SOURCES += third-party/sha1-0.2/sha1.cpp
 OBJECTS_DIR := objects
-SUBDIRS := web tests
+SUBDIRS := web tests third-party/sha1-0.2
+THIRD_PARTY_INCLUDES := third-party/sha1-0.2
 
 -include Makefile.local
 
@@ -33,6 +35,7 @@ LINK_FLAGS += -pthread
 
 CPP := g++
 CFLAGS += -I.
+CFLAGS += $(foreach dir,$(THIRD_PARTY_INCLUDES),-I$(dir))
 CFLAGS += -MMD
 CFLAGS += -g
 CFLAGS += $(foreach switch,$(SWITCHES),-D$(switch))
