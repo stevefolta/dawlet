@@ -4,6 +4,8 @@
 #include "Exception.h"
 #include "Logger.h"
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -132,8 +134,10 @@ void Connection::read_headers()
 		// Header name.
 		FieldParser fields(line);
 		string header_name = fields.next_field();
-		if (header_name.back() != ':')
+		if (header_name.back() != ':') {
 			error_out("400 Bad Request");
+			return;
+			}
 		header_name.pop_back();
 
 		// Add the header.
@@ -146,24 +150,68 @@ void Connection::read_headers()
 
 void Connection::handle_request()
 {
-	/***/
-	//*** error_out("501 Not Implemented");
+	if (cur_request == nullptr) {
+		// We're in a bad state, just die.
+		state = Closed;
+		return;
+		}
 
-	error_out("404 Not Found");
-	state = StartingRequest;
-	return;
+	if (cur_request->type() == "GET") {
+		get_file();
+		}
 
-	const char* html =
-		"<html><head><title>Test</title></head><body>Hello, world.</body></html>\r\n";
-	int html_length = strlen(html);
+	else
+		error_out("501 Not Implemented");
+}
+
+
+void Connection::get_file()
+{
+	// Get info about the file.
+	string path;
+	if (cur_request->path() == "/")
+		path = "html/index.html";
+	else
+		path = "html/" + cur_request->path();
+	struct stat file_info;
+	int result = stat(path.c_str(), &file_info);
+	if (result == -1 || !S_ISREG(file_info.st_mode)) {
+		error_out("404 Not Found");
+		return;
+		}
+	off_t size = file_info.st_size;
+
+	// Read the file contents.
+	char* contents = (char*) malloc(size);
+	bool ok = false;
+	FILE* file = fopen(path.c_str(), "r");
+	if (file) {
+		ok = true;
+		result = fread(contents, 1, size, file);
+		if (result != size)
+			ok = false;
+		fclose(file);
+		}
+	if (!ok) {
+		error_out("500 Internal Server Error");
+		free(contents);
+		return;
+		}
+
+	// Send the headers.
 	send_line("HTTP/1.1 200 OK");
-	send_line("Content-Type: text/html");
-	char content_length_header[64];
-	sprintf(content_length_header, "Content-Length: %d", html_length);
-	send_line(content_length_header);
-	send_line("");
-	send_line(html);
-	send_reply();
+	send_content_length(size);
+	send_line_fragment("Content-Type: ");
+	send_line(content_type_for(path));
+	send_line();
+	flush_send_buffer();
+
+	// Send the file contents.
+	result = write(socket, contents, size);
+	if (result == -1)
+		throw Exception("send-fail");
+
+	free(contents);
 	state = StartingRequest;
 }
 
@@ -172,8 +220,9 @@ void Connection::error_out(string code)
 {
 	send_buffer->clear();
 	send_line("HTTP/1.1 " + code);
-	send_line("Content-Length: 0");
-	send_line("");
+	send_content_length(code.length());
+	send_line();
+	send_line_fragment(code);
 	send_reply();
 	state = Closed;
 }
@@ -218,6 +267,15 @@ void Connection::send_line(string line)
 }
 
 
+void Connection::send_line()
+{
+	if (send_buffer->bytes_left() < 2)
+		flush_send_buffer();
+	send_buffer->data[send_buffer->filled++] = '\r';
+	send_buffer->data[send_buffer->filled++] = '\n';
+}
+
+
 void Connection::send_line_fragment(std::string text)
 {
 	// Adds the text to the send buffer.
@@ -246,6 +304,42 @@ void Connection::flush_send_buffer()
 	if (result == -1)
 		throw Exception("send-fail");
 	send_buffer->clear();
+}
+
+
+void Connection::send_content_length(unsigned long length)
+{
+	char content_length_header[64];
+	sprintf(content_length_header, "Content-Length: %lu", length);
+	send_line(content_length_header);
+}
+
+
+std::string Connection::content_type_for(std::string filename)
+{
+	struct ContentType {
+		const char*	suffix;
+		const char*	content_type;
+		};
+	static const ContentType content_types[] = {
+		{ "html", "text/html" },
+		{ "css", "text/css" },
+		{ "js", "application/javascript" },
+		{ nullptr, nullptr }
+		};
+
+	size_t dot_position = filename.rfind('.');
+	if (dot_position != string::npos) {
+		string suffix = filename.substr(dot_position + 1);
+		const ContentType* pair = content_types;
+		for (; pair->suffix; ++pair) {
+			if (suffix == pair->suffix)
+				return pair->content_type;
+			}
+		}
+
+	// Default: "application/octet-stream".
+	return "application/octet-stream";
 }
 
 

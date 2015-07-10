@@ -52,6 +52,7 @@ namespace Web {
 			void	start_request();
 			void	read_headers();
 			void	handle_request();
+			void	get_file();
 			void	error_out(std::string code);
 
 			struct LineResult {
@@ -62,9 +63,12 @@ namespace Web {
 			LineResult	next_line();
 
 			void	send_line(std::string line);
+			void	send_line();
 			void	send_line_fragment(std::string text);
 			void	send_reply();
 			void	flush_send_buffer();
+			void	send_content_length(unsigned long length);
+			std::string	content_type_for(std::string filename);
 		};
 
 	}
