@@ -25,6 +25,8 @@ namespace Web {
 			enum {
 				StartingRequest,
 				ReadingHeaders,
+				AwaitingWebSocketFrame,
+				ReadingWebSocketData,
 				Closed,
 				};
 
@@ -54,6 +56,10 @@ namespace Web {
 			void	handle_request();
 			void	get_file();
 			void	error_out(std::string code);
+
+			void	start_websocket();
+			void	process_websocket_frame();
+			void	read_websocket_data();
 
 			struct LineResult {
 				bool	ok;

@@ -1,8 +1,10 @@
 #include "Connection.h"
 #include "Request.h"
 #include "FieldParser.h"
+#include "Base64.h"
 #include "Exception.h"
 #include "Logger.h"
+#include "sha1.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -73,6 +75,12 @@ void Connection::process_buffer()
 			break;
 		case ReadingHeaders:
 			read_headers();
+			break;
+		case AwaitingWebSocketFrame:
+			process_websocket_frame();
+			break;
+		case ReadingWebSocketData:
+			read_websocket_data();
 			break;
 		}
 }
@@ -161,11 +169,17 @@ void Connection::handle_request()
 		}
 
 	if (cur_request->type() == "GET") {
-		get_file();
+		if (cur_request->path() == "/socket")
+			start_websocket();
+		else
+			get_file();
 		}
 
 	else
 		error_out("501 Not Implemented");
+
+	delete cur_request;
+	cur_request = nullptr;
 }
 
 
@@ -229,6 +243,60 @@ void Connection::error_out(string code)
 	send_line_fragment(code);
 	send_reply();
 	state = Closed;
+}
+
+
+void Connection::start_websocket()
+{
+	static const char* websocket_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+	// Remove any trailing whitespace from the key (we already removed leading
+	// whitespace during header parsing).
+	string key = cur_request->header("Sec-WebSocket-Key");
+	while (!key.empty()) {
+		char c = key.back();
+		if (c == ' ' || c == '\t')
+			key.pop_back();
+		else
+			break;
+		}
+
+	// Check if it's a correct WebSocket upgrade request.
+	if (cur_request->header("Upgrade") != "websocket" ||
+	    cur_request->header("Connection") != "Upgrade" ||
+		 key.empty())
+		error_out("400 Bad Request");
+
+	// Calculate the value to send back.
+	string value = key + websocket_guid;
+	SHA1 sha1;
+	sha1.addBytes(value.data(), value.length());
+	unsigned char* digest = sha1.getDigest();
+	static int digest_length = 20;
+	string accept_value = base64_encode_to_string(digest, digest_length);
+	free(digest);
+
+	// Send the reply.
+	send_line("HTTP/1.1 101 Switching Protocols");
+	send_line("Upgrade: websocket");
+	send_line("Connection: Upgrade");
+	send_line_fragment("Sec-WebSocket-Accept: ");
+	send_line(accept_value);
+	send_line();
+
+	state = AwaitingWebSocketFrame;
+}
+
+
+void Connection::process_websocket_frame()
+{
+	/***/
+}
+
+
+void Connection::read_websocket_data()
+{
+	/***/
 }
 
 

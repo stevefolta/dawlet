@@ -11,5 +11,9 @@ void RunTests()
 	extern void TestReadProject();
 	TestReadProject();
 #endif
+#ifdef TEST_SMALL_TESTS
+	extern void TestSmallTests();
+	TestSmallTests();
+#endif
 }
 

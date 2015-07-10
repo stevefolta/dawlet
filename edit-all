@@ -2,7 +2,7 @@
 
 classes=(Project Track Playlist Send AudioEngine BufferManager AudioBuffer MessageQueue)
 classes+=(web/Server web/Connection web/Request)
-classes+=(JSONParser FieldParser Logger)
+classes+=(JSONParser FieldParser Base64 Logger)
 files=()
 files+=(main.cpp)
 

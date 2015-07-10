@@ -1,9 +1,10 @@
 PROGRAM := daw
-SOURCES := main.cpp JSONParser.cpp FieldParser.cpp Logger.cpp tests/Tests.cpp
+SOURCES := main.cpp JSONParser.cpp FieldParser.cpp Logger.cpp Base64.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 SOURCES += third-party/sha1-0.2/sha1.cpp
+SOURCES += tests/Tests.cpp
 OBJECTS_DIR := objects
 SUBDIRS := web tests third-party/sha1-0.2
 THIRD_PARTY_INCLUDES := third-party/sha1-0.2
@@ -17,6 +18,10 @@ endif
 ifdef TEST_READ_PROJECT
 	SOURCES += tests/ReadProject.cpp
 	SWITCHES += TEST_READ_PROJECT
+endif
+ifdef TEST_SMALL_TESTS
+	SOURCES += tests/SmallTests.cpp
+	SWITCHES += TEST_SMALL_TESTS
 endif
 
 ######

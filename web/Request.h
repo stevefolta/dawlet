@@ -14,6 +14,8 @@ namespace Web {
 
 			void	add_header(std::string name, std::string value)
 				{ headers[name] = value; }
+			std::string	header(std::string name)
+				{ return headers[name]; }
 
 			std::string	type() { return the_type; }
 			std::string	path() { return the_path; }
