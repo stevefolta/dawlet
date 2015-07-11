@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 using namespace Web;
 using namespace std;
@@ -263,7 +264,7 @@ void Connection::start_websocket()
 
 	// Check if it's a correct WebSocket upgrade request.
 	if (cur_request->header("Upgrade") != "websocket" ||
-	    cur_request->header("Connection") != "Upgrade" ||
+	    cur_request->header("Connection").find("Upgrade") == string::npos ||
 		 key.empty())
 		error_out("400 Bad Request");
 
@@ -283,6 +284,7 @@ void Connection::start_websocket()
 	send_line_fragment("Sec-WebSocket-Accept: ");
 	send_line(accept_value);
 	send_line();
+	send_reply();
 
 	state = AwaitingWebSocketFrame;
 }
@@ -290,13 +292,155 @@ void Connection::start_websocket()
 
 void Connection::process_websocket_frame()
 {
-	/***/
+	if (buffer->readable_bytes() < 2) {
+		// We don't have the whole header yet.
+		return;
+		}
+
+	// Read the two required bytes.
+	unsigned char* header_start = (unsigned char*) &buffer->data[buffer->read];
+	unsigned char* p = header_start;
+	bool final_fragment = (*p & 0x80) != 0;
+	unsigned char opcode = *p & 0x7F;
+	++p;
+	bool is_masked = (*p & 0x80) != 0;
+	uint64_t length = *p & 0x7F;
+	++p;
+
+	// Read the extended length.
+	int length_left_to_read = 0;
+	if (length == 126) {
+		length = 0;
+		length_left_to_read = 2;
+		}
+	else if (length == 127) {
+		length = 0;
+		length_left_to_read = 8;
+		}
+	unsigned char* stopper = (unsigned char*) &buffer->data[buffer->filled];
+	if (p + length_left_to_read >= stopper) {
+		// Wait until we get the whole header.
+		return;
+		}
+	while (length_left_to_read > 0) {
+		length <<= 8;
+		length |= *p++;
+		}
+
+	// Read the masking key.
+	if (is_masked) {
+		if (p + 4 >= stopper) {
+			// Wait until we get the whole header.
+			return;
+			}
+		for (int i = 0; i < 4; ++i)
+			masking_key[i] = *p++;
+		}
+
+	// We've read the complete header, prepare to read the data.
+	buffer->read += p - header_start;
+	frame_is_final = final_fragment;
+	frame_is_masked = is_masked;
+	mask_phase = 0;
+	frame_opcode = opcode;
+	frame_length_remaining = length;
+	if (opcode == WS_Text || opcode == WS_Binary)
+		frame_data.clear();
+	control_frame_data.clear();
+	state = ReadingWebSocketData;
+	read_websocket_data();
 }
 
 
 void Connection::read_websocket_data()
 {
-	/***/
+	bool is_control =
+		(frame_opcode != WS_Text && frame_opcode != WS_Binary &&
+		 frame_opcode != WS_Continuation);
+	string* out_string = is_control ? &control_frame_data : &frame_data;
+
+	int length = buffer->readable_bytes();
+	if (length > frame_length_remaining)
+		length = frame_length_remaining;
+
+	// Read the frame data.
+	char* data_start = &buffer->data[buffer->read];
+	char* stopper = data_start + length;
+	if (frame_is_masked) {
+		// Unmask the data before incorporating it.
+		char* p = data_start;
+		char* mask_p = &masking_key[mask_phase];
+		char* mask_stopper = &masking_key[4];
+		while (p < stopper) {
+			*p++ ^= *mask_p++;
+			if (mask_p > mask_stopper)
+				mask_p = masking_key;
+			}
+		mask_phase = mask_p - masking_key;
+		}
+	out_string->append(data_start, stopper - data_start);
+	buffer->read += length;
+	frame_length_remaining -= length;
+
+	// If the frame isn't done, just keep reading.
+	if (frame_length_remaining > 0)
+		return;
+
+	state = AwaitingWebSocketFrame;
+
+	if (!is_control) {
+		if (frame_is_final) {
+			// Message complete.  Pass it up to whoever will handle it.
+			//***
+			log("Got WebSocket message: \"%s\".", frame_data.substr(0, 40).c_str());
+			if (frame_data == "ping")
+				send_websocket_message("pong");
+			}
+		}
+	else if (frame_opcode == WS_CloseConnection) {
+		// Send the reply close frame.
+		send_websocket_control_reply(WS_CloseConnection);
+		state = Closed;
+		}
+	else if (frame_opcode == WS_Ping) {
+		// Send the pong.
+		send_websocket_control_reply(WS_Pong);
+		}
+}
+
+
+void Connection::send_websocket_control_reply(int opcode)
+{
+	// Replies to either close-connection or ping messages include the payload
+	// that was sent in the request.
+
+	send_websocket_message(control_frame_data, opcode);
+}
+
+
+void Connection::send_websocket_message(std::string message, int opcode)
+{
+	// Send the header.
+	unsigned char header[10];
+	unsigned char* p = header;
+	*p++ = 0x80 | opcode;
+	uint64_t length = message.length();
+	if (length <= 125)
+		*p++ = length;
+	else if (length > 0x0FFFF) {
+		*p++ = 127;
+		for (int shift = 64 - 8; shift >= 0; shift -= 8)
+			*p++ = (length >> shift) & 0x00FF;
+		}
+	else {
+		*p++ = 126;
+		*p++ = (length >> 8) & 0x00FF;
+		*p++ = length & 0x00FF;
+		}
+	send_data(header, p - header);
+
+	// Send the payload.
+	send_data(message.data(), length);
 }
 
 
@@ -376,6 +520,14 @@ void Connection::flush_send_buffer()
 	if (result == -1)
 		throw Exception("send-fail");
 	send_buffer->clear();
+}
+
+
+void Connection::send_data(const void* data, size_t length)
+{
+	ssize_t result = write(socket, data, length);
+	if (result == -1)
+		throw Exception("send-fail");
 }
 
 

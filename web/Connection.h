@@ -30,6 +30,17 @@ namespace Web {
 				Closed,
 				};
 
+			// WebSocket opcodes.
+			enum {
+				WS_Continuation = 0x0,
+				WS_Text = 0x1,
+				WS_Binary = 0x2,
+				WS_CloseConnection = 0x8,
+				WS_Ping = 0x9,
+				WS_Pong = 0xA,
+				};
+
+
 			struct Buffer {
 				int	read, filled;
 				char	data[buffer_size];
@@ -41,6 +52,8 @@ namespace Web {
 					{ read = filled = 0; }
 				int	bytes_left()
 					{ return buffer_size - filled; }
+				int	readable_bytes()
+					{ return filled - read; }
 				};
 
 			int	socket;
@@ -60,6 +73,16 @@ namespace Web {
 			void	start_websocket();
 			void	process_websocket_frame();
 			void	read_websocket_data();
+			void	send_websocket_control_reply(int opcode);
+			void	send_websocket_message(std::string message, int opcode = WS_Text);
+
+			char	masking_key[4];
+			int	mask_phase;
+			bool	frame_is_final, frame_is_masked;
+			char	frame_opcode;
+			uint64_t	frame_length_remaining;
+			std::string	frame_data;
+			std::string	control_frame_data;
 
 			struct LineResult {
 				bool	ok;
@@ -73,6 +96,7 @@ namespace Web {
 			void	send_line_fragment(std::string text);
 			void	send_reply();
 			void	flush_send_buffer();
+			void	send_data(const void* data, size_t length);
 			void	send_content_length(unsigned long length);
 			std::string	content_type_for(std::string filename);
 		};
