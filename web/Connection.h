@@ -3,6 +3,8 @@
 
 #include <string>
 
+class DAW;
+
 
 namespace Web {
 
@@ -10,11 +12,13 @@ namespace Web {
 
 	class Connection {
 		public:
-			Connection(int socket_in);
+			Connection(int socket_in, DAW* daw);
 			~Connection();
 
 			bool	tick();
 			bool	is_closed() { return state == Closed; }
+
+			void	send_websocket_message(std::string message, int opcode = WS_Text);
 
 		protected:
 			enum {
@@ -56,6 +60,7 @@ namespace Web {
 					{ return filled - read; }
 				};
 
+			DAW*	daw;
 			int	socket;
 			int	state;
 			Buffer*	buffer;
@@ -74,7 +79,6 @@ namespace Web {
 			void	process_websocket_frame();
 			void	read_websocket_data();
 			void	send_websocket_control_reply(int opcode);
-			void	send_websocket_message(std::string message, int opcode = WS_Text);
 
 			char	masking_key[4];
 			int	mask_phase;

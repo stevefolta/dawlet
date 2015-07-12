@@ -1,5 +1,6 @@
 #include "Connection.h"
 #include "Request.h"
+#include "DAW.h"
 #include "FieldParser.h"
 #include "Base64.h"
 #include "Exception.h"
@@ -17,8 +18,8 @@ using namespace Web;
 using namespace std;
 
 
-Connection::Connection(int socket_in)
-	: socket(socket_in), cur_request(nullptr)
+Connection::Connection(int socket_in, DAW* daw_in)
+	: daw(daw_in), socket(socket_in), cur_request(nullptr)
 {
 	buffer = new Buffer();
 	send_buffer = new Buffer();
@@ -390,11 +391,10 @@ void Connection::read_websocket_data()
 
 	if (!is_control) {
 		if (frame_is_final) {
-			// Message complete.  Pass it up to whoever will handle it.
-			//***
+			// Message complete.  Pass it up to the DAW to handle it.
 			log("Got WebSocket message: \"%s\".", frame_data.substr(0, 40).c_str());
-			if (frame_data == "ping")
-				send_websocket_message("pong");
+			daw->handle_ui_message(frame_data, this);
+			//***
 			}
 		}
 	else if (frame_opcode == WS_CloseConnection) {

@@ -1,5 +1,6 @@
 PROGRAM := daw
-SOURCES := main.cpp JSONParser.cpp FieldParser.cpp Logger.cpp Base64.cpp
+SOURCES := main.cpp DAW.cpp
+SOURCES += JSONParser.cpp FieldParser.cpp Logger.cpp Base64.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp

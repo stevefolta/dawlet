@@ -3,6 +3,8 @@
 
 #include <vector>
 
+class DAW;
+
 
 namespace Web {
 
@@ -10,12 +12,13 @@ namespace Web {
 
 	class Server {
 		public:
-			Server(int port);
+			Server(int port, DAW* daw);
 			~Server();
 
 			bool	tick();
 
 		protected:
+			DAW*	daw;
 			int	listen_socket;
 			std::vector<Connection*>	connections;
 		};

@@ -1,12 +1,10 @@
-#include "AudioEngine.h"
-#include "web/Server.h"
+#include "DAW.h"
 #include "Logger.h"
 #include "Exception.h"
 #include "tests/Tests.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 
 int main(int argc, char* argv[])
@@ -39,16 +37,8 @@ int main(int argc, char* argv[])
 
 		RunTests();
 
-		AudioEngine engine();
-		Web::Server server(port);
-		printf("Listening on http://localhost:%d/\n", port);
-
-		// The event loop.
-		while (true) {
-			bool did_something = server.tick();
-			if (!did_something)
-				usleep(10000);
-			}
+		DAW daw(port);
+		daw.run();
 		}
 	catch (Exception e) {
 		fprintf(stderr, "Exception: %s.\n", e.type.c_str());

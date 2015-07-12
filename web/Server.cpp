@@ -1,5 +1,6 @@
 #include "Server.h"
 #include "Connection.h"
+#include "DAW.h"
 #include "Exception.h"
 #include "Logger.h"
 #include <sys/socket.h>
@@ -11,7 +12,8 @@
 using namespace Web;
 
 
-Server::Server(int port)
+Server::Server(int port, DAW* daw_in)
+	: daw(daw_in)
 {
 	// Set up the listen socket.
 	listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -66,7 +68,7 @@ bool Server::tick()
 		int connection_socket = accept(listen_socket, NULL, NULL);
 		if (connection_socket == -1)
 			throw Exception("accept-fail");
-		connections.push_back(new Connection(connection_socket));
+		connections.push_back(new Connection(connection_socket, daw));
 		}
 
 	// Handle connections.
