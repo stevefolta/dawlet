@@ -10,6 +10,7 @@ MessageQueue::MessageQueue()
 {
 	capacity = defaultCapacity;
 	ring = new Message[capacity];
+	head = tail = 0;
 }
 
 
