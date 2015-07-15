@@ -13,13 +13,12 @@ class AudioFile {
 		struct Info {
 			int	sample_rate;
 			int	num_channels;
+			int	bits_per_sample;
 			uint64_t	length_in_samples;
 			};
 
-		virtual Info	read_info() = 0;
-
 	protected:
-		string	path;
+		std::string	path;
 		int	id;
 		Info	info;
 	};
