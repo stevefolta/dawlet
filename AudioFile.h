@@ -3,11 +3,15 @@
 
 #include <string>
 
+class ProjectReader;
+
 
 class AudioFile {
 	public:
 		AudioFile(std::string path_in, int id_in = 0)
 			: path(path_in), id(id_in) {}
+		AudioFile(int id_in)
+			: id(id_in) {}
 		virtual ~AudioFile();
 
 		struct Info {
@@ -17,9 +21,12 @@ class AudioFile {
 			uint64_t	length_in_samples;
 			};
 
-	protected:
+		void	read_json(ProjectReader* reader);
+
 		std::string	path;
 		int	id;
+
+	protected:
 		Info	info;
 	};
 

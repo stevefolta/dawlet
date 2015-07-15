@@ -6,7 +6,7 @@ class Project;
 class Playlist;
 class Send;
 class AudioBuffer;
-class JSONParser;
+class ProjectReader;
 
 
 class Track {
@@ -14,7 +14,7 @@ class Track {
 		Track(Project* project, int id = -1);
 		~Track();
 
-		void	read_json(JSONParser* parser);
+		void	read_json(ProjectReader* reader);
 
 		void	run(AudioBuffer* buffer_out);
 

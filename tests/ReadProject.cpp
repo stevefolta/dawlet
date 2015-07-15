@@ -1,4 +1,4 @@
-#include "../JSONParser.h"
+#include "../ProjectReader.h"
 #include "../Project.h"
 #include "../Exception.h"
 #include <stdio.h>
@@ -24,8 +24,8 @@ void TestReadProject()
 	// Read the project.
 	Project* project = new Project();
 	try {
-		JSONParser parser(text);
-		project->read_json(&parser);
+		ProjectReader reader(text, project);
+		project->read_json(&reader);
 		printf("Project read succeded.\n");
 		}
 	catch (Exception& e) {

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-classes=(DAW Project Track Playlist Send)
+classes=(DAW Project Track Playlist Clip Send)
 classes+=(AudioEngine BufferManager AudioBuffer MessageQueue)
 classes+=(web/Server web/Connection web/Request)
 classes+=(AudioFile OpenAudioFile WAVFile RIFF)
-classes+=(JSONParser FieldParser Base64 Logger)
+classes+=(JSONParser FieldParser ProjectReader Base64 Logger)
 files=()
 files+=(main.cpp)
 

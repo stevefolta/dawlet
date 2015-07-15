@@ -5,7 +5,7 @@
 #include "Send.h"
 #include "AudioEngine.h"
 #include "Amp.h"
-#include "JSONParser.h"
+#include "ProjectReader.h"
 #include "Exception.h"
 
 
@@ -33,26 +33,26 @@ Track::~Track()
 }
 
 
-void Track::read_json(JSONParser* parser)
+void Track::read_json(ProjectReader* reader)
 {
-	parser->start_object();
+	reader->start_object();
 	while (true) {
-		std::string field_name = parser->next_field();
+		std::string field_name = reader->next_field();
 		if (field_name.empty())
 			break;
 		if (field_name == "id")
-			id = parser->next_int();
+			id = reader->next_int();
 		else if (field_name == "playlist") {
 			if (!playlist)
 				playlist = new Playlist();
-			playlist->read_json(parser);
+			playlist->read_json(reader);
 			}
 		else if (field_name == "children") {
-			parser->start_array();
-			while (!parser->array_is_done()) {
+			reader->start_array();
+			while (!reader->array_is_done()) {
 				Track* track = new Track(project);
 				try {
-					track->read_json(parser);
+					track->read_json(reader);
 					}
 				catch (Exception e) {
 					delete track;
@@ -63,15 +63,15 @@ void Track::read_json(JSONParser* parser)
 			}
 		else if (field_name == "sends") {
 			// TODO: We don't know how to deal with this yet...
-			parser->ignore_value();
+			reader->ignore_value();
 			}
 		else if (field_name == "gain")
-			gain = parser->next_double();
+			gain = reader->next_double();
 		else if (field_name == "sends_to_parent")
-			sends_to_parent = parser->next_bool();
+			sends_to_parent = reader->next_bool();
 		else {
 			// This is something from the future; ignore it.
-			parser->ignore_value();
+			reader->ignore_value();
 			}
 		}
 }
