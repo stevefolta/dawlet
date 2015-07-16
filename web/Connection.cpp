@@ -52,7 +52,11 @@ bool Connection::tick()
 	if (result == -1)
 		throw Exception("select-fail");
 	if (result > 0) {
-		result = read(socket, buffer->data, buffer_size - buffer->filled);
+		result =
+			read(
+				socket,
+				buffer->data + buffer->filled,
+				buffer_size - buffer->filled);
 		if (result == -1)
 			throw Exception("read-fail");
 		else if (result == 0) {
@@ -406,6 +410,9 @@ void Connection::read_websocket_data()
 		// Send the pong.
 		send_websocket_control_reply(WS_Pong);
 		}
+
+	if (state != Closed)
+		process_websocket_frame();
 }
 
 
