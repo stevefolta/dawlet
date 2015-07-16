@@ -3,15 +3,20 @@
 
 struct Message {
 	enum {
+		None,
+
 		EngineStart,
 		EngineStop,
 		EngineStarted,
 		EngineStopped,
 		EngineKill,
 		EngineDied,
+
+		ContinueProcess,
 		};
 
 	int	type;
+	void*	param;
 	};
 
 

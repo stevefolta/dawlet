@@ -2,6 +2,7 @@
 #define AudioEngine_h
 
 #include "BufferManager.h"
+#include "Message.h"
 class MessageQueue;
 
 
@@ -21,7 +22,10 @@ class AudioEngine {
 		void	free_buffer(AudioBuffer* buffer)
 			{ bufferManager->free_buffer(buffer); }
 
-		void	send(int message);
+		void	send(int message, void* param = nullptr);
+		Message	next_message_from();
+
+		double	play_head;
 
 	protected:
 		int	cur_sample_rate;

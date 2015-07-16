@@ -18,7 +18,7 @@ function load() {
 		}
 	websocket.onopen = function (event) {
 		try {
-			websocket.send("ping");
+			websocket.send("get-play-head");
 			}
 		catch (e) {
 			log("Websocket send failed!");

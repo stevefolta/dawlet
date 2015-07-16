@@ -1,5 +1,6 @@
 #include "AudioEngine.h"
 #include "MessageQueue.h"
+#include "Process.h"
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
@@ -13,6 +14,8 @@ AudioEngine::AudioEngine()
 
 	cur_sample_rate = 44100;
 	cur_buffer_size = 128;
+
+	play_head = 0.0;
 
 	bufferManager = new BufferManager;
 	to = new MessageQueue();
@@ -58,28 +61,60 @@ void AudioEngine::stop()
 }
 
 
-void AudioEngine::send(int message)
+void AudioEngine::send(int message, void* param)
 {
-	to->send(message);
+	to->send(message, param);
+}
+
+
+Message AudioEngine::next_message_from()
+{
+	Message result;
+
+	if (from->is_empty())
+		result.type = Message::None;
+	else {
+		result = *from->front();
+		from->pop();
+		}
+
+	return result;
 }
 
 
 void AudioEngine::run()
 {
-	// First, handle messages from the non-realtime thread.
-	while (!to->is_empty()) {
-		Message* message = to->front();
-		switch (message->type) {
-			case Message::EngineKill:
-				log("Engine dying.");
-				from->send(Message::EngineDied);
-				return;
-				break;
-			}
-		to->pop();
-		}
+	while (true) {
+		// First, handle messages from the non-realtime thread.
+		while (!to->is_empty()) {
+			Message* message = to->front();
+			switch (message->type) {
 
-	/***/
+				case Message::EngineKill:
+					log("Engine dying.");
+					from->send(Message::EngineDied);
+					return;
+					break;
+
+				case Message::ContinueProcess:
+					{
+						Process* process = (Process*) message->param;
+						process->next();
+						from->send(Message::ContinueProcess, process);
+						}
+					break;
+
+				}
+			to->pop();
+			}
+
+		// Prepare the next buffer.
+		/***/
+
+		// Send the buffer to the interface.
+		/***/
+		usleep(10000);
+		}
 }
 
 

@@ -5,6 +5,7 @@ SOURCES += Logger.cpp Base64.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Clip.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
+SOURCES += GetPBHeadProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp
 SOURCES += third-party/sha1-0.2/sha1.cpp
 SOURCES += tests/Tests.cpp

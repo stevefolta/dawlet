@@ -45,6 +45,17 @@ void MessageQueue::send(int message)
 }
 
 
+void MessageQueue::send(int message, void* param)
+{
+	Message* msg = back();
+	if (msg) {
+		msg->type = message;
+		msg->param = param;
+		push();
+		}
+}
+
+
 Message* MessageQueue::front()
 {
 	if (is_empty())
