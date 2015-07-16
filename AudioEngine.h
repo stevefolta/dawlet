@@ -27,6 +27,8 @@ class AudioEngine {
 		void	send(int message, void* param = nullptr);
 		void	start_process(Process* process)
 			{ send(Message::ContinueProcess, process); }
+		void	continue_process(Process* process)
+			{ send(Message::ContinueProcess, process); }
 		Message	next_message_from();
 		void	return_process(Process* process);
 

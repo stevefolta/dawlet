@@ -4,6 +4,7 @@
 #include <string>
 
 class AudioEngine;
+class AudioFileRead;
 namespace Web {
 	class Server;
 	class Connection;
@@ -20,10 +21,15 @@ class DAW {
 
 		void	handle_ui_message(std::string message, Web::Connection* connection);
 
+		void	add_file_read(AudioFileRead* read);
+
 	protected:
 		AudioEngine*	engine;
 		Web::Server*	server;
+		AudioFileRead*	active_reads;
 		bool	running;
+
+		bool	handle_file_reads();
 	};
 
 

@@ -1,5 +1,6 @@
 #include "DAW.h"
 #include "AudioEngine.h"
+#include "AudioFileRead.h"
 #include "web/Server.h"
 #include "web/Connection.h"
 #include "FieldParser.h"
@@ -13,11 +14,12 @@ using namespace std;
 
 
 DAW::DAW(int server_port)
+	: active_reads(nullptr)
 {
 	engine = new AudioEngine();
 
 	// Give the audio engine some of what it needs.
-	engine->start_process(new SupplyReadsProcess(8));
+	engine->start_process(new SupplyReadsProcess(this, 8));
 
 	// Start up the webserver.
 	server = new Web::Server(server_port, this);
@@ -71,13 +73,15 @@ bool DAW::tick()
 				}
 				break;
 			case Message::NeedMoreReadRequests:
-				engine->start_process(new SupplyReadsProcess(message.num));
+				engine->start_process(new SupplyReadsProcess(this, message.num));
 				break;
 			}
+		if (have_messages)
+			did_something = true;
 		}
 
 	// Read-ahead for audio files.
-	//***
+	did_something |= handle_file_reads();
 
 	return did_something;
 }
@@ -93,6 +97,35 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		engine->send(Message::ContinueProcess, new GetPBHeadProcess(connection));
 		}
 	/***/
+}
+
+
+void DAW::add_file_read(AudioFileRead* read)
+{
+	read->next_read = active_reads;
+	active_reads = read;
+}
+
+
+bool DAW::handle_file_reads()
+{
+	bool did_something = false;
+
+	AudioFileRead** last_link = &active_reads;
+	while (*last_link) {
+		AudioFileRead* read = *last_link;
+		if (read->read_is_complete()) {
+			// Unlink it from the list.
+			*last_link = read->next_read;
+			did_something = true;
+			}
+		else {
+			// Go to the next read in the list.
+			last_link = &read->next_read;
+			}
+		}
+
+	return did_something;
 }
 
 

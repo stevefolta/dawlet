@@ -41,7 +41,7 @@ endif
 all: runnit
 
 CFLAGS += -std=c++11 -pthread
-LINK_FLAGS += -pthread
+LINK_FLAGS += -pthread -lrt
 
 CPP := g++
 CFLAGS += -I.

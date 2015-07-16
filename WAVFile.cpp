@@ -11,6 +11,8 @@ enum {
 WAVFile::WAVFile(std::string path)
 	: OpenAudioFile(path)
 {
+	info.sample_rate = 0;
+
 	// Find where the samples are.
 	char fourcc[4];
 	int32_t chunk_length;
@@ -30,16 +32,21 @@ WAVFile::WAVFile(std::string path)
 	if (data_chunk_size < 0)
 		throw_error();
 	samples_offset = lseek(fd, 0, SEEK_CUR);
+
+	// We want to have our info, so read it whether we're asked for it or not.
+	read_info();
 }
 
 
 AudioFile::Info WAVFile::read_info()
 {
+	if (info.sample_rate != 0)
+		return info;
+
 	long chunk_size = seek_chunk("fmt ");
 	if (chunk_size < 14)
 		throw_error();
 
-	AudioFile::Info info;
 	int16_t word;
 	int result = read(fd, &word, sizeof(word));
 	if (result != sizeof(word))
@@ -68,6 +75,20 @@ AudioFile::Info WAVFile::read_info()
 		throw Exception("unspported-WAV-format");
 
 	info.length_in_samples = data_chunk_size / (info.bits_per_sample / 8);
+
+	return info;
+}
+
+
+unsigned long WAVFile::offset_for_frame(unsigned long which_frame)
+{
+	return samples_offset + size_of_frames(which_frame);
+}
+
+
+unsigned long WAVFile::size_of_frames(unsigned long num_frames)
+{
+	return num_frames * info.num_channels * (info.bits_per_sample / 8);
 }
 
 

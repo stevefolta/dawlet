@@ -1,9 +1,14 @@
 #include "AudioFileRead.h"
+#include "AudioEngine.h"
+#include "OpenAudioFile.h"
+#include "DAW.h"
+#include "Exception.h"
 #include <stdlib.h>
+#include <string.h>
 
 
-AudioFileRead::AudioFileRead()
-	: next_free(nullptr), state(Waiting), buffer(nullptr)
+AudioFileRead::AudioFileRead(DAW* daw_in)
+	: daw(daw_in), next_read(nullptr), state(Waiting), buffer(nullptr)
 {
 }
 
@@ -24,7 +29,68 @@ bool AudioFileRead::is_done()
 void AudioFileRead::next()
 {
 	switch (state) {
+		case StartingRead:
+			start_read();
+			break;
+		case Installing:
+			install();
+			break;
 		}
+}
+
+
+void AudioFileRead::request_read(
+	AudioFile* file_in,
+	unsigned long start_frame_in, unsigned long num_frames_in)
+{
+	file = file_in;
+	start_frame = start_frame_in;
+	num_frames = num_frames_in;
+
+	state = StartingRead;
+	engine->return_process(this);
+}
+
+
+void AudioFileRead::start_read()
+{
+	// Allocate the buffer.
+	OpenAudioFile* open_file = file->open();
+	buffer_size = open_file->size_of_frames(num_frames);
+	buffer = (char*) malloc(buffer_size);
+
+	// Start the read.
+	memset(&async_read, 0, sizeof(async_read));
+	async_read.aio_fildes = open_file->fd;
+	async_read.aio_offset = open_file->offset_for_frame(start_frame);
+	async_read.aio_buf = buffer;
+	async_read.aio_nbytes = buffer_size;
+	async_read.aio_reqprio = 0;
+	async_read.aio_sigevent.sigev_notify = SIGEV_NONE;
+	int result = aio_read(&async_read);
+	if (result == -1)
+		throw Exception("aio-read-fail");
+
+	state = Reading;
+	daw->add_file_read(this);
+}
+
+
+bool AudioFileRead::read_is_complete()
+{
+	if (aio_error(&async_read) == EINPROGRESS)
+		return false;
+
+	state = Installing;
+	engine->continue_process(this);
+	return true;
+}
+
+
+void AudioFileRead::install()
+{
+	/***/
+	state = Playing;
 }
 
 

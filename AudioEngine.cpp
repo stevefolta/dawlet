@@ -94,7 +94,7 @@ void AudioEngine::return_process(Process* process)
 
 void AudioEngine::receive_audio_file_read(AudioFileRead* read_request)
 {
-	read_request->next_free = free_read_requests;
+	read_request->next_read = free_read_requests;
 	free_read_requests = read_request;
 	num_free_read_requests += 1;
 }
@@ -105,8 +105,8 @@ AudioFileRead* AudioEngine::next_audio_file_read()
 	AudioFileRead* result = free_read_requests;
 	if (result == nullptr)
 		return result;
-	free_read_requests = result->next_free;
-	result->next_free = nullptr;
+	free_read_requests = result->next_read;
+	result->next_read = nullptr;
 	num_free_read_requests -= 1;
 	return result;
 }
