@@ -4,7 +4,7 @@
 #include "BufferManager.h"
 #include "Message.h"
 class MessageQueue;
-class AudioFileReadRequest;
+class AudioFileRead;
 class Process;
 
 
@@ -32,8 +32,8 @@ class AudioEngine {
 
 		double	play_head;
 
-		void	receive_audio_file_read_request(AudioFileReadRequest* read_request);
-		AudioFileReadRequest*	next_audio_file_read_request();
+		void	receive_audio_file_read(AudioFileRead* read_request);
+		AudioFileRead*	next_audio_file_read();
 
 	protected:
 		int	cur_sample_rate;
@@ -43,7 +43,7 @@ class AudioEngine {
 		MessageQueue*	to;
 		MessageQueue*	from;
 
-		AudioFileReadRequest*	free_read_requests;
+		AudioFileRead*	free_read_requests;
 		int	num_free_read_requests;
 
 		void	run();

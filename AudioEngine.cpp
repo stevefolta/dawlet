@@ -1,7 +1,7 @@
 #include "AudioEngine.h"
 #include "MessageQueue.h"
 #include "Process.h"
-#include "AudioFileReadRequest.h"
+#include "AudioFileRead.h"
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
@@ -92,7 +92,7 @@ void AudioEngine::return_process(Process* process)
 }
 
 
-void AudioEngine::receive_audio_file_read_request(AudioFileReadRequest* read_request)
+void AudioEngine::receive_audio_file_read(AudioFileRead* read_request)
 {
 	read_request->next_free = free_read_requests;
 	free_read_requests = read_request;
@@ -100,9 +100,9 @@ void AudioEngine::receive_audio_file_read_request(AudioFileReadRequest* read_req
 }
 
 
-AudioFileReadRequest* AudioEngine::next_audio_file_read_request()
+AudioFileRead* AudioEngine::next_audio_file_read()
 {
-	AudioFileReadRequest* result = free_read_requests;
+	AudioFileRead* result = free_read_requests;
 	if (result == nullptr)
 		return result;
 	free_read_requests = result->next_free;

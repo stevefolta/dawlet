@@ -5,7 +5,7 @@
 #include "FieldParser.h"
 #include "Message.h"
 #include "GetPBHeadProcess.h"
-#include "SupplyReadRequestsProcess.h"
+#include "SupplyReadsProcess.h"
 #include <unistd.h>
 #include <stdio.h>
 
@@ -17,7 +17,7 @@ DAW::DAW(int server_port)
 	engine = new AudioEngine();
 
 	// Give the audio engine some of what it needs.
-	engine->start_process(new SupplyReadRequestsProcess(8));
+	engine->start_process(new SupplyReadsProcess(8));
 
 	// Start up the webserver.
 	server = new Web::Server(server_port, this);
@@ -71,7 +71,7 @@ bool DAW::tick()
 				}
 				break;
 			case Message::NeedMoreReadRequests:
-				engine->start_process(new SupplyReadRequestsProcess(message.num));
+				engine->start_process(new SupplyReadsProcess(message.num));
 				break;
 			}
 		}
