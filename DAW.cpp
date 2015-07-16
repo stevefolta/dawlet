@@ -17,7 +17,7 @@ DAW::DAW(int server_port)
 	engine = new AudioEngine();
 
 	// Give the audio engine some of what it needs.
-	engine->start_process(new SupplyReadRequestsProcess());
+	engine->start_process(new SupplyReadRequestsProcess(8));
 
 	// Start up the webserver.
 	server = new Web::Server(server_port, this);
@@ -55,15 +55,24 @@ bool DAW::tick()
 	bool did_something = server->tick();
 
 	// Handle messages from the engine.
-	while (true) {
+	bool have_messages = true;
+	while (have_messages) {
 		Message message = engine->next_message_from();
-		if (message.type == Message::None)
-			break;
-		else if (message.type == Message::ContinueProcess) {
-			Process* process = (Process*) message.param;
-			process->next();
-			if (process->is_done())
-				delete process;
+		switch (message.type) {
+			case Message::None:
+				have_messages = false;
+				break;
+			case Message::ContinueProcess:
+				{
+				Process* process = (Process*) message.param;
+				process->next();
+				if (process->is_done())
+					delete process;
+				}
+				break;
+			case Message::NeedMoreReadRequests:
+				engine->start_process(new SupplyReadRequestsProcess(message.num));
+				break;
 			}
 		}
 

@@ -13,10 +13,16 @@ struct Message {
 		EngineDied,
 
 		ContinueProcess,
+
+		// Engine -> DAW.
+		NeedMoreReadRequests,
 		};
 
 	int	type;
-	void*	param;
+	union {
+		void*	param;
+		int	num;
+		};
 	};
 
 

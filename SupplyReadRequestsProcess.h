@@ -7,7 +7,7 @@ class AudioFileReadRequest;
 
 class SupplyReadRequestsProcess : public Process {
 	public:
-		SupplyReadRequestsProcess();
+		SupplyReadRequestsProcess(int num_requests_in);
 		~SupplyReadRequestsProcess();
 
 		bool	is_done() ;
@@ -24,6 +24,7 @@ class SupplyReadRequestsProcess : public Process {
 			num_requests = 8,
 			};
 
+		AudioFileReadRequest*	next_request;
 		AudioFileReadRequest*	requests[num_requests];
 
 		void	supplying();

@@ -138,6 +138,13 @@ void AudioEngine::run()
 			to->pop();
 			}
 
+		// Make sure we have enough free AudioFileReadRequests.
+		if (num_free_read_requests < 40 /* TODO: project->num_tracks() * factor */) {
+			from->send(
+				Message::NeedMoreReadRequests,
+				40 - num_free_read_requests /* TODO */);
+			}
+
 		// Prepare the next buffer.
 		/***/
 

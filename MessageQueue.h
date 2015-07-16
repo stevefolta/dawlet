@@ -17,6 +17,7 @@ class MessageQueue {
 		void	push();
 		void	send(int message); 	// Send a simple message with no parameters.
 		void	send(int message, void* param);
+		void	send(int message, int num);
 
 		// Receiving.
 		Message*	front();

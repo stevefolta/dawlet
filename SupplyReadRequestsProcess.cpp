@@ -4,10 +4,15 @@
 #include "Logger.h"
 
 
-SupplyReadRequestsProcess::SupplyReadRequestsProcess()
+SupplyReadRequestsProcess::SupplyReadRequestsProcess(int num_requests)
 {
-	for (int i = 0; i < num_requests; ++i)
-		requests[i] = new AudioFileReadRequest();
+	AudioFileReadRequest* last_request = nullptr;
+	for (; num_requests > 0; --num_requests) {
+		next_request = new AudioFileReadRequest();
+		next_request->next_free = last_request;
+		last_request = next_request;
+		}
+
 	state = Supplying;
 }
 
@@ -39,9 +44,11 @@ void SupplyReadRequestsProcess::next()
 
 void SupplyReadRequestsProcess::supplying()
 {
-	for (int i = 0; i < num_requests; ++i) {
-		engine->receive_audio_file_read_request(requests[i]);
-		requests[i] = nullptr;
+	while (next_request) {
+		AudioFileReadRequest* request = next_request;
+		next_request = request->next_free;
+		request->next_free = nullptr;
+		engine->receive_audio_file_read_request(request);
 		}
 
 	state = Done;
