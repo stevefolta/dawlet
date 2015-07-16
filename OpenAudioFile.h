@@ -3,7 +3,6 @@
 
 #include "AudioFile.h"
 #include <string>
-#include <stdio.h>
 
 
 class OpenAudioFile {
@@ -14,7 +13,7 @@ class OpenAudioFile {
 		virtual AudioFile::Info	read_info() = 0;
 
 	protected:
-		FILE*	file;
+		int	fd;
 	};
 
 

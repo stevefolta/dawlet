@@ -1,6 +1,7 @@
 #include "WAVFile.h"
 #include "RIFF.h"
 #include "Exception.h"
+#include <unistd.h>
 
 enum {
 	WAVE_FORMAT_PCM = 1,
@@ -13,12 +14,14 @@ WAVFile::WAVFile(std::string path)
 	// Find where the samples are.
 	char fourcc[4];
 	int32_t chunk_length;
-	rewind(file);
-	int result = fread(fourcc, 1, sizeof(fourcc), file);
+	int result = lseek(fd, 0, SEEK_SET);
+	if (result == -1)
+		throw_error();
+	result = read(fd, fourcc, sizeof(fourcc));
 	if (result != sizeof(fourcc) || !fourcc_eq(fourcc, "WAVE"))
 		throw_error();
 	long uber_chunk_size;
-	result = fread(&uber_chunk_size, 1, sizeof(uber_chunk_size), file);
+	result = read(fd, &uber_chunk_size, sizeof(uber_chunk_size));
 	if (result != sizeof(uber_chunk_size))
 		throw_error();
 	uber_chunk_size = read_dword(&uber_chunk_size);
@@ -26,7 +29,7 @@ WAVFile::WAVFile(std::string path)
 	data_chunk_size = seek_chunk("data");
 	if (data_chunk_size < 0)
 		throw_error();
-	samples_offset = ftell(file);
+	samples_offset = lseek(fd, 0, SEEK_CUR);
 }
 
 
@@ -38,26 +41,26 @@ AudioFile::Info WAVFile::read_info()
 
 	AudioFile::Info info;
 	int16_t word;
-	int result = fread(&word, 1, sizeof(word), file);
+	int result = read(fd, &word, sizeof(word));
 	if (result != sizeof(word))
 		throw_error();
 	int16_t format_tag = read_word(&word);
 	if (format_tag != WAVE_FORMAT_PCM)
 		throw Exception("unsupported-WAV-format");
-	result = fread(&word, 1, sizeof(word), file);
+	result = read(fd, &word, sizeof(word));
 	if (result != sizeof(word))
 		throw_error();
 	info.num_channels = read_word(&word);
 	int32_t dword;
-	result = fread(&dword, 1, sizeof(dword), file);
+	result = read(fd, &dword, sizeof(dword));
 	if (result != sizeof(dword))
 		throw_error();
 	info.sample_rate = read_dword(&dword);
 	// We don't care about "nAvgBytesPerSec" or "nBlockAlign", skip them.
-	result = fseek(file, 4 + 2, SEEK_CUR);
+	result = lseek(fd, 4 + 2, SEEK_CUR);
 	if (result < 0)
 		throw_error();
-	result = fread(&word, 1, sizeof(word), file);
+	result = read(fd, &word, sizeof(word));
 	if (result != sizeof(word))
 		throw_error();
 	info.bits_per_sample = read_word(&word);
@@ -71,18 +74,18 @@ AudioFile::Info WAVFile::read_info()
 long WAVFile::seek_chunk(const char* fourcc)
 {
 	long position = RIFF::chunk_header_size;
-	int result = fseek(file, position, SEEK_SET);
+	int result = lseek(fd, position, SEEK_SET);
 	if (result == -1)
 		throw_error();
 
 	while (position < file_end) {
 		// Read the next chunk header.
 		char chunk_fourcc[4];
-		result = fread(chunk_fourcc, 1, sizeof(chunk_fourcc), file);
+		result = read(fd, chunk_fourcc, sizeof(chunk_fourcc));
 		if (result != sizeof(chunk_fourcc))
 			throw_error();
 		long chunk_size;
-		result = fread(&chunk_size, 1, sizeof(chunk_size), file);
+		result = read(fd, &chunk_size, sizeof(chunk_size));
 		if (result != sizeof(chunk_size))
 			throw_error();
 		chunk_size = read_dword(&chunk_size);
@@ -94,7 +97,7 @@ long WAVFile::seek_chunk(const char* fourcc)
 
 		// Keep looking.
 		position += chunk_size;
-		result = fseek(file, position, SEEK_SET);
+		result = lseek(fd, position, SEEK_SET);
 		if (result == -1)
 			throw_error();
 		}
