@@ -21,6 +21,9 @@ AudioEngine::AudioEngine()
 	to = new MessageQueue();
 	from = new MessageQueue();
 
+	for (int i = 0; i < max_read_requests; ++i)
+		read_requests[i] = nullptr;
+
 	pthread_t thread;
 	pthread_create(&thread, nullptr, &thread_start, this);
 }
@@ -79,6 +82,29 @@ Message AudioEngine::next_message_from()
 		}
 
 	return result;
+}
+
+
+void AudioEngine::return_process(Process* process)
+{
+	from->send(Message::ContinueProcess, process);
+}
+
+
+int AudioEngine::receive_audio_file_read_requests(int num_requests, AudioFileReadRequest** requests)
+{
+	int next_request = 0;
+
+	for (int i = 0; i < max_read_requests; ++i) {
+		if (read_requests[i] == nullptr) {
+			read_requests[i] = requests[next_request++];
+			if (next_request >= num_requests)
+				break;
+			}
+		}
+
+	// Returns the number of requests taken.
+	return next_request;
 }
 
 

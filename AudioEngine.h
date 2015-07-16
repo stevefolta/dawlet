@@ -4,6 +4,8 @@
 #include "BufferManager.h"
 #include "Message.h"
 class MessageQueue;
+class AudioFileReadRequest;
+class Process;
 
 
 class AudioEngine {
@@ -23,9 +25,14 @@ class AudioEngine {
 			{ bufferManager->free_buffer(buffer); }
 
 		void	send(int message, void* param = nullptr);
+		void	start_process(Process* process)
+			{ send(Message::ContinueProcess, process); }
 		Message	next_message_from();
+		void	return_process(Process* process);
 
 		double	play_head;
+
+		int	receive_audio_file_read_requests(int num_requests, AudioFileReadRequest** requests);
 
 	protected:
 		int	cur_sample_rate;
@@ -34,6 +41,11 @@ class AudioEngine {
 		BufferManager*	bufferManager;
 		MessageQueue*	to;
 		MessageQueue*	from;
+
+		enum {
+			max_read_requests = 40,
+			};
+		AudioFileReadRequest*	read_requests[max_read_requests];
 
 		void	run();
 		static void*	thread_start(void* arg);

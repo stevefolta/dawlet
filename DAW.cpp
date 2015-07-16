@@ -5,6 +5,7 @@
 #include "FieldParser.h"
 #include "Message.h"
 #include "GetPBHeadProcess.h"
+#include "SupplyReadRequestsProcess.h"
 #include <unistd.h>
 #include <stdio.h>
 
@@ -14,8 +15,12 @@ using namespace std;
 DAW::DAW(int server_port)
 {
 	engine = new AudioEngine();
-	server = new Web::Server(server_port, this);
 
+	// Give the audio engine some of what it needs.
+	engine->start_process(new SupplyReadRequestsProcess());
+
+	// Start up the webserver.
+	server = new Web::Server(server_port, this);
 	printf("Listening on http://localhost:%d/\n", server_port);
 }
 
