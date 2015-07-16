@@ -374,7 +374,7 @@ void Connection::read_websocket_data()
 		char* mask_stopper = &masking_key[4];
 		while (p < stopper) {
 			*p++ ^= *mask_p++;
-			if (mask_p > mask_stopper)
+			if (mask_p >= mask_stopper)
 				mask_p = masking_key;
 			}
 		mask_phase = mask_p - masking_key;
