@@ -29,7 +29,7 @@ void GetPBHeadProcess::in_engine()
 void GetPBHeadProcess::replying()
 {
 	char msg[64];
-	sprintf(msg, "play-head %g", position);
+	sprintf(msg, "play-head %.20g", position);
 	connection->send_websocket_message(msg);
 	state = Done;
 }
