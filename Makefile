@@ -1,4 +1,4 @@
-PROGRAM := daw
+PROGRAM := dawlet
 SOURCES := main.cpp DAW.cpp
 SOURCES += ProjectReader.cpp JSONParser.cpp FieldParser.cpp
 SOURCES += Logger.cpp Base64.cpp
