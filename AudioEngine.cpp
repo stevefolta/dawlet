@@ -1,6 +1,7 @@
 #include "AudioEngine.h"
 #include "MessageQueue.h"
 #include "Process.h"
+#include "AudioFileReadRequest.h"
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
@@ -21,8 +22,8 @@ AudioEngine::AudioEngine()
 	to = new MessageQueue();
 	from = new MessageQueue();
 
-	for (int i = 0; i < max_read_requests; ++i)
-		read_requests[i] = nullptr;
+	free_read_requests = nullptr;
+	num_free_read_requests = 0;
 
 	pthread_t thread;
 	pthread_create(&thread, nullptr, &thread_start, this);
@@ -91,20 +92,23 @@ void AudioEngine::return_process(Process* process)
 }
 
 
-int AudioEngine::receive_audio_file_read_requests(int num_requests, AudioFileReadRequest** requests)
+void AudioEngine::receive_audio_file_read_request(AudioFileReadRequest* read_request)
 {
-	int next_request = 0;
+	read_request->next_free = free_read_requests;
+	free_read_requests = read_request;
+	num_free_read_requests += 1;
+}
 
-	for (int i = 0; i < max_read_requests; ++i) {
-		if (read_requests[i] == nullptr) {
-			read_requests[i] = requests[next_request++];
-			if (next_request >= num_requests)
-				break;
-			}
-		}
 
-	// Returns the number of requests taken.
-	return next_request;
+AudioFileReadRequest* AudioEngine::next_audio_file_read_request()
+{
+	AudioFileReadRequest* result = free_read_requests;
+	if (result == nullptr)
+		return result;
+	free_read_requests = result->next_free;
+	result->next_free = nullptr;
+	num_free_read_requests -= 1;
+	return result;
 }
 
 

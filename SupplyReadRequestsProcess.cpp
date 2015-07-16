@@ -39,10 +39,10 @@ void SupplyReadRequestsProcess::next()
 
 void SupplyReadRequestsProcess::supplying()
 {
-	int num_taken =
-		engine->receive_audio_file_read_requests(num_requests, requests);
-	for (int i = 0; i < num_taken; ++i)
+	for (int i = 0; i < num_requests; ++i) {
+		engine->receive_audio_file_read_request(requests[i]);
 		requests[i] = nullptr;
+		}
 
 	state = Done;
 }

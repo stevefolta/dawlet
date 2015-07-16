@@ -32,7 +32,8 @@ class AudioEngine {
 
 		double	play_head;
 
-		int	receive_audio_file_read_requests(int num_requests, AudioFileReadRequest** requests);
+		void	receive_audio_file_read_request(AudioFileReadRequest* read_request);
+		AudioFileReadRequest*	next_audio_file_read_request();
 
 	protected:
 		int	cur_sample_rate;
@@ -42,10 +43,8 @@ class AudioEngine {
 		MessageQueue*	to;
 		MessageQueue*	from;
 
-		enum {
-			max_read_requests = 40,
-			};
-		AudioFileReadRequest*	read_requests[max_read_requests];
+		AudioFileReadRequest*	free_read_requests;
+		int	num_free_read_requests;
 
 		void	run();
 		static void*	thread_start(void* arg);
