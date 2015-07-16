@@ -4,6 +4,7 @@ SOURCES += ProjectReader.cpp JSONParser.cpp FieldParser.cpp
 SOURCES += Logger.cpp Base64.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Clip.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
+SOURCES += AudioFileRead.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 SOURCES += GetPBHeadProcess.cpp SupplyReadsProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp

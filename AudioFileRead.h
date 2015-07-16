@@ -1,15 +1,29 @@
 #ifndef AudioFileRead_h
 #define AudioFileRead_h
 
+#include "Process.h"
 
-class AudioFileRead {
+
+class AudioFileRead : public Process {
 	public:
-		AudioFileRead()
-			: next_free(nullptr) {}
+		AudioFileRead();
+		~AudioFileRead();
+
+		bool	is_done();
+		void	next();
 
 		AudioFileRead*	next_free;
+		char*	buffer;
 
 	protected:
+		enum {
+			Waiting,
+			StartingRead,
+			Reading,
+			Playing,
+			Done
+			};
+		int state;
 	};
 
 
