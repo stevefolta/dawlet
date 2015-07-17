@@ -158,6 +158,7 @@ void DAW::open_project(std::string path)
 	try {
 		ProjectReader reader(text, project);
 		project->read_json(&reader);
+		project->load_audio_file_info();
 		engine->start_process(new InstallProjectProcess(project));
 		}
 	catch (Exception& e) {

@@ -80,6 +80,8 @@ bool AudioFileRead::read_is_complete()
 	if (aio_error(&async_read) == EINPROGRESS)
 		return false;
 
+	clip->file->close();
+
 	state = Playing;
 	engine->continue_process(this);
 	return true;

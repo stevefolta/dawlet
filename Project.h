@@ -25,6 +25,7 @@ class Project {
 		void	add_file(AudioFile* file);
 
 		int	get_dirfd();
+		void	load_audio_file_info();
 
 	protected:
 		std::string	path;

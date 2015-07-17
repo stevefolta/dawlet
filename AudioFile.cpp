@@ -34,6 +34,14 @@ void AudioFile::read_json(ProjectReader* reader)
 }
 
 
+void AudioFile::load_info()
+{
+	OpenAudioFile* open_file = open();
+	info = open_file->read_info();
+	close();
+}
+
+
 OpenAudioFile* AudioFile::open()
 {
 	if (open_file == nullptr) {

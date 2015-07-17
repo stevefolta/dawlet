@@ -105,4 +105,11 @@ int Project::get_dirfd()
 }
 
 
+void Project::load_audio_file_info()
+{
+	for (auto it = files.begin(); it != files.end(); ++it)
+		(*it)->load_info();
+}
+
+
 

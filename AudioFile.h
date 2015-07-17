@@ -24,6 +24,7 @@ class AudioFile {
 		Info	info;
 
 		void	read_json(ProjectReader* reader);
+		void	load_info();
 
 		OpenAudioFile*	open();
 		void	close();
