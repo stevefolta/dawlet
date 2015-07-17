@@ -1,12 +1,16 @@
 #include "DAW.h"
 #include "AudioEngine.h"
 #include "AudioFileRead.h"
+#include "Project.h"
+#include "ProjectReader.h"
 #include "web/Server.h"
 #include "web/Connection.h"
 #include "FieldParser.h"
 #include "Message.h"
 #include "GetPBHeadProcess.h"
 #include "SupplyReadsProcess.h"
+#include "InstallProjectProcess.h"
+#include "Exception.h"
 #include <unistd.h>
 #include <stdio.h>
 
@@ -96,7 +100,10 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 	else if (command == "get-play-head") {
 		engine->send(Message::ContinueProcess, new GetPBHeadProcess(connection));
 		}
-	/***/
+	else if (command == "open-project") {
+		string path = fields.next_field();
+		open_project(path);
+		}
 }
 
 
@@ -126,6 +133,40 @@ bool DAW::handle_file_reads()
 		}
 
 	return did_something;
+}
+
+
+void DAW::open_project(std::string path)
+{
+	// Read the file into "text".
+	FILE* file = fopen(path.c_str(), "r");
+	if (file == NULL) {
+		/***/
+		fprintf(stderr, "Couldn't open %s!\n", path.c_str());
+		return;
+		}
+	fseek(file, 0, SEEK_END);
+	int size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	char* contents = (char*) malloc(size);
+	fread(contents, size, 1, file);
+	fclose(file);
+	std::string text(contents, contents + size);
+
+	// Read the project.
+	Project* project = new Project(path);
+	try {
+		ProjectReader reader(text, project);
+		project->read_json(&reader);
+		engine->start_process(new InstallProjectProcess(project));
+		}
+	catch (Exception& e) {
+		/***/
+		fprintf(stderr, "Reading project failed: %s.\n", e.type.c_str());
+		}
+
+	// Clean up.
+	free(contents);
 }
 
 

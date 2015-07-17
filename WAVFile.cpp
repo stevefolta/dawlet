@@ -8,8 +8,8 @@ enum {
 	};
 
 
-WAVFile::WAVFile(std::string path)
-	: OpenAudioFile(path)
+WAVFile::WAVFile(std::string path, int dirfd)
+	: OpenAudioFile(path, dirfd)
 {
 	info.sample_rate = 0;
 
@@ -20,14 +20,17 @@ WAVFile::WAVFile(std::string path)
 	if (result == -1)
 		throw_error();
 	result = read(fd, fourcc, sizeof(fourcc));
-	if (result != sizeof(fourcc) || !fourcc_eq(fourcc, "WAVE"))
+	if (result != sizeof(fourcc) || !fourcc_eq(fourcc, "RIFF"))
 		throw_error();
-	long uber_chunk_size;
+	int32_t uber_chunk_size;
 	result = read(fd, &uber_chunk_size, sizeof(uber_chunk_size));
 	if (result != sizeof(uber_chunk_size))
 		throw_error();
 	uber_chunk_size = read_dword(&uber_chunk_size);
 	file_end = RIFF::chunk_header_size + uber_chunk_size;
+	result = read(fd, fourcc, sizeof(fourcc));
+	if (result != sizeof(fourcc) || !fourcc_eq(fourcc, "WAVE"))
+		throw_error();
 	data_chunk_size = seek_chunk("data");
 	if (data_chunk_size < 0)
 		throw_error();
@@ -95,7 +98,7 @@ unsigned long WAVFile::size_of_frames(unsigned long num_frames)
 
 long WAVFile::seek_chunk(const char* fourcc)
 {
-	long position = RIFF::chunk_header_size;
+	long position = RIFF::chunk_header_size + 4;
 	int result = lseek(fd, position, SEEK_SET);
 	if (result == -1)
 		throw_error();
@@ -106,7 +109,7 @@ long WAVFile::seek_chunk(const char* fourcc)
 		result = read(fd, chunk_fourcc, sizeof(chunk_fourcc));
 		if (result != sizeof(chunk_fourcc))
 			throw_error();
-		long chunk_size;
+		int32_t chunk_size;
 		result = read(fd, &chunk_size, sizeof(chunk_size));
 		if (result != sizeof(chunk_size))
 			throw_error();

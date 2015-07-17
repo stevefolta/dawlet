@@ -6,7 +6,7 @@
 
 class WAVFile : public OpenAudioFile {
 	public:
-		WAVFile(std::string path);
+		WAVFile(std::string path, int dirfd);
 
 		AudioFile::Info	read_info();
 		unsigned long	offset_for_frame(unsigned long which_frame);

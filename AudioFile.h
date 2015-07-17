@@ -4,14 +4,12 @@
 #include <string>
 
 class ProjectReader;
+class Project;
 class OpenAudioFile;
 
 
 class AudioFile {
 	public:
-		AudioFile(std::string path_in, int id_in = 0)
-			: path(path_in), id(id_in), open_file(nullptr), num_opens(0)
-			{ init(); }
 		AudioFile(int id_in)
 			: id(id_in), open_file(nullptr), num_opens(0)
 			{ init(); }
@@ -34,6 +32,7 @@ class AudioFile {
 		int	id;
 
 	protected:
+		Project*	project;
 		OpenAudioFile*	open_file;
 		int	num_opens;
 

@@ -22,7 +22,7 @@ void TestReadProject()
 	std::string text(contents, contents + size);
 
 	// Read the project.
-	Project* project = new Project();
+	Project* project = new Project(path);
 	try {
 		ProjectReader reader(text, project);
 		project->read_json(&reader);

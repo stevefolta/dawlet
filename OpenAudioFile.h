@@ -7,7 +7,7 @@
 
 class OpenAudioFile {
 	public:
-		OpenAudioFile(std::string path);
+		OpenAudioFile(std::string path, int dirfd);
 		virtual ~OpenAudioFile();
 
 		virtual AudioFile::Info	read_info() = 0;

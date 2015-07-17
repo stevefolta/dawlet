@@ -5,7 +5,7 @@
 class Project;
 
 
-class InstallProjectProcess : public Project {
+class InstallProjectProcess : public Process {
 	public:
 		InstallProjectProcess(Project* project_in)
 			: project(project_in), state(Installing) {}

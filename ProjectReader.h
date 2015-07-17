@@ -32,6 +32,8 @@ class ProjectReader {
 
 		static int	string_to_id(std::string str);
 
+		Project*	get_project() { return project; }
+
 	protected:
 		Project*	project;
 		std::map<int, Track*>	tracks;

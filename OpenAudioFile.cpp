@@ -6,9 +6,9 @@
 #include <unistd.h>
 
 
-OpenAudioFile::OpenAudioFile(std::string path)
+OpenAudioFile::OpenAudioFile(std::string path, int dirfd)
 {
-	fd = open(path.c_str(), O_RDONLY);
+	fd = openat(dirfd, path.c_str(), O_RDONLY);
 	if (fd == -1)
 		throw Exception("open-file-error");
 }

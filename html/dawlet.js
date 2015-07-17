@@ -11,6 +11,11 @@ function log(message) {
 
 function load() {
 	log("Loaded page.");
+
+	document.getElementById("open-project").onclick = function() {
+		websocket.send("open-project \"test/test.json\"");
+		};
+
 	document.getElementById("start_message").textContent = "...in progress...";
 	websocket = new WebSocket("ws://localhost:8080/socket");
 	websocket.onmessage = function (event) {

@@ -1,6 +1,7 @@
 #include "AudioFile.h"
 #include "ProjectReader.h"
 #include "WAVFile.h"
+#include "Project.h"
 #include "Exception.h"
 
 
@@ -18,6 +19,8 @@ AudioFile::~AudioFile()
 
 void AudioFile::read_json(ProjectReader* reader)
 {
+	project = reader->get_project();
+
 	reader->start_object();
 	while (true) {
 		std::string field_name = reader->next_field();
@@ -39,7 +42,7 @@ OpenAudioFile* AudioFile::open()
 			throw Exception("unsupported-audio-file-type");
 		std::string suffix = path.substr(dot_position + 1);
 		if (suffix == "wav" || suffix == "WAV")
-			open_file = new WAVFile(path);
+			open_file = new WAVFile(path, project->get_dirfd());
 		else
 			throw Exception("unsupported-audio-file-type");
 		if (info.sample_rate == 0)

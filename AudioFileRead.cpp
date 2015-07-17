@@ -4,6 +4,7 @@
 #include "OpenAudioFile.h"
 #include "DAW.h"
 #include "Exception.h"
+#include "Logger.h"
 #include <stdlib.h>
 #include <string.h>
 
