@@ -74,7 +74,8 @@ AudioFile::Info WAVFile::read_info()
 	if (info.bits_per_sample != 16 && info.bits_per_sample != 24)
 		throw Exception("unspported-WAV-format");
 
-	info.length_in_samples = data_chunk_size / (info.bits_per_sample / 8);
+	info.length_in_frames =
+		data_chunk_size / ((info.bits_per_sample / 8) * info.num_channels);
 
 	return info;
 }

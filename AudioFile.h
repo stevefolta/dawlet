@@ -21,8 +21,9 @@ class AudioFile {
 			int	sample_rate;
 			int	num_channels;
 			int	bits_per_sample;
-			uint64_t	length_in_samples;
+			uint64_t	length_in_frames;
 			};
+		Info	info;
 
 		void	read_json(ProjectReader* reader);
 
@@ -33,7 +34,6 @@ class AudioFile {
 		int	id;
 
 	protected:
-		Info	info;
 		OpenAudioFile*	open_file;
 		int	num_opens;
 

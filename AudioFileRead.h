@@ -3,7 +3,7 @@
 
 #include "Process.h"
 #include <aio.h>
-class AudioFile;
+class Clip;
 class DAW;
 
 
@@ -16,15 +16,21 @@ class AudioFileRead : public Process {
 		void	next();
 
 		void	request_read(
-			AudioFile* file, unsigned long start_frame, unsigned long num_frames);
+			Clip* clip, unsigned long start_frame, unsigned long num_frames);
 		bool	read_is_complete();
+		void	dispose();
 
 		// When in a linked list.
 		AudioFileRead*	next_read;
 
-		// Valid after read.
+		// Valid after read requested.
+		unsigned long	start_frame, num_frames;
+
+		// Valid after read complete.
 		char*	buffer;
 		unsigned long	buffer_size;
+
+		unsigned long	end_frame() { return num_frames - start_frame; }
 
 	protected:
 		DAW*	daw;
@@ -33,19 +39,15 @@ class AudioFileRead : public Process {
 			Waiting,
 			StartingRead,
 			Reading,
-			Installing,
 			Playing,
 			Done
 			};
 		int state;
 
-		AudioFile*	file;
-		unsigned long	start_frame, num_frames;
+		Clip*	clip;
 
 		void	start_read();
 		struct aiocb	async_read;
-
-		void	install();
 	};
 
 

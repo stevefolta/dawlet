@@ -44,4 +44,11 @@ void Playlist::run(AudioBuffer* buffer_out)
 }
 
 
+void Playlist::read_ahead()
+{
+	for (auto it = clips.begin(); it != clips.end(); ++it)
+		(*it)->read_ahead();
+}
+
+
 

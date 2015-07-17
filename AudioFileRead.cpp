@@ -1,5 +1,6 @@
 #include "AudioFileRead.h"
 #include "AudioEngine.h"
+#include "Clip.h"
 #include "OpenAudioFile.h"
 #include "DAW.h"
 #include "Exception.h"
@@ -32,18 +33,15 @@ void AudioFileRead::next()
 		case StartingRead:
 			start_read();
 			break;
-		case Installing:
-			install();
-			break;
 		}
 }
 
 
 void AudioFileRead::request_read(
-	AudioFile* file_in,
+	Clip* clip_in,
 	unsigned long start_frame_in, unsigned long num_frames_in)
 {
-	file = file_in;
+	clip = clip_in;
 	start_frame = start_frame_in;
 	num_frames = num_frames_in;
 
@@ -55,7 +53,7 @@ void AudioFileRead::request_read(
 void AudioFileRead::start_read()
 {
 	// Allocate the buffer.
-	OpenAudioFile* open_file = file->open();
+	OpenAudioFile* open_file = clip->file->open();
 	buffer_size = open_file->size_of_frames(num_frames);
 	buffer = (char*) malloc(buffer_size);
 
@@ -81,16 +79,16 @@ bool AudioFileRead::read_is_complete()
 	if (aio_error(&async_read) == EINPROGRESS)
 		return false;
 
-	state = Installing;
+	state = Playing;
 	engine->continue_process(this);
 	return true;
 }
 
 
-void AudioFileRead::install()
+void AudioFileRead::dispose()
 {
-	/***/
-	state = Playing;
+	state = Done;
+	engine->continue_process(this);
 }
 
 

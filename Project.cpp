@@ -58,6 +58,12 @@ void Project::run(AudioBuffer* buffer_out)
 }
 
 
+void Project::read_ahead()
+{
+	master->read_ahead();
+}
+
+
 int Project::new_id()
 {
 	return ++next_new_id;

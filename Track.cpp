@@ -114,6 +114,16 @@ void Track::run(AudioBuffer* buffer_out)
 }
 
 
+void Track::read_ahead()
+{
+	if (playlist)
+		playlist->read_ahead();
+
+	for (auto it = children.begin(); it != children.end(); ++it)
+		(*it)->read_ahead();
+}
+
+
 int Track::max_used_id()
 {
 	int max_id = id;

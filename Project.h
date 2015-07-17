@@ -16,6 +16,7 @@ class Project {
 		void	read_json(ProjectReader* reader);
 
 		void	run(AudioBuffer* buffer_out);
+		void	read_ahead();
 
 		int	new_id();
 		int	max_used_id();

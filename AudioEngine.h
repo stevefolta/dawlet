@@ -37,6 +37,10 @@ class AudioEngine {
 		void	receive_audio_file_read(AudioFileRead* read_request);
 		AudioFileRead*	next_audio_file_read();
 
+		enum {
+			read_ahead_seconds = 2,
+			};
+
 	protected:
 		int	cur_sample_rate;
 		int	cur_buffer_size;
