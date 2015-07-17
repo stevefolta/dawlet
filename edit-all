@@ -7,6 +7,8 @@ classes+=(AudioFile OpenAudioFile WAVFile RIFF)
 classes+=(AudioFileRead)
 classes+=(JSONParser FieldParser ProjectReader Base64 Logger)
 classes+=(Process GetPBHeadProcess SupplyReadsProcess InstallProjectProcess)
+classes+=(AudioSystem AudioInterface)
+classes+=(ALSAAudioSystem ALSAAudioInterface)
 files=()
 files+=(main.cpp)
 

@@ -10,9 +10,11 @@
 #include "GetPBHeadProcess.h"
 #include "SupplyReadsProcess.h"
 #include "InstallProjectProcess.h"
+#include "ALSAAudioSystem.h"
 #include "Exception.h"
 #include <unistd.h>
 #include <stdio.h>
+#include <sstream>
 
 using namespace std;
 
@@ -20,6 +22,8 @@ using namespace std;
 DAW::DAW(int server_port)
 	: active_reads(nullptr)
 {
+	audio_system = new ALSAAudioSystem();
+
 	engine = new AudioEngine();
 
 	// Give the audio engine some of what it needs.
@@ -103,6 +107,21 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 	else if (command == "open-project") {
 		string path = fields.next_field();
 		open_project(path);
+		}
+	else if (command == "list-interfaces") {
+		vector<string> interfaces = audio_system->list_interfaces();
+		stringstream reply;
+		reply << "interfaces [";
+		bool did_one = false;
+		for (auto it = interfaces.begin(); it != interfaces.end(); ++it) {
+			if (did_one)
+				reply << ", ";
+			else
+				did_one = true;
+			reply << '"' << *it << '"';
+			}
+		reply << "]";
+		connection->send_websocket_message(reply.str());
 		}
 }
 

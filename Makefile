@@ -8,6 +8,8 @@ SOURCES += AudioFileRead.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 SOURCES += GetPBHeadProcess.cpp SupplyReadsProcess.cpp InstallProjectProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp
+SOURCES += AudioSystem.cpp
+SOURCES += ALSAAudioSystem.cpp
 SOURCES += third-party/sha1-0.2/sha1.cpp
 SOURCES += tests/Tests.cpp
 OBJECTS_DIR := objects
@@ -42,6 +44,7 @@ all: runnit
 
 CFLAGS += -std=c++11 -pthread
 LINK_FLAGS += -pthread -lrt
+LINK_FLAGS += -lasound
 
 CPP := g++
 CFLAGS += -I.
