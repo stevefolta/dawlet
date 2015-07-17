@@ -6,7 +6,7 @@ classes+=(web/Server web/Connection web/Request)
 classes+=(AudioFile OpenAudioFile WAVFile RIFF)
 classes+=(AudioFileRead)
 classes+=(JSONParser FieldParser ProjectReader Base64 Logger)
-classes+=(Process GetPBHeadProcess SupplyReadsProcess)
+classes+=(Process GetPBHeadProcess SupplyReadsProcess InstallProjectProcess)
 files=()
 files+=(main.cpp)
 

@@ -6,6 +6,7 @@
 class MessageQueue;
 class AudioFileRead;
 class Process;
+class Project;
 
 
 class AudioEngine {
@@ -32,6 +33,8 @@ class AudioEngine {
 		Message	next_message_from();
 		void	return_process(Process* process);
 
+		Project*	install_project(Project* new_project);
+
 		double	play_head;
 
 		void	receive_audio_file_read(AudioFileRead* read_request);
@@ -44,6 +47,7 @@ class AudioEngine {
 	protected:
 		int	cur_sample_rate;
 		int	cur_buffer_size;
+		bool	playing;
 
 		BufferManager*	bufferManager;
 		MessageQueue*	to;
@@ -51,6 +55,8 @@ class AudioEngine {
 
 		AudioFileRead*	free_read_requests;
 		int	num_free_read_requests;
+
+		Project*	project;
 
 		void	run();
 		static void*	thread_start(void* arg);

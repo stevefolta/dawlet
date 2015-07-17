@@ -2,6 +2,7 @@
 #include "MessageQueue.h"
 #include "Process.h"
 #include "AudioFileRead.h"
+#include "Project.h"
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
@@ -17,6 +18,8 @@ AudioEngine::AudioEngine()
 	cur_buffer_size = 128;
 
 	play_head = 0.0;
+	playing = false;
+	project = nullptr;
 
 	bufferManager = new BufferManager;
 	to = new MessageQueue();
@@ -50,6 +53,7 @@ AudioEngine::~AudioEngine()
 	delete to;
 	delete from;
 	delete bufferManager;
+	delete project;
 }
 
 
@@ -89,6 +93,17 @@ Message AudioEngine::next_message_from()
 void AudioEngine::return_process(Process* process)
 {
 	from->send(Message::ContinueProcess, process);
+}
+
+
+Project* AudioEngine::install_project(Project* new_project)
+{
+	playing = false;
+	Project* old_project = project;
+	project = new_project;
+	play_head = 0.0;
+	project->read_ahead();
+	return old_project;
 }
 
 
@@ -146,11 +161,17 @@ void AudioEngine::run()
 			}
 
 		// Prepare the next buffer.
-		/***/
+		AudioBuffer* out_buffer = get_buffer();
+		if (out_buffer) {
+			out_buffer->clear();
+			project->run(out_buffer);
+			}
 
 		// Send the buffer to the interface.
 		/***/
 		usleep(10000);
+		if (out_buffer)
+			free_buffer(out_buffer);
 		}
 }
 
