@@ -13,6 +13,7 @@ void SelectInterfaceProcess::next()
 	switch (state) {
 		case Selecting:
 			audio_system->select_interface(name);
+			state = Done;
 			break;
 		}
 }
