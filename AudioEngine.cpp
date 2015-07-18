@@ -2,6 +2,8 @@
 #include "MessageQueue.h"
 #include "Process.h"
 #include "AudioFileRead.h"
+#include "AudioSystem.h"
+#include "AudioInterface.h"
 #include "Project.h"
 #include "Logger.h"
 #include <pthread.h>
@@ -66,6 +68,12 @@ void AudioEngine::start()
 void AudioEngine::stop()
 {
 	/***/
+}
+
+
+void AudioEngine::tick()
+{
+	bufferManager->tick();
 }
 
 
@@ -160,18 +168,30 @@ void AudioEngine::run()
 				40 - num_free_read_requests /* TODO */);
 			}
 
+		bufferManager->run();
+
+		AudioInterface* interface = audio_system->selected_interface();
+		if (interface == nullptr) {
+			usleep(10000);
+			continue;
+			}
+
 		// Prepare the next buffer.
 		AudioBuffer* out_buffer = get_buffer();
 		if (out_buffer) {
 			out_buffer->clear();
-			project->run(out_buffer);
+			if (playing) {
+				project->run(out_buffer);
+				play_head += (ProjectPosition) cur_buffer_size / cur_sample_rate;
+				}
 			}
 
 		// Send the buffer to the interface.
-		/***/
-		usleep(10000);
-		if (out_buffer)
+		if (out_buffer) {
+			interface->wait_until_ready();
+			interface->send_data(out_buffer->samples);
 			free_buffer(out_buffer);
+			}
 		}
 }
 

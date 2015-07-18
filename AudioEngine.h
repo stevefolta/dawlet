@@ -20,6 +20,8 @@ class AudioEngine {
 		void	start();
 		void	stop();
 
+		void	tick();
+
 		AudioBuffer*	get_buffer()
 			{ return bufferManager->get_buffer(); }
 		void	free_buffer(AudioBuffer* buffer)

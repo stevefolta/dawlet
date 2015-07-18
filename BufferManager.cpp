@@ -1,6 +1,7 @@
 #include "BufferManager.h"
 #include "AudioBuffer.h"
 #include "AudioEngine.h"
+#include "Logger.h"
 #include <stdlib.h>
 
 enum {

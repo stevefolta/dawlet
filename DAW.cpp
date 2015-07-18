@@ -10,6 +10,7 @@
 #include "GetPBHeadProcess.h"
 #include "SupplyReadsProcess.h"
 #include "InstallProjectProcess.h"
+#include "SelectInterfaceProcess.h"
 #include "ALSAAudioSystem.h"
 #include "Exception.h"
 #include <unistd.h>
@@ -63,6 +64,8 @@ bool DAW::tick()
 
 	// Handle web requests.
 	bool did_something = server->tick();
+
+	engine->tick();
 
 	// Handle messages from the engine.
 	bool have_messages = true;
@@ -123,6 +126,8 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		reply << "]";
 		connection->send_websocket_message(reply.str());
 		}
+	else if (command == "select-interface")
+		engine->start_process(new SelectInterfaceProcess(fields.next_field()));
 }
 
 

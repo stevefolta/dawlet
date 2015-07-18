@@ -2,6 +2,7 @@
 #define ALSAAudioSystem_h
 
 #include "AudioSystem.h"
+class ALSAAudioInterface;
 
 
 class ALSAAudioSystem : public AudioSystem {
@@ -14,6 +15,7 @@ class ALSAAudioSystem : public AudioSystem {
 		AudioInterface*	selected_interface();
 
 	protected:
+		ALSAAudioInterface*	interface;
 	};
 
 

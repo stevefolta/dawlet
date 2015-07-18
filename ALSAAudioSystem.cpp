@@ -1,14 +1,18 @@
 #include "ALSAAudioSystem.h"
+#include "ALSAAudioInterface.h"
+#include "AudioEngine.h"
 #include <alsa/asoundlib.h>
 
 
 ALSAAudioSystem::ALSAAudioSystem()
+	: interface(nullptr)
 {
 }
 
 
 ALSAAudioSystem::~ALSAAudioSystem()
 {
+	delete interface;
 }
 
 
@@ -37,14 +41,15 @@ std::vector<std::string> ALSAAudioSystem::list_interfaces()
 
 void ALSAAudioSystem::select_interface(std::string name)
 {
-	/***/
+	delete interface;
+	interface = new ALSAAudioInterface(name);
+	interface->setup(1, engine->sample_rate(), engine->buffer_size());
 }
 
 
 AudioInterface* ALSAAudioSystem::selected_interface()
 {
-	/***/
-	return nullptr;
+	return interface;
 }
 
 

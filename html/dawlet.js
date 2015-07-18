@@ -12,6 +12,13 @@ function log(message) {
 function load() {
 	log("Loaded page.");
 
+	if (!String.prototype.startsWith) {
+		String.prototype.startsWith = function(searchString, position) {
+			position = position || 0;
+			return this.indexOf(searchString, position) === position;
+			};
+		}
+
 	document.getElementById("open-project").onclick = function() {
 		websocket.send("open-project \"test/test.json\"");
 		};
@@ -23,6 +30,12 @@ function load() {
 	websocket = new WebSocket("ws://localhost:8080/socket");
 	websocket.onmessage = function (event) {
 		log("Got websocket message: \"" + event.data + "\"");
+		if (event.data.startsWith("interfaces ")) {
+			var json = event.data.substr(10);
+			var interfaces = JSON.parse(json);
+			if (interfaces && interfaces[0])
+				websocket.send("select-interface \"" + interfaces[0] + "\"");
+			}
 		}
 	websocket.onopen = function (event) {
 		try {
