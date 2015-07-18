@@ -37,7 +37,7 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 		playback, hw_params, SND_PCM_ACCESS_RW_NONINTERLEAVED);
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
-	err = snd_pcm_hw_params_set_format(playback, hw_params, SND_PCM_FORMAT_S24_LE);
+	err = snd_pcm_hw_params_set_format(playback, hw_params, SND_PCM_FORMAT_FLOAT_LE);
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
 	err = snd_pcm_hw_params_set_rate(playback, hw_params, sample_rate, 0);
@@ -99,20 +99,9 @@ void ALSAAudioInterface::send_data(AudioSample* samples)
 	if (frames_to_deliver > buffer_size)
 		frames_to_deliver = buffer_size;
 
-	// Convert from AudioSample to 24-bit LE samples.
-	char* p = out_buffer;
-	AudioSample* sample = samples;
-	for (int frames_left = frames_to_deliver; frames_left > 0; --frames_left) {
-		int32_t int_sample = *sample++ * (2 << 23 - 1);
-		*p++ = int_sample & 0xFF;
-		*p++ = (int_sample >> 8) & 0xFF;
-		*p++ = (int_sample >> 16) & 0xFF;
-		*p++ = 0;
-		}
-
 	// Send the samples.
 	void* channel_buffers[1];
-	channel_buffers[0] = out_buffer;
+	channel_buffers[0] = samples;
 	int err = snd_pcm_writen(playback, channel_buffers, frames_to_deliver);
 	if (err < 0) {
 		log("snd_pcm_writen() returned %d.", err);
