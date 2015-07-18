@@ -79,8 +79,10 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 void ALSAAudioInterface::wait_until_ready()
 {
 	int err = snd_pcm_wait(playback, 1000);
-	if (err < 0)
+	if (err < 0) {
+		log("snd_pcm_wait returned %d.", err);
 		throw Exception("playback-fail");
+		}
 }
 
 

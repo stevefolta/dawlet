@@ -1,5 +1,6 @@
 #include "AudioBuffer.h"
 #include "AudioEngine.h"
+#include "Logger.h"
 #include <string.h>
 
 

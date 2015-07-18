@@ -5,6 +5,7 @@
 #include "AudioSystem.h"
 #include "AudioInterface.h"
 #include "Project.h"
+#include "Exception.h"
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
@@ -188,8 +189,13 @@ void AudioEngine::run()
 
 		// Send the buffer to the interface.
 		if (out_buffer) {
-			interface->wait_until_ready();
-			interface->send_data(out_buffer->samples);
+			try {
+				interface->wait_until_ready();
+				interface->send_data(out_buffer->samples);
+				}
+			catch (Exception& e) {
+				fprintf(stderr, "Exception during audio send: %s.\n", e.type.c_str());
+				}
 			free_buffer(out_buffer);
 			}
 		}
