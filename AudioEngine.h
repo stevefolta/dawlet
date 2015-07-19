@@ -37,7 +37,7 @@ class AudioEngine {
 
 		Project*	install_project(Project* new_project);
 
-		double	play_head;
+		double	play_start, play_head;
 
 		void	receive_audio_file_read(AudioFileRead* read_request);
 		AudioFileRead*	next_audio_file_read();

@@ -55,15 +55,15 @@ void Project::read_json(ProjectReader* reader)
 }
 
 
-void Project::run(AudioBuffer* buffer_out)
+void Project::prepare_to_play()
 {
-	master->run(buffer_out);
+	master->prepare_to_play();
 }
 
 
-void Project::read_ahead()
+void Project::run(AudioBuffer* buffer_out)
 {
-	master->read_ahead();
+	master->run(buffer_out);
 }
 
 

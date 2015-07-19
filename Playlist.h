@@ -15,11 +15,14 @@ class Playlist {
 
 		void	read_json(ProjectReader* reader);
 
+		void	prepare_to_play();
 		void	run(AudioBuffer* buffer_out);
-		void	read_ahead();
 
 	protected:
 		std::vector<Clip*>	clips;
+
+		// While playing.
+		std::vector<Clip*>::iterator	first_playing_clip;
 	};
 
 

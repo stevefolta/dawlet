@@ -77,6 +77,16 @@ void Track::read_json(ProjectReader* reader)
 }
 
 
+void Track::prepare_to_play()
+{
+	if (playlist)
+		playlist->prepare_to_play();
+
+	for (auto it = children.begin(); it != children.end(); ++it)
+		(*it)->prepare_to_play();
+}
+
+
 void Track::run(AudioBuffer* buffer_out)
 {
 	// Get a buffer for the track.
@@ -111,16 +121,6 @@ void Track::run(AudioBuffer* buffer_out)
 		}
 
 	engine->free_buffer(track_buffer);
-}
-
-
-void Track::read_ahead()
-{
-	if (playlist)
-		playlist->read_ahead();
-
-	for (auto it = children.begin(); it != children.end(); ++it)
-		(*it)->read_ahead();
 }
 
 

@@ -43,6 +43,46 @@ void Clip::read_json(ProjectReader* reader)
 }
 
 
+void Clip::prepare_to_play()
+{
+	playing = false;
+	read_ahead();
+}
+
+
+void Clip::run(AudioBuffer* buffer_out)
+{
+	int start_out_frame = 0;
+
+	if (!playing) {
+		ProjectPosition buffer_end_time =
+			engine->play_head +
+			(ProjectPosition) engine->buffer_size() / engine->sample_rate();
+		if (buffer_end_time < start) {
+			// This clip will not start in this buffer.
+			return;
+			}
+
+		// We're starting playback.
+		int sample_rate = file->info.sample_rate;
+		if (engine->play_head > start) {
+			// Starting playback in the middle of the clip.
+			play_frame =
+				file_start_frame + (engine->play_head - start) * sample_rate;
+			}
+		else {
+			// The clip starts in the middle (or the beginning) of the buffer.
+			play_frame = file_start_frame;
+			start_out_frame = (start - engine->play_head) * sample_rate;
+			}
+		playing = true;
+		}
+
+	// Copy samples into the buffer.
+	/***/
+}
+
+
 void Clip::read_ahead()
 {
 	// Free any buffers we no longer need.
@@ -114,6 +154,18 @@ void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 		}
 	reads[i] = read;
 	read->request_read(this, start_frame, num_frames);
+}
+
+
+ProjectPosition Clip::end()
+{
+	return start + (length_in_frames / file->info.sample_rate);
+}
+
+
+bool Clip::contains_time(ProjectPosition time)
+{
+	return (time >= start && time < end());
 }
 
 

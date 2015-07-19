@@ -16,8 +16,8 @@ class Track {
 
 		void	read_json(ProjectReader* reader);
 
+		void	prepare_to_play();
 		void	run(AudioBuffer* buffer_out);
-		void	read_ahead();
 
 		int	id;
 		int	max_used_id();

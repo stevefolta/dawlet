@@ -20,7 +20,7 @@ AudioEngine::AudioEngine()
 	cur_sample_rate = 44100;
 	cur_buffer_size = 128;
 
-	play_head = 0.0;
+	play_start = play_head = 0.0;
 	playing = false;
 	project = nullptr;
 
@@ -111,7 +111,7 @@ Project* AudioEngine::install_project(Project* new_project)
 	Project* old_project = project;
 	project = new_project;
 	play_head = 0.0;
-	project->read_ahead();
+	project->prepare_to_play();
 	return old_project;
 }
 

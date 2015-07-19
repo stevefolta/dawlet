@@ -7,6 +7,7 @@
 class ProjectReader;
 class AudioFile;
 class AudioFileRead;
+class AudioBuffer;
 
 
 class Clip {
@@ -23,12 +24,21 @@ class Clip {
 		ProjectPosition	start;
 		unsigned long	file_start_frame;
 		unsigned long	length_in_frames;
+		unsigned long	file_end_frame()
+			{ return file_start_frame + length_in_frames; }
 
+		void	prepare_to_play();
+		void	run(AudioBuffer* buffer_out);
 		void	read_ahead();
+
+		bool	contains_time(ProjectPosition time);
+		ProjectPosition	end();
 
 	protected:
 		// Used during playback.
 		AudioFileRead*	reads[2];
+		bool	playing;
+		unsigned long	play_frame;
 
 		void	init();
 		void	start_read(unsigned long start_frame, unsigned long num_frames);
