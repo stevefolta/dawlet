@@ -1,6 +1,7 @@
 #include "ALSAAudioSystem.h"
 #include "ALSAAudioInterface.h"
 #include "AudioEngine.h"
+#include "Logger.h"
 #include <alsa/asoundlib.h>
 
 

@@ -20,6 +20,7 @@ class ALSAAudioInterface : public AudioInterface {
 		snd_pcm_t*	playback;
 		int	buffer_size;
 		char*	out_buffer;
+		int	buffers_sent;
 	};
 
 

@@ -9,6 +9,7 @@ ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
 	int err = snd_pcm_open(&playback, name.c_str(), SND_PCM_STREAM_PLAYBACK, 0);
 	if (err < 0)
 		throw Exception("alsa-open-fail");
+	buffers_sent = 0;
 }
 
 
@@ -80,7 +81,10 @@ void ALSAAudioInterface::wait_until_ready()
 {
 	int err = snd_pcm_wait(playback, 1000);
 	if (err < 0) {
-		log("snd_pcm_wait returned %d.", err);
+		snd_pcm_state_t state = snd_pcm_state(playback);
+		log("snd_pcm_wait returned %d (\"%s\").", err, snd_strerror(err));
+		log("snd_pcm_state() is %d.", state);
+		log("buffers_sent: %d.", buffers_sent);
 		throw Exception("playback-fail");
 		}
 }
@@ -93,21 +97,24 @@ void ALSAAudioInterface::send_data(AudioSample* samples)
 		throw Exception("playback-xrun");
 	else if (frames_to_deliver < 0)
 		throw Exception("alsa-playback-fail");
-	if (frames_to_deliver < buffer_size)
-		log("Short play write!: %d frames.", frames_to_deliver);
-
-	if (frames_to_deliver > buffer_size)
-		frames_to_deliver = buffer_size;
+	if (frames_to_deliver < buffer_size) {
+		// This happens often, but we'll be using a blocking write below.  So
+		// really, the call to snd_pcm_avail_update() is just to detect xruns.
+		// log("Short play write!: %d frames.", frames_to_deliver);
+		}
 
 	// Send the samples.
 	void* channel_buffers[1];
 	channel_buffers[0] = samples;
-	int err = snd_pcm_writen(playback, channel_buffers, frames_to_deliver);
+	int err = snd_pcm_writen(playback, channel_buffers, buffer_size);
 	if (err < 0) {
-		log("snd_pcm_writen() returned %d.", err);
+		log("snd_pcm_writen() returned %d (\"%s\").", err, snd_strerror(err));
 		log("state = %d", snd_pcm_state(playback));
+		log("buffers_sent: %d.", buffers_sent);
 		throw Exception("alsa-playback-fail");
 		}
+
+	buffers_sent += 1;
 }
 
 
