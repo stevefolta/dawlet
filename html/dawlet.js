@@ -25,6 +25,26 @@ function populate_interfaces(interfaces) {
 	}
 
 
+function show_play_head(play_head) {
+	var hours = "" + Math.floor(play_head / (60 * 60));
+	var minutes = "" + Math.floor(play_head / 60);
+	if (minutes.length < 2)
+		minutes = "0" + minutes;
+	var seconds = "" + (play_head % 60).toFixed(3);
+	if (seconds.indexOf(".") < 2)
+		seconds = "0" + seconds;
+	document.getElementById("play-head").textContent =
+		hours + ":" + minutes + ":" + seconds;
+	}
+
+
+function set_button_function(id, fn) {
+	var button = document.getElementById(id);
+	if (button)
+		button.onclick = fn;
+	}
+
+
 function load() {
 	log("Loaded page.");
 
@@ -35,31 +55,28 @@ function load() {
 			};
 		}
 
-	document.getElementById("open-project").onclick = function() {
-		websocket.send("open-project \"test/project.json\"");
-		};
-	document.getElementById("list-interfaces").onclick = function() {
-		websocket.send("list-interfaces");
-		};
-	document.getElementById("play").onclick = function() {
+	set_button_function("play", function() {
 		websocket.send("play");
-		};
-	document.getElementById("stop").onclick = function() {
+		});
+	set_button_function("stop", function() {
 		websocket.send("stop");
-		};
-	document.getElementById("pause").onclick = function() {
+		});
+	set_button_function("pause", function() {
 		websocket.send("pause");
-		};
-	document.getElementById("rewind").onclick = function() {
+		});
+	set_button_function("rewind", function() {
 		websocket.send("rewind");
-		};
-	var go_button = document.getElementById("go");
-	if (go_button) {
-		go_button.onclick = function() {
-			websocket.send("open-project \"test/project.json\"");
-			websocket.send("play");
-			};
-		}
+		});
+	set_button_function("open-project", function() {
+		websocket.send("open-project \"test/project.json\"");
+		});
+	set_button_function("list-interfaces", function() {
+		websocket.send("list-interfaces");
+		});
+	set_button_function("go", function() {
+		websocket.send("open-project \"test/project.json\"");
+		websocket.send("play");
+		});
 	document.getElementById("interface-popup").onchange = function(event) {
 		websocket.send("select-interface \"" + event.target.value + "\"");
 		};
@@ -68,7 +85,6 @@ function load() {
 		},
 		200);
 
-	document.getElementById("start_message").textContent = "...in progress...";
 	websocket = new WebSocket("ws://localhost:8080/socket");
 	websocket.onmessage = function (event) {
 		log("Got websocket message: \"" + event.data + "\"");
@@ -82,7 +98,7 @@ function load() {
 			}
 		else if (event.data.startsWith("play-head ")) {
 			var play_head = parseFloat(event.data.substr(10));
-			document.getElementById("play-head").textContent = "" + play_head.toFixed(3);
+			show_play_head(play_head);
 			}
 		};
 	websocket.onopen = function (event) {

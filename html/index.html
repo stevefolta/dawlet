@@ -13,8 +13,9 @@
 
 <h2> Welcome to DAWlet! </h2>
 
-<p id="start_message"></p>
+<table id="header-table"><tr>
 
+<td>
 <div class="button-row">
 	<span class="button-span">
 		<span id="play" class="button">Play</span>
@@ -22,17 +23,21 @@
 		<span id="pause" class="button">Pause</span>
 		<span id="rewind" class="button">Rewind</span>
 	</span>
+</div>
+</td>
+
+<td class="header-middle">
+<div id="play-head"></div>
+</td>
+
+<td class="header-right">
 	<span class="interface-selector-span">
 		Interface:
 		<select id="interface-popup"></select>
 	</span>
-</div>
-<div class="button-row">
-	<span id="open-project" class="button">Open Project</span>
-	<span id="list-interfaces" class="button">Start Interface</span>
-</div>
+</td>
 
-<div id="play-head"></div>
+</tr></table>
 
 </body>
 

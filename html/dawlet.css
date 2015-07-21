@@ -20,5 +20,19 @@ div.button-row {
 	}
 span.button-span {
 	margin-right: 1em;
-	};
+	}
+
+div#play-head {
+	font-family: Arial Black;
+	}
+
+table#header-table {
+	width: 100%;
+	}
+td.header-middle {
+	text-align: middle;
+	}
+td.header-right {
+	text-align: right;
+	}
 
