@@ -36,7 +36,7 @@ function load() {
 		}
 
 	document.getElementById("open-project").onclick = function() {
-		websocket.send("open-project \"test/test.json\"");
+		websocket.send("open-project \"test/project.json\"");
 		};
 	document.getElementById("list-interfaces").onclick = function() {
 		websocket.send("list-interfaces");
@@ -56,7 +56,7 @@ function load() {
 	var go_button = document.getElementById("go");
 	if (go_button) {
 		go_button.onclick = function() {
-			websocket.send("open-project \"test/test.json\"");
+			websocket.send("open-project \"test/project.json\"");
 			websocket.send("play");
 			};
 		}
@@ -89,7 +89,7 @@ function load() {
 		try {
 			websocket.send("ping");
 			websocket.send("list-interfaces");
-			websocket.send("open-project \"test/test.json\"");
+			websocket.send("open-project \"test/project.json\"");
 			}
 		catch (e) {
 			log("Websocket send failed!");
