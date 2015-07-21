@@ -82,7 +82,7 @@ void AudioFile::play_into_buffer(
 	int bytes_per_frame = bytes_per_sample * info.num_channels;
 	data += start_in_frame * bytes_per_frame;
 	AudioSample* out = buffer_out->samples + start_out_frame;
-	AudioSample scale = 1.0 / ((2 << info.bits_per_sample) - 1);
+	AudioSample scale = 1.0 / 0x7FFFFFFF;
 	for (; num_frames > 0; --num_frames) {
 		//*** TODO: Support non-little-endian files.
 		uint32_t sample = 0;
