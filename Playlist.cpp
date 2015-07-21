@@ -68,7 +68,7 @@ void Playlist::run(AudioBuffer* buffer_out)
 			first_playing_clip = it + 1;
 
 		// Are we done?
-		if (read_ahead_point > clip->start)
+		if (read_ahead_point < clip->start)
 			break;
 
 		// Playback.

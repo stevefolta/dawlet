@@ -3,6 +3,7 @@
 #include "WAVFile.h"
 #include "Project.h"
 #include "AudioBuffer.h"
+#include "Logger.h"
 #include "Exception.h"
 
 
@@ -80,7 +81,7 @@ void AudioFile::play_into_buffer(
 	int bytes_per_sample = info.bits_per_sample / 8;
 	int bytes_per_frame = bytes_per_sample * info.num_channels;
 	data += start_in_frame * bytes_per_frame;
-	AudioSample* out = buffer_out->samples + start_in_frame;
+	AudioSample* out = buffer_out->samples + start_out_frame;
 	for (; num_frames > 0; --num_frames) {
 		//*** TODO: Support non-little-endian files.
 		uint32_t sample = 0;

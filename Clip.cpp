@@ -181,8 +181,11 @@ void Clip::read_ahead()
 		}
 
 	// Read past the read-ahead point.
-	if (last_loading_frame <= read_ahead_point)
-		start_read(last_loading_frame, read_ahead_point - last_loading_frame);
+	if (last_loading_frame + 1 < read_ahead_point) {
+		start_read(
+			last_loading_frame + 1,
+			read_ahead_point - last_loading_frame - 1);
+		}
 }
 
 

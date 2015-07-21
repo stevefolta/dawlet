@@ -161,7 +161,9 @@ void Connection::read_headers()
 		// Add the header.
 		string value = fields.remainder();
 		cur_request->add_header(header_name, value);
-		log("Header: \"%s\": \"%s\".", header_name.c_str(), value.c_str());
+		#ifdef LOG_HTTP_HEADERS
+			log("Header: \"%s\": \"%s\".", header_name.c_str(), value.c_str());
+		#endif
 		}
 }
 
