@@ -157,7 +157,6 @@ void Clip::read_ahead()
 			next_play_frame > end_frame ||
 			reads[i]->start_frame > read_ahead_point;
 		if (unneeded) {
-SFX log("Disposing read[%d] from %d - %d.", i, reads[i]->start_frame, end_frame);
 			reads[i]->dispose();
 			reads[i] = nullptr;
 			}
