@@ -2,16 +2,9 @@ p#start_message {
 	font-style: italic;
 	}
 
-a.button {
-	font-family: Arial Black;
-	font-size: large;
-	text-decoration: none;
-	margin-right: 16px;
-	color: black;
-	}
-
 span.button {
-	font-family: Arial Black;
+	font-family: Raleway, Arial Black;
+	font-weight: 800;
 	font-size: large;
 	text-decoration: none;
 	color: black;
