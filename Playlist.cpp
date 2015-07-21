@@ -2,6 +2,7 @@
 #include "Clip.h"
 #include "ProjectReader.h"
 #include "AudioEngine.h"
+#include "Logger.h"
 
 
 Playlist::Playlist()

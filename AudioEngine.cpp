@@ -60,18 +60,6 @@ AudioEngine::~AudioEngine()
 }
 
 
-void AudioEngine::start()
-{
-	/***/
-}
-
-
-void AudioEngine::stop()
-{
-	/***/
-}
-
-
 void AudioEngine::tick()
 {
 	bufferManager->tick();
@@ -150,6 +138,13 @@ void AudioEngine::run()
 					return;
 					break;
 
+				case Message::Play:
+					play();
+					break;
+				case Message::Stop:
+					stop();
+					break;
+
 				case Message::ContinueProcess:
 					{
 						Process* process = (Process*) message->param;
@@ -199,6 +194,19 @@ void AudioEngine::run()
 			free_buffer(out_buffer);
 			}
 		}
+}
+
+
+void AudioEngine::play()
+{
+	playing = true;
+}
+
+
+void AudioEngine::stop()
+{
+	playing = false;
+	play_head = play_start;
 }
 
 

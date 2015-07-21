@@ -25,6 +25,12 @@ function load() {
 	document.getElementById("list-interfaces").onclick = function() {
 		websocket.send("list-interfaces");
 		};
+	document.getElementById("play").onclick = function() {
+		websocket.send("play");
+		}
+	document.getElementById("stop").onclick = function() {
+		websocket.send("stop");
+		}
 
 	document.getElementById("start_message").textContent = "...in progress...";
 	websocket = new WebSocket("ws://localhost:8080/socket");

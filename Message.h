@@ -5,14 +5,14 @@ struct Message {
 	enum {
 		None,
 
-		EngineStart,
-		EngineStop,
-		EngineStarted,
-		EngineStopped,
 		EngineKill,
 		EngineDied,
 
 		ContinueProcess,
+
+		// DAW -> Engine.
+		Play,
+		Stop,
 
 		// Engine -> DAW.
 		NeedMoreReadRequests,

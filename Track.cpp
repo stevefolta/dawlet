@@ -6,6 +6,7 @@
 #include "AudioEngine.h"
 #include "Amp.h"
 #include "ProjectReader.h"
+#include "Logger.h"
 #include "Exception.h"
 
 

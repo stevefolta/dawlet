@@ -1,5 +1,6 @@
 #include "WAVFile.h"
 #include "RIFF.h"
+#include "Logger.h"
 #include "Exception.h"
 #include <unistd.h>
 

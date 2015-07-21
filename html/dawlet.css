@@ -2,3 +2,11 @@ p#start_message {
 	font-style: italic;
 	}
 
+a.button {
+	font-family: Arial Black;
+	font-size: 0.8em;
+	text-decoration: none;
+	margin-right: 16px;
+	color: blue;
+	}
+

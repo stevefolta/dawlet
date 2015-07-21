@@ -3,6 +3,7 @@
 #include "AudioFile.h"
 #include "ProjectReader.h"
 #include "JSONParser.h"
+#include "Logger.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

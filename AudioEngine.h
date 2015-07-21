@@ -17,9 +17,6 @@ class AudioEngine {
 		int	sample_rate() { return cur_sample_rate; }
 		int	buffer_size() { return cur_buffer_size; }
 
-		void	start();
-		void	stop();
-
 		void	tick();
 
 		AudioBuffer*	get_buffer()
@@ -61,6 +58,8 @@ class AudioEngine {
 		Project*	project;
 
 		void	run();
+		void	play();
+		void	stop();
 		static void*	thread_start(void* arg);
 	};
 

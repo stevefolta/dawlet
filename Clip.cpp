@@ -212,7 +212,7 @@ void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 
 ProjectPosition Clip::end()
 {
-	return start + (length_in_frames / file->info.sample_rate);
+	return start + ((ProjectPosition) length_in_frames / file->info.sample_rate);
 }
 
 

@@ -105,7 +105,7 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 	if (command == "ping")
 		connection->send_websocket_message("pong");
 	else if (command == "get-play-head") {
-		engine->send(Message::ContinueProcess, new GetPBHeadProcess(connection));
+		engine->start_process(new GetPBHeadProcess(connection));
 		}
 	else if (command == "open-project") {
 		string path = fields.next_field();
@@ -128,6 +128,10 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		}
 	else if (command == "select-interface")
 		engine->start_process(new SelectInterfaceProcess(fields.next_field()));
+	else if (command == "play")
+		engine->send(Message::Play);
+	else if (command == "stop")
+		engine->send(Message::Stop);
 }
 
 
