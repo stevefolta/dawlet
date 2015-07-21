@@ -18,4 +18,7 @@ span.button:hover {
 div.button-row {
 	margin-bottom: 0.5em;
 	}
+span.button-span {
+	margin-right: 1em;
+	};
 
