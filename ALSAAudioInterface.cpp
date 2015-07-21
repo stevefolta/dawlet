@@ -15,6 +15,7 @@ ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
 
 ALSAAudioInterface::~ALSAAudioInterface()
 {
+	snd_pcm_drain(playback);
 	snd_pcm_close(playback);
 	free(out_buffer);
 }
