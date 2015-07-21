@@ -36,6 +36,10 @@ function load() {
 		websocket.send("list-interfaces");
 		websocket.send("play");
 		}
+	window.setInterval(function() {
+		websocket.send("get-play-head");
+		},
+		200);
 
 	document.getElementById("start_message").textContent = "...in progress...";
 	websocket = new WebSocket("ws://localhost:8080/socket");
@@ -46,6 +50,10 @@ function load() {
 			var interfaces = JSON.parse(json);
 			if (interfaces && interfaces[0])
 				websocket.send("select-interface \"" + interfaces[0] + "\"");
+			}
+		else if (event.data.startsWith("play-head ")) {
+			var play_head = parseFloat(event.data.substr(10));
+			document.getElementById("play-head").textContent = "" + play_head.toFixed(3);
 			}
 		}
 	websocket.onopen = function (event) {
