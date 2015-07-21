@@ -182,10 +182,13 @@ SFX log("Disposing read[%d] from %d - %d.", i, reads[i]->start_frame, end_frame)
 		}
 
 	// Read past the read-ahead point.
-	if (last_loading_frame + 1 < read_ahead_point) {
-		start_read(
-			last_loading_frame + 1,
-			read_ahead_point - last_loading_frame - 1);
+	unsigned long read_start = last_loading_frame + 1;
+	if (read_start < read_ahead_point && read_start < file_end_frame()) {
+		unsigned long num_frames = engine->read_ahead_seconds * sample_rate;
+		unsigned long max_length = file_end_frame() - read_start;
+		if (num_frames > max_length)
+			num_frames = max_length;
+		start_read(read_start, num_frames);
 		}
 }
 
