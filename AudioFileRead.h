@@ -32,7 +32,7 @@ class AudioFileRead : public Process {
 		char*	buffer;
 		unsigned long	buffer_size;
 
-		unsigned long	end_frame() { return num_frames - start_frame; }
+		unsigned long	end_frame() { return start_frame + num_frames; }
 
 	protected:
 		DAW*	daw;

@@ -110,7 +110,7 @@ void Clip::run(AudioBuffer* buffer_out)
 					break;
 					}
 				}
-			if (which_read < 0) {
+			if (which_read < 0 || !reads[which_read]->is_playable()) {
 				// We've got nothing for this entire buffer.
 				play_frame += buffer_size;
 				break;
@@ -150,11 +150,12 @@ void Clip::read_ahead()
 			next_play_frame > end_frame ||
 			reads[i]->start_frame > read_ahead_point;
 		if (unneeded) {
+SFX log("Disposing read[%d] from %d - %d.", i, reads[i]->start_frame, end_frame);
 			reads[i]->dispose();
 			reads[i] = nullptr;
 			}
 		else {
-			if (reads[i]->start_frame > first_loading_frame)
+			if (first_loading_frame < 0 || (long) reads[i]->start_frame < first_loading_frame)
 				first_loading_frame = reads[i]->start_frame;
 			if (end_frame - 1 > last_loading_frame)
 				last_loading_frame = end_frame - 1;

@@ -152,6 +152,7 @@ bool DAW::handle_file_reads()
 		if (read->read_is_complete()) {
 			// Unlink it from the list.
 			*last_link = read->next_read;
+			read->next_read = nullptr;
 			did_something = true;
 			}
 		else {
