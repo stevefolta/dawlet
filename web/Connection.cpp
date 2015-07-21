@@ -398,9 +398,9 @@ void Connection::read_websocket_data()
 	if (!is_control) {
 		if (frame_is_final) {
 			// Message complete.  Pass it up to the DAW to handle it.
-			log("Got WebSocket message: \"%s\".", frame_data.substr(0, 40).c_str());
+			if (frame_data != "get-play-head")
+				log("Got WebSocket message: \"%s\".", frame_data.substr(0, 40).c_str());
 			daw->handle_ui_message(frame_data, this);
-			//***
 			}
 		}
 	else if (frame_opcode == WS_CloseConnection) {
