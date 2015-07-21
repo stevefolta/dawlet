@@ -9,6 +9,9 @@
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
+#ifdef USE_LOCAL_H
+	#include "local.h"
+#endif
 
 AudioEngine* engine = nullptr;
 
@@ -19,6 +22,9 @@ AudioEngine::AudioEngine()
 
 	cur_sample_rate = 44100;
 	cur_buffer_size = 128;
+	#ifdef DEFAULT_BUFFER_SIZE
+		cur_buffer_size = DEFAULT_BUFFER_SIZE;
+	#endif
 
 	play_start = play_head = 0.0;
 	playing = false;
