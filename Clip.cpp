@@ -55,6 +55,7 @@ void Clip::run(AudioBuffer* buffer_out)
 	int start_out_frame = 0;
 	int buffer_size = engine->buffer_size();
 
+	// Are we starting playback?
 	if (!playing) {
 		ProjectPosition buffer_end_time =
 			engine->play_head +
@@ -81,6 +82,12 @@ void Clip::run(AudioBuffer* buffer_out)
 
 	// Copy samples into the buffer.
 	while (start_out_frame < buffer_size) {
+		// Are we done with playback?
+		if (play_frame >= file_end_frame()) {
+			playing = false;
+			return;
+			}
+
 		// Find the read containing play_frame.
 		int which_read = -1;
 		for (int i = 0; i < num_reads; ++i) {
@@ -161,6 +168,10 @@ SFX log("Disposing read[%d] from %d - %d.", i, reads[i]->start_frame, end_frame)
 				last_loading_frame = end_frame - 1;
 			}
 		}
+
+	// Are we over with?
+	if (play_frame >= file_end_frame())
+		return;
 
 	// Read from the current point if needed.
 	// Hopefully we're not playing...
