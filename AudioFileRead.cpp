@@ -95,4 +95,10 @@ void AudioFileRead::dispose()
 }
 
 
+bool AudioFileRead::is_playable()
+{
+	return state == Playing;
+}
+
+
 

@@ -20,6 +20,8 @@ class AudioFileRead : public Process {
 		bool	read_is_complete();
 		void	dispose();
 
+		bool	is_playable();
+
 		// When in a linked list.
 		AudioFileRead*	next_read;
 

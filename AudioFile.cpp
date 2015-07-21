@@ -2,6 +2,7 @@
 #include "ProjectReader.h"
 #include "WAVFile.h"
 #include "Project.h"
+#include "AudioBuffer.h"
 #include "Exception.h"
 
 
@@ -68,6 +69,29 @@ void AudioFile::close()
 		delete open_file;
 		open_file = nullptr;
 		num_opens = false;
+		}
+}
+
+
+void AudioFile::play_into_buffer(
+	AudioBuffer* buffer_out, int start_out_frame,
+	char* data, int start_in_frame, int num_frames)
+{
+	int bytes_per_sample = info.bits_per_sample / 8;
+	int bytes_per_frame = bytes_per_sample * info.num_channels;
+	data += start_in_frame * bytes_per_frame;
+	AudioSample* out = buffer_out->samples + start_in_frame;
+	for (; num_frames > 0; --num_frames) {
+		//*** TODO: Support non-little-endian files.
+		uint32_t sample = 0;
+		int shift = 8 * (4 - bytes_per_sample);
+		for (int bytes_left = bytes_per_sample; bytes_left > 0; --bytes_left) {
+			sample |= ((uint8_t) *data++) << shift;
+			shift += 8;
+			}
+		*out++ += (AudioSample) ((int32_t) sample);
+		if (info.num_channels > 1)
+			data += bytes_per_frame - bytes_per_sample;
 		}
 }
 

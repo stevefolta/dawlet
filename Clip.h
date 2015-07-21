@@ -35,8 +35,12 @@ class Clip {
 		ProjectPosition	end();
 
 	protected:
+		enum {
+			num_reads = 2,
+			};
+
 		// Used during playback.
-		AudioFileRead*	reads[2];
+		AudioFileRead*	reads[num_reads];
 		bool	playing;
 		unsigned long	play_frame;
 
