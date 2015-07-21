@@ -31,6 +31,11 @@ function load() {
 	document.getElementById("stop").onclick = function() {
 		websocket.send("stop");
 		}
+	document.getElementById("go").onclick = function() {
+		websocket.send("open-project \"test/test.json\"");
+		websocket.send("list-interfaces");
+		websocket.send("play");
+		}
 
 	document.getElementById("start_message").textContent = "...in progress...";
 	websocket = new WebSocket("ws://localhost:8080/socket");

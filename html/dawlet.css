@@ -4,9 +4,25 @@ p#start_message {
 
 a.button {
 	font-family: Arial Black;
-	font-size: 0.8em;
+	font-size: large;
 	text-decoration: none;
 	margin-right: 16px;
-	color: blue;
+	color: black;
+	}
+
+span.button {
+	font-family: Arial Black;
+	font-size: large;
+	text-decoration: none;
+	color: black;
+	border: 1px solid #AAAAAA;
+	padding: 0.1em 0.5em;
+	}
+span.button:hover {
+	cursor: pointer;
+	}
+
+div.button-row {
+	margin-bottom: 0.5em;
 	}
 
