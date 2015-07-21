@@ -46,6 +46,8 @@ void Clip::read_json(ProjectReader* reader)
 void Clip::prepare_to_play()
 {
 	playing = false;
+	play_frame =
+		file_start_frame + (engine->play_head - start) * file->info.sample_rate;
 	read_ahead();
 }
 
