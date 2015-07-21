@@ -130,30 +130,37 @@ void AudioEngine::run()
 		// First, handle messages from the non-realtime thread.
 		while (!to->is_empty()) {
 			Message* message = to->front();
-			switch (message->type) {
 
-				case Message::EngineKill:
-					log("Engine dying.");
-					from->send(Message::EngineDied);
-					return;
-					break;
+			try {
+				switch (message->type) {
 
-				case Message::Play:
-					play();
-					break;
-				case Message::Stop:
-					stop();
-					break;
+					case Message::EngineKill:
+						log("Engine dying.");
+						from->send(Message::EngineDied);
+						return;
+						break;
 
-				case Message::ContinueProcess:
-					{
-						Process* process = (Process*) message->param;
-						process->next();
-						from->send(Message::ContinueProcess, process);
+					case Message::Play:
+						play();
+						break;
+					case Message::Stop:
+						stop();
+						break;
+
+					case Message::ContinueProcess:
+						{
+							Process* process = (Process*) message->param;
+							process->next();
+							from->send(Message::ContinueProcess, process);
 						}
-					break;
+						break;
 
+					}
 				}
+			catch (Exception& e) {
+				log("Exception in engine: \"%s\".", e.type.c_str());
+				}
+
 			to->pop();
 			}
 
