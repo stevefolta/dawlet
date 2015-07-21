@@ -53,10 +53,13 @@ function load() {
 	document.getElementById("rewind").onclick = function() {
 		websocket.send("rewind");
 		};
-	document.getElementById("go").onclick = function() {
-		websocket.send("open-project \"test/test.json\"");
-		websocket.send("play");
-		};
+	var go_button = document.getElementById("go");
+	if (go_button) {
+		go_button.onclick = function() {
+			websocket.send("open-project \"test/test.json\"");
+			websocket.send("play");
+			};
+		}
 	document.getElementById("interface-popup").onchange = function(event) {
 		websocket.send("select-interface \"" + event.target.value + "\"");
 		};
@@ -81,15 +84,16 @@ function load() {
 			var play_head = parseFloat(event.data.substr(10));
 			document.getElementById("play-head").textContent = "" + play_head.toFixed(3);
 			}
-		}
+		};
 	websocket.onopen = function (event) {
 		try {
 			websocket.send("ping");
 			websocket.send("list-interfaces");
-			websocket.send("get-play-head");
+			websocket.send("open-project \"test/test.json\"");
 			}
 		catch (e) {
 			log("Websocket send failed!");
 			}
 		}
 	}
+
