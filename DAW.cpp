@@ -197,6 +197,7 @@ void DAW::open_project(std::string path)
 	catch (Exception& e) {
 		/***/
 		fprintf(stderr, "Reading project failed: %s.\n", e.type.c_str());
+		delete project;
 		}
 
 	// Clean up.
