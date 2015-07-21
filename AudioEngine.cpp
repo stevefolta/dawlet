@@ -146,6 +146,12 @@ void AudioEngine::run()
 					case Message::Stop:
 						stop();
 						break;
+					case Message::Pause:
+						pause();
+						break;
+					case Message::Rewind:
+						rewind();
+						break;
 
 					case Message::ContinueProcess:
 						{
@@ -214,6 +220,26 @@ void AudioEngine::stop()
 {
 	playing = false;
 	play_head = play_start;
+	if (project)
+		project->prepare_to_play();
+}
+
+
+void AudioEngine::pause()
+{
+	playing = false;
+	play_start = play_head;
+	if (project)
+		project->prepare_to_play();
+}
+
+
+void AudioEngine::rewind()
+{
+	playing = false;
+	play_start = play_head = 0;
+	if (project)
+		project->prepare_to_play();
 }
 
 

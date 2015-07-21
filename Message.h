@@ -13,6 +13,8 @@ struct Message {
 		// DAW -> Engine.
 		Play,
 		Stop,
+		Pause,
+		Rewind,
 
 		// Engine -> DAW.
 		NeedMoreReadRequests,

@@ -60,6 +60,8 @@ class AudioEngine {
 		void	run();
 		void	play();
 		void	stop();
+		void	pause();
+		void	rewind();
 		static void*	thread_start(void* arg);
 	};
 

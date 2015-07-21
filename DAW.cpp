@@ -132,6 +132,10 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		engine->send(Message::Play);
 	else if (command == "stop")
 		engine->send(Message::Stop);
+	else if (command == "pause")
+		engine->send(Message::Pause);
+	else if (command == "rewind")
+		engine->send(Message::Rewind);
 }
 
 

@@ -47,6 +47,12 @@ function load() {
 	document.getElementById("stop").onclick = function() {
 		websocket.send("stop");
 		};
+	document.getElementById("pause").onclick = function() {
+		websocket.send("pause");
+		};
+	document.getElementById("rewind").onclick = function() {
+		websocket.send("rewind");
+		};
 	document.getElementById("go").onclick = function() {
 		websocket.send("open-project \"test/test.json\"");
 		websocket.send("play");
