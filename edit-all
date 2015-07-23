@@ -3,6 +3,7 @@
 classes=(DAW Project Track Playlist Clip Send)
 classes+=(AudioEngine BufferManager AudioBuffer MessageQueue)
 classes+=(web/Server web/Connection web/Request)
+classes+=(APIHandlers)
 classes+=(AudioFile OpenAudioFile WAVFile RIFF)
 classes+=(AudioFileRead)
 classes+=(JSONParser FieldParser ProjectReader Base64 Logger)

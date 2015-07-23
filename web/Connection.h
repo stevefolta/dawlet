@@ -18,6 +18,8 @@ namespace Web {
 			bool	tick();
 			bool	is_closed() { return state == Closed; }
 
+			void	error_out(std::string code);
+
 			void	send_websocket_message(std::string message, int opcode = WS_Text);
 
 		protected:
@@ -73,7 +75,7 @@ namespace Web {
 			void	read_headers();
 			void	handle_request();
 			void	get_file();
-			void	error_out(std::string code);
+			void	handle_api();
 
 			void	start_websocket();
 			void	process_websocket_frame();

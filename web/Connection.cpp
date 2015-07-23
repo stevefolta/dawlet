@@ -1,5 +1,6 @@
 #include "Connection.h"
 #include "Request.h"
+#include "APIHandlers.h"
 #include "DAW.h"
 #include "FieldParser.h"
 #include "Base64.h"
@@ -179,6 +180,8 @@ void Connection::handle_request()
 	if (cur_request->type() == "GET") {
 		if (cur_request->path() == "/socket")
 			start_websocket();
+		else if (cur_request->path().find("/api/") == 0)
+			handle_api();
 		else
 			get_file();
 		}
@@ -239,6 +242,14 @@ void Connection::get_file()
 
 	free(contents);
 	state = StartingRequest;
+}
+
+
+void Connection::handle_api()
+{
+	static int prefix_len = strlen("/api/");
+	string path = cur_request->path().substr(prefix_len);
+	dispatch_top_level_api(path, this);
 }
 
 
