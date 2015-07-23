@@ -9,7 +9,8 @@ namespace Web {
 
 class APIHandler {
 	public:
-		virtual void	handle(std::string url_remainder, Web::Connection* connection) = 0;
+		virtual void	handle(std::string url_remainder, Web::Connection* connection);
+		virtual std::string	json_value();
 
 	protected:
 	};
