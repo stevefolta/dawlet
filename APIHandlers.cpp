@@ -1,12 +1,17 @@
 #include "APIHandlers.h"
 #include "web/Connection.h"
+#include "Project.h"
+#include "DAW.h"
 #include <map>
 
 
-void APIHandler_project::handle(std::string url_remainder, Web::Connection* connection)
+std::string APIHandler_project::json_value()
 {
-	connection->error_out("501 Not Implemented");
-	/***/
+	Project* project = daw->cur_project();
+	if (project)
+		return project->api_json();
+	else
+		return "null";
 }
 
 
@@ -55,19 +60,12 @@ void dispatch_top_level_api(std::string url_remainder, Web::Connection* connecti
 		handlers_map_initialized = true;
 		}
 
-	std::string api;
-	int slash_pos = url_remainder.find('/');
-	if (slash_pos != std::string::npos) {
-		api = url_remainder.substr(0, slash_pos);
-		url_remainder = url_remainder.substr(slash_pos + 1);
-		}
-	else {
-		api = url_remainder;
-		url_remainder = "";
-		}
+	std::string api = pop_url_front(&url_remainder);
 	APIHandler* handler = handlers_map[api];
 	if (handler)
 		handler->handle(url_remainder, connection);
+	else
+		connection->error_out("404 Not Found");
 }
 
 

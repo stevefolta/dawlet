@@ -4,6 +4,7 @@
 #include "ProjectReader.h"
 #include "JSONParser.h"
 #include "Logger.h"
+#include <sstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -53,6 +54,16 @@ void Project::read_json(ProjectReader* reader)
 			}
 		}
 	next_new_id = max_used_id() + 1;
+}
+
+
+std::string Project::api_json()
+{
+	std::stringstream result;
+	result << "{ ";
+	result << "\"master\": " << master->id;
+	result << " }";
+	return result.str();
 }
 
 

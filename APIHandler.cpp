@@ -26,3 +26,20 @@ std::string APIHandler::json_value()
 
 
 
+std::string pop_url_front(std::string* url_remainder)
+{
+	std::string front;
+	int slash_pos = url_remainder->find('/');
+	if (slash_pos != std::string::npos) {
+		front = url_remainder->substr(0, slash_pos);
+		url_remainder->erase(0, slash_pos + 1);
+		}
+	else {
+		front = *url_remainder;
+		*url_remainder = "";
+		}
+	return front;
+}
+
+
+

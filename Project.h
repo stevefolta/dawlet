@@ -15,6 +15,7 @@ class Project {
 		~Project();
 
 		void	read_json(ProjectReader* reader);
+		std::string	api_json();
 
 		void	prepare_to_play();
 		void	run(AudioBuffer* buffer_out);

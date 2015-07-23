@@ -16,5 +16,8 @@ class APIHandler {
 	};
 
 
+extern std::string pop_url_front(std::string* url_remainder);
+
+
 #endif	// !APIHandler_h
 

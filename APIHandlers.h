@@ -5,7 +5,7 @@
 
 class APIHandler_project : public APIHandler {
 	public:
-		void	handle(std::string url_remainder, Web::Connection* connection);
+		std::string	json_value();
 	};
 
 class APIHandler_track : public APIHandler {

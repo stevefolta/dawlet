@@ -19,10 +19,14 @@
 
 using namespace std;
 
+DAW* daw = nullptr;
+
 
 DAW::DAW(int server_port)
-	: active_reads(nullptr)
+	: active_reads(nullptr), project(nullptr)
 {
+	daw = this;
+
 	audio_system = new ALSAAudioSystem();
 
 	engine = new AudioEngine();
@@ -193,6 +197,7 @@ void DAW::open_project(std::string path)
 		project->read_json(&reader);
 		project->load_audio_file_info();
 		engine->start_process(new InstallProjectProcess(project));
+		this->project = project;
 		}
 	catch (Exception& e) {
 		/***/
