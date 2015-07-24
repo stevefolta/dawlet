@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#ifdef USE_LOCAL_H
+	#include "local.h"
+#endif
 
 using namespace Web;
 using namespace std;
@@ -186,8 +189,10 @@ void Connection::handle_request()
 			get_file();
 		}
 
-	else
+	else {
 		error_out("501 Not Implemented");
+		state = StartingRequest;
+		}
 
 	delete cur_request;
 	cur_request = nullptr;
@@ -250,6 +255,7 @@ void Connection::handle_api()
 	static int prefix_len = strlen("/api/");
 	string path = cur_request->path().substr(prefix_len);
 	dispatch_top_level_api(path, this);
+	state = StartingRequest;
 }
 
 
@@ -569,6 +575,7 @@ std::string Connection::content_type_for(std::string filename)
 		{ "html", "text/html" },
 		{ "css", "text/css" },
 		{ "js", "application/javascript" },
+		{ "svg", "image/svg+xml" },
 		{ nullptr, nullptr }
 		};
 
