@@ -1,5 +1,6 @@
 var websocket = null;
 var logging_enabled = false;
+var track_template = null;
 
 function log(message) {
 	if (!logging_enabled)
@@ -42,6 +43,12 @@ function set_button_function(id, fn) {
 	var button = document.getElementById(id);
 	if (button)
 		button.onclick = fn;
+	}
+
+
+function got_track_template(request) {
+	var document = request.responseXML;
+	track_template = document.getElementById("layer1");
 	}
 
 
@@ -111,5 +118,14 @@ function load() {
 			log("Websocket send failed!");
 			}
 		}
+
+	var request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE)
+			got_track_template(this);
+		}
+	request.open("GET", "track.svg", true);
+	request.send(null);
 	}
 
