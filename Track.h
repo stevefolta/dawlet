@@ -2,6 +2,7 @@
 #define Track_h
 
 #include <vector>
+#include <string>
 class Project;
 class Playlist;
 class Send;
@@ -15,6 +16,7 @@ class Track {
 		~Track();
 
 		void	read_json(ProjectReader* reader);
+		std::string	api_json();
 
 		void	prepare_to_play();
 		void	run(AudioBuffer* buffer_out);
@@ -24,6 +26,7 @@ class Track {
 
 	protected:
 		Project*	project;
+		std::string	name;
 		Playlist*	playlist;
 		std::vector<Track*>	children;
 		std::vector<Send*>	sends;

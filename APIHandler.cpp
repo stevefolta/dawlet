@@ -6,15 +6,7 @@ void APIHandler::handle(std::string url_remainder, Web::Connection* connection)
 {
 	// Default: reply with json_value.
 
-	std::string json = json_value();
-
-	// Send the response headers.
-	connection->send_line("HTTP/1.1 200 OK");
-	connection->send_content_length(json.length());
-	connection->send_line("Content-Type: application/json");
-	connection->send_line();
-	connection->send_line_fragment(json);
-	connection->flush_send_buffer();
+	send_json_reply(connection, json_value());
 }
 
 
@@ -22,6 +14,17 @@ std::string APIHandler::json_value()
 {
 	// Default: should be overridden if handle() isn't.
 	return "";
+}
+
+
+void APIHandler::send_json_reply(Web::Connection* connection, std::string json)
+{
+	connection->send_line("HTTP/1.1 200 OK");
+	connection->send_content_length(json.length());
+	connection->send_line("Content-Type: application/json");
+	connection->send_line();
+	connection->send_line_fragment(json);
+	connection->flush_send_buffer();
 }
 
 

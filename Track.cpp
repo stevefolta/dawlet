@@ -8,6 +8,7 @@
 #include "ProjectReader.h"
 #include "Logger.h"
 #include "Exception.h"
+#include <sstream>
 
 
 Track::Track(Project* projectIn, int idIn)
@@ -43,6 +44,8 @@ void Track::read_json(ProjectReader* reader)
 			break;
 		if (field_name == "id")
 			id = reader->next_int();
+		else if (field_name == "name")
+			name = reader->next_string();
 		else if (field_name == "playlist") {
 			if (!playlist)
 				playlist = new Playlist();
@@ -54,6 +57,7 @@ void Track::read_json(ProjectReader* reader)
 				Track* track = new Track(project);
 				try {
 					track->read_json(reader);
+					project->add_track_by_id(track);
 					}
 				catch (Exception e) {
 					delete track;
@@ -75,6 +79,20 @@ void Track::read_json(ProjectReader* reader)
 			reader->ignore_value();
 			}
 		}
+}
+
+
+std::string Track::api_json()
+{
+	std::stringstream result;
+	result << "{ ";
+	result << "\"name\": \"" << name << "\"";
+	result << ", ";
+	result << "\"gain\": " << gain;
+	result << ", ";
+	result << "\"sends_to_parent\": " << sends_to_parent;
+	result << " }";
+	return result.str();
 }
 
 

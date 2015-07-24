@@ -14,6 +14,7 @@ Project::Project(std::string path_in)
 	: path(path_in), next_new_id(1), dirfd(-1)
 {
 	master = new Track(this, new_id());
+	add_track_by_id(master);
 }
 
 
@@ -81,7 +82,7 @@ void Project::run(AudioBuffer* buffer_out)
 
 int Project::new_id()
 {
-	return ++next_new_id;
+	return next_new_id++;
 }
 
 
@@ -121,6 +122,12 @@ void Project::load_audio_file_info()
 {
 	for (auto it = files.begin(); it != files.end(); ++it)
 		(*it)->load_info();
+}
+
+
+void Project::add_track_by_id(Track* track)
+{
+	tracks_by_id[track->id] = track;
 }
 
 

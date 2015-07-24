@@ -36,7 +36,6 @@ class ProjectReader {
 
 	protected:
 		Project*	project;
-		std::map<int, Track*>	tracks;
 		std::map<int, AudioFile*>	files;
 	};
 

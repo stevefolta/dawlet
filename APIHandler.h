@@ -12,6 +12,8 @@ class APIHandler {
 		virtual void	handle(std::string url_remainder, Web::Connection* connection);
 		virtual std::string	json_value();
 
+		void	send_json_reply(Web::Connection* connection, std::string json);
+
 	protected:
 	};
 

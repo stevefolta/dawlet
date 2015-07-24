@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 class Track;
 class AudioFile;
 class AudioBuffer;
@@ -28,12 +29,17 @@ class Project {
 		int	get_dirfd();
 		void	load_audio_file_info();
 
+		void	add_track_by_id(Track* track);
+		void	remove_track_by_id(int id) { tracks_by_id.erase(id); }
+		Track*	track_by_id(int id) { return tracks_by_id[id]; }
+
 	protected:
 		std::string	path;
 		Track*	master;
 		std::vector<AudioFile*>	files;
 		int	next_new_id;
 		int	dirfd;
+		std::map<int, Track*>	tracks_by_id;
 	};
 
 
