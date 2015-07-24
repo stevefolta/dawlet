@@ -46,9 +46,26 @@ function set_button_function(id, fn) {
 	}
 
 
+function find_element_by_id(element, id) {
+	var element_id = element.getAttribute('id');
+	if (element_id && element_id == id)
+		return element;
+	for (var child = element.firstElementChild; child; child = child.nextElementSibling) {
+		var result = find_element_by_id(child, id);
+		if (result)
+			return result;
+		}
+	return null;
+	}
+
 function got_track_template(request) {
-	var document = request.responseXML;
-	track_template = document.getElementById("layer1");
+	var template_document = request.responseXML;
+	track_template = template_document.getElementById("layer1");
+	var track_svg = track_template.cloneNode(true);
+	var name_element = find_element_by_id(track_svg, "track-name");
+	name_element.textContent = "Master";
+	var svg = document.getElementById('master');
+	svg.appendChild(track_svg);
 	}
 
 
