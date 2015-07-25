@@ -21,6 +21,7 @@ for class in "${classes[@]}"; do
 
 files+=(Message.h AudioTypes.h Amp.h)
 files+=(html/index.html html/dawlet.css html/dawlet.js)
+files+=(html/Track.js html/Knob.js html/MouseTracker.js)
 files+=(Makefile edit-all)
 
 $EDITOR "${files[@]}"

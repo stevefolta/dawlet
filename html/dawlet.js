@@ -67,6 +67,7 @@ function got_track_template(request) {
 	var svg = document.getElementById('master');
 	svg.appendChild(track_svg);
 	svg.style.height = track_svg.getBoundingClientRect().height;
+	new Knob(find_element_by_id(track_svg, 'gain-knob'));
 	}
 
 
