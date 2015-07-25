@@ -66,6 +66,7 @@ function got_track_template(request) {
 	name_element.textContent = "Master";
 	var svg = document.getElementById('master');
 	svg.appendChild(track_svg);
+	svg.style.height = track_svg.getBoundingClientRect().height;
 	}
 
 
