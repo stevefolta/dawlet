@@ -67,7 +67,16 @@ function got_track_template(request) {
 	var svg = document.getElementById('master');
 	svg.appendChild(track_svg);
 	svg.style.height = track_svg.getBoundingClientRect().height;
-	new Knob(find_element_by_id(track_svg, 'gain-knob'));
+	var gain_knob = new Knob(find_element_by_id(track_svg, 'gain-knob'));
+	gain_knob.is_db_knob = true;
+	gain_knob.set_db_value(0);
+	}
+
+
+function show_entered_value(value) {
+	var entered_value_element = document.getElementById("entered-value");
+	if (entered_value_element)
+		entered_value_element.textContent = value;
 	}
 
 

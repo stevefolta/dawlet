@@ -13,7 +13,7 @@ function MouseTracker(event) {
 		};
 	document.addEventListener('mousemove', this.move_listener);
 	this.up_listener = function (event) {
-		tracker.mouse_up(event);
+		tracker.mouse_up_outer(event);
 		}
 	document.addEventListener('mouseup', this.up_listener);
 
@@ -36,9 +36,14 @@ MouseTracker.prototype.mouse_moved_outer = function(event) {
 	};
 
 
-MouseTracker.prototype.mouse_up = function(event) {
+MouseTracker.prototype.mouse_up_outer = function(event) {
+	this.mouse_up(event);
 	document.removeEventListener('mousemove', this.move_listener);
 	document.removeEventListener('mouseup', this.up_listener);
+	};
+
+MouseTracker.prototype.mouse_up = function(event) {
+	// Default: do nothing extra.
 	};
 
 

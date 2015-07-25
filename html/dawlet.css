@@ -35,6 +35,9 @@ td.header-middle {
 td.header-right {
 	text-align: right;
 	}
+div#entered-value {
+	min-width: 4em;
+	}
 
 svg#master {
 	width: 100%;
