@@ -23,7 +23,7 @@ DAW* daw = nullptr;
 
 
 DAW::DAW(int server_port)
-	: active_reads(nullptr), project(nullptr)
+	: active_reads(nullptr), project(nullptr), cur_websocket_connection(nullptr)
 {
 	daw = this;
 

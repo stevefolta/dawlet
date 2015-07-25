@@ -26,9 +26,14 @@ class DAW {
 
 		Project*	cur_project() { return project; }
 
+		Web::Connection* websocket_connection() { return cur_websocket_connection; }
+		void	set_websocket_connection(Web::Connection* connection)
+			{ cur_websocket_connection = connection; }
+
 	protected:
 		AudioEngine*	engine;
 		Web::Server*	server;
+		Web::Connection*	cur_websocket_connection;
 		Project*	project;
 		AudioFileRead*	active_reads;
 		bool	running;

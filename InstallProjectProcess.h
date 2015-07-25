@@ -17,6 +17,7 @@ class InstallProjectProcess : public Process {
 	protected:
 		enum {
 			Installing,
+			Reporting,
 			Done,
 			};
 

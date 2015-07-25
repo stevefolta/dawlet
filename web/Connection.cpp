@@ -310,6 +310,8 @@ void Connection::start_websocket()
 	send_line();
 	send_reply();
 
+	daw->set_websocket_connection(this);
+
 	state = AwaitingWebSocketFrame;
 }
 
