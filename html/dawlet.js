@@ -122,7 +122,8 @@ function load() {
 
 	websocket = new WebSocket("ws://localhost:8080/socket");
 	websocket.onmessage = function (event) {
-		log("Got websocket message: \"" + event.data + "\"");
+		if (!event.data.startsWith("play-head "))
+			log("Got websocket message: \"" + event.data + "\"");
 		if (event.data.startsWith("interfaces ")) {
 			var json = event.data.substr(10);
 			var interfaces = JSON.parse(json);
