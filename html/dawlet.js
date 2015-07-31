@@ -74,14 +74,7 @@ function got_track_template(request) {
 		var gain = dB_to_gain(new_db);
 		var request = new XMLHttpRequest();
 		request.open("PUT", "/api/track/1/gain", true);
-		request.onreadystatechange = function() {
-			log("readyState = " + this.readyState);
-			var DONE = this.DONE || 4;
-			if (this.readyState === DONE)
-				log("got reply: " + this.responseText);
-			};
 		request.send("" + gain);
-log("sent gain " + gain);
 		};
 	}
 
