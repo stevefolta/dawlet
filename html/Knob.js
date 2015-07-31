@@ -32,7 +32,7 @@ Knob.prototype.set_value = function(value) {
 	}
 
 Knob.prototype.db_value = function() {
-	var zero_point = Math.round((this.max_value * 3) / 4);
+	var zero_point = Math.round((this.max_value * 2) / 3);
 	var value = this.cur_value();
 	var db = 0.0;
 	// Handle end values specially, to avoid rounding problems.
@@ -57,7 +57,7 @@ Knob.prototype.set_db_value = function(db) {
 	else if (db < -this.db_below_zero)
 		db = -this.db_below_zero;
 
-	var zero_point = Math.round((this.max_value * 3) / 4);
+	var zero_point = Math.round((this.max_value * 2) / 3);
 	var value = 0;
 	if (db >= 0) {
 		value =
