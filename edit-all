@@ -9,6 +9,7 @@ classes+=(AudioFileRead)
 classes+=(JSONParser FieldParser ProjectReader Base64 Logger)
 classes+=(Process GetPBHeadProcess SupplyReadsProcess InstallProjectProcess)
 classes+=(SelectInterfaceProcess)
+classes+=(SetTrackGainProcess)
 classes+=(AudioSystem AudioInterface)
 classes+=(ALSAAudioSystem ALSAAudioInterface)
 files=()
@@ -22,6 +23,7 @@ for class in "${classes[@]}"; do
 files+=(Message.h AudioTypes.h Amp.h)
 files+=(html/index.html html/dawlet.css html/dawlet.js)
 files+=(html/Track.js html/Knob.js html/MouseTracker.js)
+files+=(html/dB.js)
 files+=(Makefile edit-all)
 
 $EDITOR "${files[@]}"

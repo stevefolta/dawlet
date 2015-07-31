@@ -70,6 +70,19 @@ function got_track_template(request) {
 	var gain_knob = new Knob(find_element_by_id(track_svg, 'gain-knob'));
 	gain_knob.is_db_knob = true;
 	gain_knob.set_db_value(0);
+	gain_knob.changed = function(new_db) {
+		var gain = dB_to_gain(new_db);
+		var request = new XMLHttpRequest();
+		request.open("PUT", "/api/track/1/gain", true);
+		request.onreadystatechange = function() {
+			log("readyState = " + this.readyState);
+			var DONE = this.DONE || 4;
+			if (this.readyState === DONE)
+				log("got reply: " + this.responseText);
+			};
+		request.send("" + gain);
+log("sent gain " + gain);
+		};
 	}
 
 
@@ -83,13 +96,18 @@ function show_entered_value(value) {
 function load() {
 	log("Loaded page.");
 
+	// Polyfills.
 	if (!String.prototype.startsWith) {
 		String.prototype.startsWith = function(searchString, position) {
 			position = position || 0;
 			return this.indexOf(searchString, position) === position;
 			};
 		}
+	Math.log10 = Math.log10 || function(x) {
+		return Math.log(x) / Math.LN10;
+		};
 
+	// Buttons.
 	set_button_function("play", function() {
 		websocket.send("play");
 		});
@@ -120,6 +138,7 @@ function load() {
 		},
 		200);
 
+	// Start the websocket.
 	websocket = new WebSocket("ws://localhost:8080/socket");
 	websocket.onmessage = function (event) {
 		if (!event.data.startsWith("play-head "))
@@ -148,6 +167,7 @@ function load() {
 			}
 		}
 
+	// Get the track template.
 	var request = new XMLHttpRequest();
 	request.onreadystatechange = function() {
 		var DONE = this.DONE || 4;

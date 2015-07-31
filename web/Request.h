@@ -19,10 +19,15 @@ namespace Web {
 
 			std::string	type() { return the_type; }
 			std::string	path() { return the_path; }
+			std::string	content() { return the_content; }
+
+			void	append_content(std::string more_content)
+				{ the_content += more_content; }
 
 		protected:
 			std::string	the_type;
 			std::string	the_path;
+			std::string	the_content;
 			std::map<std::string, std::string>	headers;
 		};
 

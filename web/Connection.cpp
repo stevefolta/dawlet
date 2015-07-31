@@ -92,6 +92,9 @@ void Connection::process_buffer()
 		case ReadingWebSocketData:
 			read_websocket_data();
 			break;
+		case ReadingRequestContent:
+			read_request_content();
+			break;
 		}
 }
 
@@ -184,9 +187,18 @@ void Connection::handle_request()
 		if (cur_request->path() == "/socket")
 			start_websocket();
 		else if (cur_request->path().find("/api/") == 0)
-			handle_api();
+			handle_api_get();
 		else
 			get_file();
+		}
+
+	else if (cur_request->type() == "PUT") {
+		if (cur_request->path().find("/api/") == 0)
+			handle_api_put();
+		else {
+			error_out("405 Method Not Allowed");
+			state = StartingRequest;
+			}
 		}
 
 	else {
@@ -250,12 +262,30 @@ void Connection::get_file()
 }
 
 
-void Connection::handle_api()
+void Connection::handle_api_get()
 {
 	static int prefix_len = strlen("/api/");
 	string path = cur_request->path().substr(prefix_len);
 	dispatch_top_level_api(path, this);
 	state = StartingRequest;
+}
+
+
+void Connection::handle_api_put()
+{
+	// Get the length.
+	string content_length_header = cur_request->header("Content-Length");
+	char* end_ptr;
+	request_content_left_to_read = strtol(content_length_header.c_str(), &end_ptr, 10);
+	if (request_content_left_to_read <= 0 || end_ptr <= content_length_header.c_str()) {
+		error_out("411 Length Required");
+		state = StartingRequest;
+		return;
+		}
+
+	// Start reading.
+	state = ReadingRequestContent;
+	read_request_content();
 }
 
 
@@ -268,6 +298,39 @@ void Connection::error_out(string code)
 	send_line_fragment(code);
 	send_reply();
 	state = Closed;
+}
+
+
+void Connection::finish_reply()
+{
+	flush_send_buffer();
+	state = StartingRequest;
+}
+
+
+void Connection::start_replying()
+{
+	state = Replying;
+}
+
+
+void Connection::send_json_reply(std::string json)
+{
+	send_line("HTTP/1.1 200 OK");
+	send_content_length(json.length());
+	send_line("Content-Type: application/json");
+	send_line();
+	send_line_fragment(json);
+	finish_reply();
+}
+
+
+void Connection::send_ok_reply()
+{
+	send_line("HTTP/1.1 200 OK");
+	send_content_length(0);
+	send_line();
+	finish_reply();
 }
 
 
@@ -469,6 +532,26 @@ void Connection::send_websocket_message(std::string message, int opcode)
 
 	// Send the payload.
 	send_data(message.data(), length);
+}
+
+
+void Connection::read_request_content()
+{
+	int length = buffer->readable_bytes();
+	if (length > request_content_left_to_read)
+		length = request_content_left_to_read;
+	if (length == 0)
+		return;
+
+	cur_request->append_content(string(buffer->data + buffer->read, length));
+	buffer->read += length;
+	request_content_left_to_read -= length;
+	if (request_content_left_to_read == 0) {
+		static int prefix_len = strlen("/api/");
+		string path = cur_request->path().substr(prefix_len);
+		dispatch_top_level_api_put(path, cur_request->content(), this);
+		state = StartingRequest;
+		}
 }
 
 

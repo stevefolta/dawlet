@@ -8,6 +8,7 @@ class Playlist;
 class Send;
 class AudioBuffer;
 class ProjectReader;
+class SetTrackGainProcess;
 
 
 class Track {
@@ -33,6 +34,8 @@ class Track {
 		std::vector<Send*>	receives;
 		float	gain;
 		bool	sends_to_parent;
+
+		friend class SetTrackGainProcess;
 	};
 
 

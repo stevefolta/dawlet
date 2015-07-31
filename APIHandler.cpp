@@ -17,14 +17,28 @@ std::string APIHandler::json_value()
 }
 
 
+bool APIHandler::can_put()
+{
+	// Default: no:
+	return false;
+}
+
+
+void APIHandler::handle_put(std::string url_remainder, std::string value, Web::Connection* connection)
+{
+	// Default: doesn't handle put.
+}
+
+
 void APIHandler::send_json_reply(Web::Connection* connection, std::string json)
 {
-	connection->send_line("HTTP/1.1 200 OK");
-	connection->send_content_length(json.length());
-	connection->send_line("Content-Type: application/json");
-	connection->send_line();
-	connection->send_line_fragment(json);
-	connection->flush_send_buffer();
+	connection->send_json_reply(json);
+}
+
+
+void APIHandler::send_ok_reply(Web::Connection* connection)
+{
+	connection->send_ok_reply();
 }
 
 

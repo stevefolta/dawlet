@@ -27,6 +27,11 @@ namespace Web {
 			void	send_content_length(unsigned long length);
 			std::string	content_type_for(std::string filename);
 			void	error_out(std::string code);
+			void	finish_reply();
+
+			void	start_replying();
+			void	send_json_reply(std::string json);
+			void	send_ok_reply();
 
 			void	send_websocket_message(std::string message, int opcode = WS_Text);
 
@@ -41,6 +46,8 @@ namespace Web {
 				ReadingHeaders,
 				AwaitingWebSocketFrame,
 				ReadingWebSocketData,
+				ReadingRequestContent,
+				Replying,
 				Closed,
 				};
 
@@ -83,7 +90,8 @@ namespace Web {
 			void	read_headers();
 			void	handle_request();
 			void	get_file();
-			void	handle_api();
+			void	handle_api_get();
+			void	handle_api_put();
 
 			void	start_websocket();
 			void	process_websocket_frame();
@@ -97,6 +105,9 @@ namespace Web {
 			uint64_t	frame_length_remaining;
 			std::string	frame_data;
 			std::string	control_frame_data;
+
+			void	read_request_content();
+			long	request_content_left_to_read;
 
 			struct LineResult {
 				bool	ok;

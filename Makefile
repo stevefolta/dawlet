@@ -9,6 +9,7 @@ SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 SOURCES += APIHandler.cpp APIHandlers.cpp
 SOURCES += GetPBHeadProcess.cpp SupplyReadsProcess.cpp InstallProjectProcess.cpp
 SOURCES += SelectInterfaceProcess.cpp
+SOURCES += SetTrackGainProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp
 SOURCES += AudioSystem.cpp
 SOURCES += ALSAAudioSystem.cpp ALSAAudioInterface.cpp
