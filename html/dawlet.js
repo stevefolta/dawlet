@@ -132,7 +132,8 @@ function load() {
 		200);
 
 	// Start the websocket.
-	websocket = new WebSocket("ws://localhost:8080/socket");
+	// Unfortunately, we can't give a relative URL.
+	websocket = new WebSocket("ws://" + window.location.host + "/socket");
 	websocket.onmessage = function (event) {
 		if (!event.data.startsWith("play-head "))
 			log("Got websocket message: \"" + event.data + "\"");
