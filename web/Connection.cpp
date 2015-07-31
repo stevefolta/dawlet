@@ -329,6 +329,7 @@ void Connection::send_ok_reply()
 {
 	send_line("HTTP/1.1 200 OK");
 	send_content_length(0);
+	send_line("Content-Type: text/plain");
 	send_line();
 	finish_reply();
 }
