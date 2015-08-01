@@ -1,5 +1,5 @@
-function Track(json, parent) {
-	this.id = json.id;
+function Track(id, parent) {
+	this.id = id;
 	this.children_div = null;
 	var track = this;
 
@@ -8,7 +8,8 @@ function Track(json, parent) {
 	this.div.setAttribute('class', 'track');
 	var track_svg = track_template.cloneNode(true);
 	var name_element = find_element_by_id(track_svg, "track-name");
-	name_element.textContent = json.name;
+	name_element.textContent = "";
+		// Until we get the real name.
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
 	this.div.appendChild(svg);
 	svg.appendChild(track_svg);
@@ -28,23 +29,35 @@ function Track(json, parent) {
 	svg.style.height = size.height;
 
 	// Set up the gain knob.
-	var gain_knob = new Knob(find_element_by_id(track_svg, 'gain-knob'));
-	gain_knob.is_db_knob = true;
-	gain_knob.set_db_value(gain_to_dB(json.gain));
-	gain_knob.changed = function(new_db) {
+	this.gain_knob = new Knob(find_element_by_id(track_svg, 'gain-knob'));
+	this.gain_knob.is_db_knob = true;
+	this.gain_knob.set_db_value(0);
+		// Until we get the real value.
+	this.gain_knob.changed = function(new_db) {
 		var gain = dB_to_gain(new_db);
 		var request = new XMLHttpRequest();
 		request.open("PUT", "/api/track/" + track.id + "/gain", true);
 		request.send("" + gain);
 		};
 
+	// Call the API to get our data.
+	api_get("/api/track/" + this.id, function(json) { track.got_json(json); });
+	};
+
+
+Track.prototype.got_json = function(json) {
+	var track = this;
+
+	var name_element = find_element_by_id(this.div, "track-name");
+	name_element.textContent = json.name;
+
+	this.gain_knob.set_db_value(gain_to_dB(json.gain));
+
 	// Load up the children.
 	json.children.forEach(function(child_id) {
-		api_get("/api/track/" + child_id, function(json) {
-			new Track(json, track);
-			});
+		new Track(child_id, track);
 		});
-	};
+	}
 
 
 Track.prototype.is_master = function() {

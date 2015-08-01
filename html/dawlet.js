@@ -89,11 +89,7 @@ function got_project_json(json) {
 		tracks.removeChild(tracks.lastChild);
 
 	// Get the master track; the rest of the tracks will follow from there.
-	api_get("/api/track/" + json.master, got_track_json);
-	}
-
-function got_track_json(json) {
-	new Track(json);
+	new Track(json.master);
 	}
 
 
