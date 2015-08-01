@@ -88,9 +88,25 @@ std::string Track::api_json()
 	result << "{ ";
 	result << "\"name\": \"" << name << "\"";
 	result << ", ";
+	result << "\"id\": " << id;
+	result << ", ";
 	result << "\"gain\": " << gain;
 	result << ", ";
 	result << "\"sends_to_parent\": " << sends_to_parent;
+	result << ", ";
+
+	// Children.
+	result << "\"children\": [";
+	bool did_child = false;
+	for (auto it = children.begin(); it != children.end(); ++it) {
+		if (did_child)
+			result << ", ";
+		else
+			did_child = true;
+		result << (*it)->id;
+		}
+	result << "] ";
+
 	result << " }";
 	return result.str();
 }

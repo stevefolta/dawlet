@@ -61,21 +61,39 @@ function find_element_by_id(element, id) {
 function got_track_template(request) {
 	var template_document = request.responseXML;
 	track_template = template_document.getElementById("layer1");
-	var track_svg = track_template.cloneNode(true);
-	var name_element = find_element_by_id(track_svg, "track-name");
-	name_element.textContent = "Master";
-	var svg = document.getElementById('master');
-	svg.appendChild(track_svg);
-	svg.style.height = track_svg.getBoundingClientRect().height;
-	var gain_knob = new Knob(find_element_by_id(track_svg, 'gain-knob'));
-	gain_knob.is_db_knob = true;
-	gain_knob.set_db_value(0);
-	gain_knob.changed = function(new_db) {
-		var gain = dB_to_gain(new_db);
-		var request = new XMLHttpRequest();
-		request.open("PUT", "/api/track/1/gain", true);
-		request.send("" + gain);
-		};
+	}
+
+
+function api_get(url, when_done) {
+	var request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE)
+			when_done(JSON.parse(this.responseText));
+		}
+	request.open("GET", url, true);
+	request.send(null);
+	}
+
+function project_loaded() {
+	api_get("/api/project", got_project_json);
+	}
+
+function got_project_json(json) {
+	// Clear out any existing elements.
+	var master = document.getElementById('master');
+	while (master.hasChildNodes())
+		master.removeChild(master.lastChild);
+	var tracks = document.getElementById('tracks');
+	while (tracks.hasChildNodes())
+		tracks.removeChild(tracks.lastChild);
+
+	// Get the master track; the rest of the tracks will follow from there.
+	api_get("/api/track/" + json.master, got_track_json);
+	}
+
+function got_track_json(json) {
+	new Track(json);
 	}
 
 
@@ -131,6 +149,16 @@ function load() {
 		},
 		200);
 
+	// Get the track template.
+	var request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE)
+			got_track_template(this);
+		}
+	request.open("GET", "track.svg", true);
+	request.send(null);
+
 	// Start the websocket.
 	// Unfortunately, we can't give a relative URL.
 	websocket = new WebSocket("ws://" + window.location.host + "/socket");
@@ -149,6 +177,8 @@ function load() {
 			var play_head = parseFloat(event.data.substr(10));
 			show_play_head(play_head);
 			}
+		else if (event.data == "project-loaded")
+			project_loaded();
 		};
 	websocket.onopen = function (event) {
 		try {
@@ -160,15 +190,5 @@ function load() {
 			log("Websocket send failed!");
 			}
 		}
-
-	// Get the track template.
-	var request = new XMLHttpRequest();
-	request.onreadystatechange = function() {
-		var DONE = this.DONE || 4;
-		if (this.readyState === DONE)
-			got_track_template(this);
-		}
-	request.open("GET", "track.svg", true);
-	request.send(null);
 	}
 

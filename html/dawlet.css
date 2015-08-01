@@ -39,11 +39,16 @@ div#entered-value {
 	min-width: 4em;
 	}
 
-svg#master {
+div#master {
 	width: 100%;
 	}
-svg#tracks {
+div#tracks {
 	width: 100%;
 	height: 100%;
+	margin-top: 0.5em;
+	}
+
+div.track-children {
+	margin-left: 2em;
 	}
 
