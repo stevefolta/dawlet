@@ -13,7 +13,7 @@ class ALSAAudioInterface : public AudioInterface {
 
 		void	setup(int num_channels, int sample_rate, int buffer_size);
 		void	wait_until_ready();
-		void	send_data(AudioSample* samples);
+		void	send_data(AudioBuffer** buffers, int num_channels);
 
 	protected:
 		std::string	name;

@@ -33,8 +33,8 @@ class AudioFile {
 		std::string	path;
 		int	id;
 
-		void	play_into_buffer(
-			AudioBuffer* buffer_out, int start_out_frame,
+		void	play_into_buffers(
+			AudioBuffer** buffers_out, int num_out_channels, int start_out_frame,
 			char* data, int start_in_frame, int num_frames);
 
 	protected:

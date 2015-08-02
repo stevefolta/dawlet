@@ -122,40 +122,48 @@ void Track::prepare_to_play()
 }
 
 
-void Track::run(AudioBuffer* buffer_out)
+void Track::run(AudioBuffer** buffers_out, int num_channels)
 {
-	// Get a buffer for the track.
+	// Get buffers for the track.
 	int buffer_size = engine->buffer_size();
-	AudioBuffer* track_buffer = engine->get_buffer();
-	track_buffer->clear();
+	AudioBuffer* track_buffers[num_channels];
+	int which_channel;
+	for (which_channel = 0; which_channel < num_channels; ++which_channel) {
+		AudioBuffer* buffer = engine->get_buffer();
+		buffer->clear();
+		track_buffers[which_channel] = buffer;
+		}
 
 	// Playlist.
 	if (playlist)
-		playlist->run(track_buffer);
+		playlist->run(track_buffers, num_channels);
 
 	// Children.
 	if (!children.empty()) {
 		for (auto it = children.begin(); it != children.end(); ++it) {
 			// Run the child track.
 			Track* child = *it;
-			child->run(track_buffer);
+			child->run(track_buffers, num_channels);
 			}
 		}
 
 	// Receives.
 	/***/
 
-	// Mix the track into the output buffer.
+	// Mix the track into the output buffers.
 	if (sends_to_parent) {
-		AudioSample* in = track_buffer->samples;
-		AudioSample* out = buffer_out->samples;
-		for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
-			*out += amp(gain, *in++);
-			++out;
+		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
+			AudioSample* in = track_buffers[which_channel]->samples;
+			AudioSample* out = buffers_out[which_channel]->samples;
+			for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
+				*out += amp(gain, *in++);
+				++out;
+				}
 			}
 		}
 
-	engine->free_buffer(track_buffer);
+	for (which_channel = 0; which_channel < num_channels; ++which_channel)
+		engine->free_buffer(track_buffers[which_channel]);
 }
 
 

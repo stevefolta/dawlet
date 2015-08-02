@@ -74,26 +74,56 @@ void AudioFile::close()
 }
 
 
-void AudioFile::play_into_buffer(
-	AudioBuffer* buffer_out, int start_out_frame,
+void AudioFile::play_into_buffers(
+	AudioBuffer** buffers_out, int num_out_channels, int start_out_frame,
 	char* data, int start_in_frame, int num_frames)
 {
 	int bytes_per_sample = info.bits_per_sample / 8;
 	int bytes_per_frame = bytes_per_sample * info.num_channels;
 	data += start_in_frame * bytes_per_frame;
-	AudioSample* out = buffer_out->samples + start_out_frame;
 	AudioSample scale = 1.0 / 0x7FFFFFFF;
-	for (; num_frames > 0; --num_frames) {
-		//*** TODO: Support non-little-endian files.
-		uint32_t sample = 0;
-		int shift = 8 * (4 - bytes_per_sample);
-		for (int bytes_left = bytes_per_sample; bytes_left > 0; --bytes_left) {
-			sample |= ((uint8_t) *data++) << shift;
-			shift += 8;
+
+	AudioSample* outs[num_out_channels];
+	int which_out = 0;
+	for (which_out = 0; which_out < num_out_channels; ++which_out)
+		outs[which_out] = buffers_out[which_out]->samples + start_out_frame;
+
+	// Mono file: copy to all channels.
+	if (info.num_channels == 1) {
+		for (; num_frames > 0; --num_frames) {
+			//*** TODO: Support non-little-endian files.
+			uint32_t sample = 0;
+			int shift = 8 * (4 - bytes_per_sample);
+			for (int bytes_left = bytes_per_sample; bytes_left > 0; --bytes_left) {
+				sample |= ((uint8_t) *data++) << shift;
+				shift += 8;
+				}
+			AudioSample sample_out = (AudioSample) ((int32_t) sample) * scale;
+			for (which_out = 0; which_out < num_out_channels; ++which_out)
+				*outs[which_out]++ += sample_out;
 			}
-		*out++ += (AudioSample) ((int32_t) sample) * scale;
-		if (info.num_channels > 1)
-			data += bytes_per_frame - bytes_per_sample;
+		}
+
+	// Stereo or more: copy to as many channels as the file has.
+	else {
+		int skip_bytes = 0;
+		if (num_out_channels > info.num_channels)
+			num_out_channels = info.num_channels;
+		else if (num_out_channels < info.num_channels)
+			skip_bytes = bytes_per_sample * (info.num_channels - num_out_channels);
+		for (; num_frames > 0; --num_frames) {
+			for (which_out = 0; which_out < num_out_channels; ++which_out) {
+				//*** TODO: Support non-little-endian files.
+				uint32_t sample = 0;
+				int shift = 8 * (4 - bytes_per_sample);
+				for (int bytes_left = bytes_per_sample; bytes_left > 0; --bytes_left) {
+					sample |= ((uint8_t) *data++) << shift;
+					shift += 8;
+					}
+				*outs[which_out]++ += (AudioSample) ((int32_t) sample) * scale;
+				}
+			data += skip_bytes;
+			}
 		}
 }
 

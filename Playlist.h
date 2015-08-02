@@ -16,7 +16,7 @@ class Playlist {
 		void	read_json(ProjectReader* reader);
 
 		void	prepare_to_play();
-		void	run(AudioBuffer* buffer_out);
+		void	run(AudioBuffer** buffers_out, int num_channels);
 
 	protected:
 		std::vector<Clip*>	clips;

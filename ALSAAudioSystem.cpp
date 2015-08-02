@@ -44,7 +44,7 @@ void ALSAAudioSystem::select_interface(std::string name)
 {
 	delete interface;
 	interface = new ALSAAudioInterface(name);
-	interface->setup(1, engine->sample_rate(), engine->buffer_size());
+	interface->setup(2, engine->sample_rate(), engine->buffer_size());
 }
 
 

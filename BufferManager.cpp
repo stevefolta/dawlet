@@ -62,6 +62,9 @@ AudioBuffer* BufferManager::get_buffer()
 
 void BufferManager::free_buffer(AudioBuffer* buffer)
 {
+	if (buffer == nullptr)
+		return;
+
 	FreeAudioBuffer* free_buffer = (FreeAudioBuffer*) buffer;
 	free_buffer->next = first_free_buffer;
 	first_free_buffer = free_buffer;

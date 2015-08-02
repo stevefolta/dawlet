@@ -74,9 +74,9 @@ void Project::prepare_to_play()
 }
 
 
-void Project::run(AudioBuffer* buffer_out)
+void Project::run(AudioBuffer** buffers_out, int num_channels)
 {
-	master->run(buffer_out);
+	master->run(buffers_out, num_channels);
 }
 
 

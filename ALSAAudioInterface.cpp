@@ -1,4 +1,5 @@
 #include "ALSAAudioInterface.h"
+#include "AudioBuffer.h"
 #include "Exception.h"
 #include "Logger.h"
 
@@ -91,7 +92,7 @@ void ALSAAudioInterface::wait_until_ready()
 }
 
 
-void ALSAAudioInterface::send_data(AudioSample* samples)
+void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 {
 	int frames_to_deliver = snd_pcm_avail_update(playback);
 	if (frames_to_deliver == -EPIPE)
@@ -105,8 +106,9 @@ void ALSAAudioInterface::send_data(AudioSample* samples)
 		}
 
 	// Send the samples.
-	void* channel_buffers[1];
-	channel_buffers[0] = samples;
+	void* channel_buffers[num_channels];
+	for (int which_channel = 0; which_channel < num_channels; ++which_channel)
+		channel_buffers[which_channel] = buffers[which_channel]->samples;
 	int err = snd_pcm_writen(playback, channel_buffers, buffer_size);
 	if (err < 0) {
 		log("snd_pcm_writen() returned %d (\"%s\").", err, snd_strerror(err));

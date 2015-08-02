@@ -192,25 +192,36 @@ void AudioEngine::run()
 			}
 
 		// Prepare the next buffer.
-		AudioBuffer* out_buffer = get_buffer();
-		if (out_buffer) {
-			out_buffer->clear();
-			if (playing) {
-				project->run(out_buffer);
-				play_head += (ProjectPosition) cur_buffer_size / cur_sample_rate;
+		int num_channels = 2;
+		AudioBuffer* out_buffers[num_channels];
+		bool missing_buffers = false;
+		int which_channel;
+		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
+			AudioBuffer* buffer = get_buffer();
+			if (buffer) {
+				buffer->clear();
+				out_buffers[which_channel] = buffer;
 				}
+			else
+				missing_buffers = true;
+			}
+		if (playing) {
+			if (!missing_buffers)
+				project->run(out_buffers, num_channels);
+			play_head += (ProjectPosition) cur_buffer_size / cur_sample_rate;
 			}
 
-		// Send the buffer to the interface.
-		if (out_buffer) {
+		// Send the buffers to the interface.
+		if (!missing_buffers) {
 			try {
 				interface->wait_until_ready();
-				interface->send_data(out_buffer->samples);
+				interface->send_data(out_buffers, num_channels);
 				}
 			catch (Exception& e) {
 				fprintf(stderr, "Exception during audio send: %s.\n", e.type.c_str());
 				}
-			free_buffer(out_buffer);
+			for (which_channel = 0; which_channel < num_channels; ++which_channel)
+				free_buffer(out_buffers[which_channel]);
 			}
 		}
 }

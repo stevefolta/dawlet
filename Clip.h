@@ -28,7 +28,7 @@ class Clip {
 			{ return file_start_frame + length_in_frames; }
 
 		void	prepare_to_play();
-		void	run(AudioBuffer* buffer_out);
+		void	run(AudioBuffer** buffers_out, int num_channels);
 		void	read_ahead();
 
 		bool	contains_time(ProjectPosition time);

@@ -52,7 +52,7 @@ void Clip::prepare_to_play()
 }
 
 
-void Clip::run(AudioBuffer* buffer_out)
+void Clip::run(AudioBuffer** buffers_out, int num_channels)
 {
 	int start_out_frame = 0;
 	int buffer_size = engine->buffer_size();
@@ -132,8 +132,8 @@ void Clip::run(AudioBuffer* buffer_out)
 		int frames_in_read = read->end_frame() - play_frame;
 		if (frames_in_read < num_frames)
 			num_frames = frames_in_read;
-		file->play_into_buffer(
-			buffer_out, start_out_frame,
+		file->play_into_buffers(
+			buffers_out, num_channels, start_out_frame,
 			read->buffer, play_frame - read->start_frame, num_frames);
 		play_frame += num_frames;
 		start_out_frame += num_frames;

@@ -20,7 +20,7 @@ class Track {
 		std::string	api_json();
 
 		void	prepare_to_play();
-		void	run(AudioBuffer* buffer_out);
+		void	run(AudioBuffer** buffers_out, int num_channels);
 
 		int	id;
 		int	max_used_id();

@@ -54,7 +54,7 @@ void Playlist::prepare_to_play()
 }
 
 
-void Playlist::run(AudioBuffer* buffer_out)
+void Playlist::run(AudioBuffer** buffers_out, int num_channels)
 {
 	std::vector<Clip*>::iterator it = first_playing_clip;
 	ProjectPosition read_ahead_point =
@@ -72,7 +72,7 @@ void Playlist::run(AudioBuffer* buffer_out)
 			break;
 
 		// Playback.
-		clip->run(buffer_out);
+		clip->run(buffers_out, num_channels);
 		}
 }
 
