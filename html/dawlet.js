@@ -1,6 +1,8 @@
 var websocket = null;
 var logging_enabled = false;
-var track_template = null;
+var templates = {};
+
+var template_names = [ 'track' ];
 
 function log(message) {
 	if (!logging_enabled)
@@ -57,12 +59,6 @@ function find_element_by_id(element, id) {
 		}
 	return null;
 	}
-
-function got_track_template(request) {
-	var template_document = request.responseXML;
-	track_template = template_document.getElementById("layer1");
-	}
-
 
 function api_get(url, when_done) {
 	var request = new XMLHttpRequest();
@@ -145,15 +141,19 @@ function load() {
 		},
 		200);
 
-	// Get the track template.
-	var request = new XMLHttpRequest();
-	request.onreadystatechange = function() {
-		var DONE = this.DONE || 4;
-		if (this.readyState === DONE)
-			got_track_template(this);
-		}
-	request.open("GET", "track.svg", true);
-	request.send(null);
+	// Get the templates.
+	template_names.forEach(function(name) {
+		var request = new XMLHttpRequest;
+		request.onreadystatechange = function() {
+			var DONE = this.DONE || 4;
+			if (this.readyState === DONE) {
+				var template_document = request.responseXML;
+				templates[name] = template_document.getElementById("layer1");
+				}
+			};
+		request.open('GET', name + '.svg', true);
+		request.send(null);
+		});
 
 	// Start the websocket.
 	// Unfortunately, we can't give a relative URL.
