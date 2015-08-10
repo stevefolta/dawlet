@@ -3,6 +3,7 @@
 
 #include "AudioTypes.h"
 #include <stdint.h>
+#include <sstream>
 
 class ProjectReader;
 class AudioFile;
@@ -19,6 +20,7 @@ class Clip {
 		~Clip();
 
 		void	read_json(ProjectReader* reader);
+		void	build_api_json(std::stringstream& result);
 
 		AudioFile*	file;
 		ProjectPosition	start;

@@ -6,13 +6,13 @@ function Track(id, parent) {
 	// Create the elements (<div> & <svg>).
 	this.div = document.createElement('div');
 	this.div.setAttribute('class', 'track');
-	var track_svg = templates['track'].cloneNode(true);
-	var name_element = find_element_by_id(track_svg, "track-name");
+	this.track_svg = templates['track'].cloneNode(true);
+	var name_element = find_element_by_id(this.track_svg, "track-name");
 	name_element.textContent = "";
 		// Until we get the real name.
-	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
-	this.div.appendChild(svg);
-	svg.appendChild(track_svg);
+	this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
+	this.div.appendChild(this.svg);
+	this.svg.appendChild(this.track_svg);
 
 	// Add this track's elements into the document in the appropriate place.
 	// We have to do this before we start dealing with widths and heights.
@@ -24,12 +24,12 @@ function Track(id, parent) {
 		parent.append_child(this);
 
 	// For some reason, we need to set the SVG's width & height.
-	var size = track_svg.getBoundingClientRect();
-	svg.style.width = size.width;
-	svg.style.height = size.height;
+	var size = this.track_svg.getBoundingClientRect();
+	this.svg.style.width = size.width;
+	this.svg.style.height = size.height;
 
 	// Set up the gain knob.
-	this.gain_knob = new Knob(find_element_by_id(track_svg, 'gain-knob'));
+	this.gain_knob = new Knob(find_element_by_id(this.track_svg, 'gain-knob'));
 	this.gain_knob.is_db_knob = true;
 	this.gain_knob.set_db_value(0);
 		// Until we get the real value.
@@ -42,6 +42,9 @@ function Track(id, parent) {
 
 	// Call the API to get our data.
 	api_get("/api/track/" + this.id, function(json) { track.got_json(json); });
+	api_get(
+		"/api/track/" + this.id + "/clips",
+		function(json) { track.got_clips_json(json); });
 	};
 
 
@@ -59,6 +62,10 @@ Track.prototype.got_json = function(json) {
 		});
 	}
 
+
+Track.prototype.got_clips_json = function(json) {
+	//***
+	}
 
 Track.prototype.is_master = function() {
 	return this.id == 1;

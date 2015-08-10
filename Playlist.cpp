@@ -2,7 +2,9 @@
 #include "Clip.h"
 #include "ProjectReader.h"
 #include "AudioEngine.h"
+#include "web/Connection.h"
 #include "Logger.h"
+#include <sstream>
 
 
 Playlist::Playlist()
@@ -37,6 +39,23 @@ void Playlist::read_json(ProjectReader* reader)
 		else
 			reader->ignore_value();
 		}
+}
+
+
+std::string Playlist::clips_json()
+{
+	std::stringstream result;
+	result << "[ ";
+	bool did_one = false;
+	for (auto it = clips.begin(); it != clips.end(); ++it) {
+		if (did_one)
+			result << ", ";
+		else
+			did_one = true;
+		(*it)->build_api_json(result);
+		}
+	result << " ]";
+	return result.str();
 }
 
 

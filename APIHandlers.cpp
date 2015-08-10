@@ -39,6 +39,8 @@ void APIHandler_track::handle(std::string url_remainder, Web::Connection* connec
 
 	if (url_remainder.empty())
 		send_json_reply(connection, track->api_json());
+	else if (url_remainder == "clips")
+		send_json_reply(connection, track->clips_json());
 	else {
 		connection->error_out("404 Not Found");
 		}

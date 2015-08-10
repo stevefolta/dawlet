@@ -112,6 +112,12 @@ std::string Track::api_json()
 }
 
 
+std::string Track::clips_json()
+{
+	return playlist->clips_json();
+}
+
+
 void Track::prepare_to_play()
 {
 	if (playlist)

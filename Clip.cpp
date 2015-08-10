@@ -43,6 +43,16 @@ void Clip::read_json(ProjectReader* reader)
 }
 
 
+void Clip::build_api_json(std::stringstream& result)
+{
+	result << "{ ";
+	result << "\"start\": " << start;
+	result << ", ";
+	result << "\"length\": " << (ProjectPosition) length_in_frames / file->info.sample_rate;
+	result << " }";
+}
+
+
 void Clip::prepare_to_play()
 {
 	playing = false;
