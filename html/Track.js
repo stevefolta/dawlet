@@ -6,7 +6,7 @@ function Track(id, parent) {
 	// Create the elements (<div> & <svg>).
 	this.div = document.createElement('div');
 	this.div.setAttribute('class', 'track');
-	this.track_svg = templates['track'].cloneNode(true);
+	this.track_svg = templates['track'].clone();
 	var name_element = find_element_by_id(this.track_svg, "track-name");
 	name_element.textContent = "";
 		// Until we get the real name.

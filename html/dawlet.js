@@ -177,7 +177,7 @@ function load() {
 			var DONE = this.DONE || 4;
 			if (this.readyState === DONE) {
 				var template_document = request.responseXML;
-				templates[name] = template_document.getElementById("layer1");
+				templates[name] = new SVGTemplate(template_document);
 				}
 			};
 		request.open('GET', name + '.svg', true);
