@@ -52,15 +52,14 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,-992.36218)">
+     id="layer1">
     <rect
        style="opacity:1;fill:#fafafa;fill-opacity:1;stroke:#9f9f9f;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="rect4697"
        width="100"
        height="60"
        x="0.53571427"
-       y="992.7193"
+       y="0.35712"
        ry="6"
        rx="6"
        attach="0011" />
