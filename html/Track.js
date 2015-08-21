@@ -22,11 +22,14 @@ function Track(id, parent) {
 		document.getElementById('tracks').appendChild(this.div);
 	else
 		parent.append_child(this);
+	var total_width = this.div.getBoundingClientRect().width;
 
 	// For some reason, we need to set the SVG's width & height.
 	var size = this.track_svg.getBoundingClientRect();
-	this.svg.style.width = size.width;
-	this.svg.style.height = size.height;
+	var controls_width = size.width;
+	var track_height = size.height;
+	this.svg.style.width = total_width;
+	this.svg.style.height = track_height;
 
 	// Set up the gain knob.
 	this.gain_knob = new Knob(find_element_by_id(this.track_svg, 'gain-knob'));
@@ -39,6 +42,11 @@ function Track(id, parent) {
 		request.open("PUT", "/api/track/" + track.id + "/gain", true);
 		request.send("" + gain);
 		};
+
+	// Add the lane.
+	this.lane = templates['lane'].clone(
+		total_width - controls_width, track_height, controls_width);
+	this.svg.appendChild(this.lane);
 
 	// Call the API to get our data.
 	api_get("/api/track/" + this.id, function(json) { track.got_json(json); });
@@ -64,7 +72,16 @@ Track.prototype.got_json = function(json) {
 
 
 Track.prototype.got_clips_json = function(json) {
-	//***
+	var pixels_per_second = 5;
+	var track = this;
+	json.forEach(function(clip) {
+		var lanes_rect = track.lane.getBoundingClientRect();
+		var svg_rect = track.svg.getBoundingClientRect();
+		var clip_svg = templates['clip'].clone(
+			clip.length * pixels_per_second, lanes_rect.height,
+			lanes_rect.left - svg_rect.left + clip.start * pixels_per_second, 0);
+		track.svg.appendChild(clip_svg);
+		});
 	}
 
 Track.prototype.is_master = function() {

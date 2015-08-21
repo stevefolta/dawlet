@@ -2,7 +2,7 @@ var websocket = null;
 var logging_enabled = false;
 var templates = {};
 
-var template_names = [ 'track', 'clip' ];
+var template_names = [ 'track', 'lane', 'clip' ];
 
 function log(message) {
 	if (!logging_enabled)
@@ -58,35 +58,6 @@ function find_element_by_id(element, id) {
 			return result;
 		}
 	return null;
-	}
-
-function scale_svg_elements(element, width_delta, height_delta) {
-	var attach_spec = element.getAttribute('attach');
-	if (attach_spec) {
-		var attach_bits = parseInt(attach_spec, 2);
-		var rect = element.getBoundingClientRect();
-		var x_move = 0, y_move = 0;
-		var x_scale = 0, y_scale = 0;
-		if ((attach_bits & 0b1010) == 0b1010)
-			x_move = width_delta;
-		else if ((attach_bits & 0b1010) == 0b0010)
-			x_scale = (rect.width + width_delta) / rect.width;
-		// 0b1000 is not supported.
-		if ((attach_bits & 0b0101) == 0b0101)
-			y_move = height_delta;
-		else if ((attach_bits & 0b0101) == 0b0010)
-			y_scale = (rect.height + height_delta) / rect.height;
-		var transform = '';
-		if (x_move || y_move)
-			transform += 'translate(' + x_move + ', ' + y_move + ') ';
-		if (x_scale || y_scale)
-			transform += 'scale(' + x_scale + ', ' + y_scale + ') ';
-		if (transform)
-			element.setAttribute('transform', transform);
-		}
-
-	for (var child = element.firstElementChild; child; child = child.nextElementSibling)
-		child.scale_svg_elements(child, width_delta, height_delta);
 	}
 
 function api_get(url, when_done) {
