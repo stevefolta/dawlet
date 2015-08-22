@@ -72,7 +72,8 @@
        height="59.390377"
        x="0.30481055"
        y="992.66705"
-       style="opacity:1;fill:none;stroke:#848484;stroke-width:0.60962111;stroke-opacity:1" />
+       style="opacity:1;fill:none;stroke:#848484;stroke-width:0.60962111;stroke-opacity:1"
+		 attach="0011" />
     <g
        id="gain-knob"
        inkscape:label="#g4207">
@@ -84,7 +85,8 @@
          height="23.244606"
          width="381.12885"
          id="knob-track"
-         style="opacity:1;fill:none;fill-opacity:0.16119403;stroke:#dcdcdc;stroke-width:0.8498348;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:none;fill-opacity:0.16119403;stroke:#dcdcdc;stroke-width:0.8498348;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
+			attach="0011"/>
       <g
          inkscape:label="#g4203"
          id="knob-indicator">

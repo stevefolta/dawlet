@@ -1,6 +1,9 @@
 var websocket = null;
 var logging_enabled = false;
 var templates = {};
+var controls_width = 500;
+var track_height = 60;
+var child_track_indent = 20;
 
 var template_names = [ 'track', 'lane', 'clip' ];
 

@@ -1,12 +1,18 @@
 function Track(id, parent) {
 	this.id = id;
+	this.parent = parent;
 	this.children_div = null;
 	var track = this;
+
+	var indent = 0;
+	var level = this.level();
+	if (level > 1)
+		indent = child_track_indent * (level - 1);
 
 	// Create the elements (<div> & <svg>).
 	this.div = document.createElement('div');
 	this.div.setAttribute('class', 'track');
-	this.track_svg = templates['track'].clone();
+	this.track_svg = templates['track'].clone(controls_width - indent, track_height, indent, 0);
 	var name_element = find_element_by_id(this.track_svg, "track-name");
 	name_element.textContent = "";
 		// Until we get the real name.
@@ -25,9 +31,6 @@ function Track(id, parent) {
 	var total_width = this.div.getBoundingClientRect().width;
 
 	// For some reason, we need to set the SVG's width & height.
-	var size = this.track_svg.getBoundingClientRect();
-	var controls_width = size.width;
-	var track_height = size.height;
 	this.svg.style.width = total_width;
 	this.svg.style.height = track_height;
 
@@ -99,4 +102,11 @@ Track.prototype.append_child = function(child) {
 	this.children_div.appendChild(child.div);
 	};
 
+
+Track.prototype.level = function() {
+	var level = 0;
+	for (var parent = this.parent; parent; parent = parent.parent)
+		level += 1;
+	return level;
+	}
 
