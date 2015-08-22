@@ -151,7 +151,7 @@ function load() {
 				templates[name] = new SVGTemplate(template_document);
 				}
 			};
-		request.open('GET', name + '.svg', true);
+		request.open('GET', 'theme/' + name + '.svg', true);
 		request.send(null);
 		});
 
