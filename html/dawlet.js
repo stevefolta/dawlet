@@ -4,6 +4,7 @@ var templates = {};
 var controls_width = 500;
 var track_height = 60;
 var child_track_indent = 20;
+var pixels_per_second = 5;
 
 var template_names = [ 'track', 'lane', 'clip' ];
 
@@ -32,6 +33,7 @@ function populate_interfaces(interfaces) {
 
 
 function show_play_head(play_head) {
+	// Clock.
 	var hours = "" + Math.floor(play_head / (60 * 60));
 	var minutes = "" + Math.floor(play_head / 60);
 	if (minutes.length < 2)
@@ -39,8 +41,13 @@ function show_play_head(play_head) {
 	var seconds = "" + (play_head % 60).toFixed(3);
 	if (seconds.indexOf(".") < 2)
 		seconds = "0" + seconds;
-	document.getElementById("play-head").textContent =
+	document.getElementById("clock").textContent =
 		hours + ":" + minutes + ":" + seconds;
+
+	// Play head.
+	var play_head_x = controls_width + play_head * pixels_per_second;
+	document.getElementById("play-head").setAttribute(
+		'transform', "translate(" + play_head_x + ", 0)");
 	}
 
 

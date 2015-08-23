@@ -75,7 +75,6 @@ Track.prototype.got_json = function(json) {
 
 
 Track.prototype.got_clips_json = function(json) {
-	var pixels_per_second = 5;
 	var track = this;
 	json.forEach(function(clip) {
 		var lanes_rect = track.lane.getBoundingClientRect();
