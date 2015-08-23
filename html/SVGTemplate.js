@@ -92,7 +92,6 @@ SVGTemplate.prototype.scale_svg_elements = function(element, width_delta, height
 
 SVGTemplate.prototype.scale_svg_path = function(element, width_delta, height_delta, x_move, y_move) {
 	var path = element.getAttribute('d');
-	log(path);
 	path = path.match(/[A-Za-z]|[0-9.]+/g);
 
 	function is_number(str) {
@@ -360,7 +359,6 @@ SVGTemplate.prototype.scale_svg_path = function(element, width_delta, height_del
 				break;
 			}
 		}
-	log(result.join(' '));
 	element.setAttribute('d', result.join(' '));
 	}
 
