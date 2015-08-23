@@ -191,6 +191,7 @@ function load() {
 			websocket.send("ping");
 			websocket.send("list-interfaces");
 			websocket.send("open-project \"test/project.json\"");
+			document.getElementById('project-title').textContent = "Test Project";
 			}
 		catch (e) {
 			log("Websocket send failed!");
