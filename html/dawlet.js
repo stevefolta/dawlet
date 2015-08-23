@@ -5,6 +5,11 @@ var controls_width = 500;
 var track_height = 60;
 var child_track_indent = 20;
 var pixels_per_second = 5;
+var play_head = 0;
+
+var prefs = {
+	playhead_nudge: 0.1,
+	};
 
 var template_names = [ 'track', 'lane', 'clip' ];
 
@@ -120,6 +125,9 @@ function load() {
 		return Math.log(x) / Math.LN10;
 		};
 
+	// Keys.
+	window.addEventListener("keydown", handle_key_down);
+
 	// Buttons.
 	set_button_function("play", function() {
 		websocket.send("play");
@@ -180,7 +188,7 @@ function load() {
 				}
 			}
 		else if (event.data.startsWith("play-head ")) {
-			var play_head = parseFloat(event.data.substr(10));
+			play_head = parseFloat(event.data.substr(10));
 			show_play_head(play_head);
 			}
 		else if (event.data == "project-loaded")

@@ -155,6 +155,18 @@ void AudioEngine::run()
 					case Message::Pause:
 						pause();
 						break;
+					case Message::StopPlay:
+						if (playing)
+							stop();
+						else
+							play();
+						break;
+					case Message::PausePlay:
+						if (playing)
+							pause();
+						else
+							play();
+						break;
 					case Message::Rewind:
 						rewind();
 						break;
@@ -255,6 +267,17 @@ void AudioEngine::rewind()
 {
 	playing = false;
 	play_start = play_head = 0;
+	if (project)
+		project->prepare_to_play();
+}
+
+
+void AudioEngine::seek(ProjectPosition position)
+{
+	if (position < 0)
+		position = 0;
+	playing = false;
+	play_start = play_head = position;
 	if (project)
 		project->prepare_to_play();
 }

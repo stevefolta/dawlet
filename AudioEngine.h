@@ -3,6 +3,7 @@
 
 #include "BufferManager.h"
 #include "Message.h"
+#include "AudioTypes.h"
 class MessageQueue;
 class AudioFileRead;
 class Process;
@@ -33,8 +34,9 @@ class AudioEngine {
 		void	return_process(Process* process);
 
 		Project*	install_project(Project* new_project);
+		void	seek(ProjectPosition position);
 
-		double	play_start, play_head;
+		ProjectPosition	play_start, play_head;
 
 		void	receive_audio_file_read(AudioFileRead* read_request);
 		AudioFileRead*	next_audio_file_read();

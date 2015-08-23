@@ -8,6 +8,7 @@
 #include "FieldParser.h"
 #include "Message.h"
 #include "GetPBHeadProcess.h"
+#include "SeekProcess.h"
 #include "SupplyReadsProcess.h"
 #include "InstallProjectProcess.h"
 #include "SelectInterfaceProcess.h"
@@ -138,8 +139,16 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		engine->send(Message::Stop);
 	else if (command == "pause")
 		engine->send(Message::Pause);
+	else if (command == "stop-play")
+		engine->send(Message::StopPlay);
+	else if (command == "pause-play")
+		engine->send(Message::PausePlay);
 	else if (command == "rewind")
 		engine->send(Message::Rewind);
+	else if (command == "seek") {
+		ProjectPosition position = strtod(fields.next_field().c_str(), NULL);
+		engine->start_process(new SeekProcess(position));
+		}
 }
 
 

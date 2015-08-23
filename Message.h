@@ -14,6 +14,8 @@ struct Message {
 		Play,
 		Stop,
 		Pause,
+		StopPlay,
+		PausePlay,
 		Rewind,
 
 		// Engine -> DAW.
