@@ -3,6 +3,7 @@
 #include "AudioFileRead.h"
 #include "AudioFile.h"
 #include "AudioEngine.h"
+#include "IndentedOStream.h"
 #include "Logger.h"
 
 
@@ -50,6 +51,18 @@ void Clip::build_api_json(std::stringstream& result)
 	result << ", ";
 	result << "\"length\": " << (ProjectPosition) length_in_frames / file->info.sample_rate;
 	result << " }";
+}
+
+
+void Clip::write_to_file(IndentedOStream& stream)
+{
+	stream << "{ ";
+	stream << "\"file\": " << file->id;
+	stream << ", ";
+	stream << "\"start\": " << start;
+	stream << ", ";
+	stream << "\"length\": " << length_in_frames;
+	stream << " }";
 }
 
 

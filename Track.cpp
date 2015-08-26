@@ -6,6 +6,7 @@
 #include "AudioEngine.h"
 #include "Amp.h"
 #include "ProjectReader.h"
+#include "IndentedOStream.h"
 #include "Logger.h"
 #include "Exception.h"
 #include <sstream>
@@ -115,6 +116,41 @@ std::string Track::api_json()
 std::string Track::clips_json()
 {
 	return playlist->clips_json();
+}
+
+
+void Track::write_to_file(IndentedOStream& stream)
+{
+	bool compact = playlist->is_empty() && children.empty();
+	char separator = (compact ? ' ' : '\n');
+
+	stream << "{" << separator;
+	IndentedOStream::Indenter indenter(stream);
+
+	stream << "\"id\": " << id << "," << separator;
+	stream << "\"name\": \"" << name << "\"," << separator;
+	stream << "\"gain\": " << gain << "," << separator;
+	stream << "\"sends_to_parent\": " << (sends_to_parent ? "true" : "false") << "," << separator;
+
+	stream << "\"playlist\": ";
+	playlist->write_to_file(stream);
+
+	if (!children.empty()) {
+		stream << "," << separator;
+		stream << "\"children\": [" << '\n';
+		IndentedOStream::Indenter indenter(stream);
+		bool first_one = true;
+		for (auto it = children.begin(); it != children.end(); ++it) {
+			if (first_one)
+				first_one = false;
+			else
+				stream << ',' << '\n';
+			(*it)->write_to_file(stream);
+			}
+		stream << '\n' << "]" << '\n';
+		}
+
+	stream << "}";
 }
 
 

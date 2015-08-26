@@ -37,9 +37,11 @@ class DAW {
 		Project*	project;
 		AudioFileRead*	active_reads;
 		bool	running;
+		std::string	project_path;
 
 		bool	handle_file_reads();
 		void	open_project(std::string path);
+		void	save_project();
 	};
 
 

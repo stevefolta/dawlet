@@ -7,6 +7,7 @@
 class Clip;
 class AudioBuffer;
 class ProjectReader;
+class IndentedOStream;
 
 
 class Playlist {
@@ -16,9 +17,12 @@ class Playlist {
 
 		void	read_json(ProjectReader* reader);
 		std::string	clips_json();
+		void	write_to_file(IndentedOStream& stream);
 
 		void	prepare_to_play();
 		void	run(AudioBuffer** buffers_out, int num_channels);
+
+		bool	is_empty() { return clips.empty(); }
 
 	protected:
 		std::vector<Clip*>	clips;

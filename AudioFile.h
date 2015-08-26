@@ -7,6 +7,7 @@ class ProjectReader;
 class Project;
 class OpenAudioFile;
 class AudioBuffer;
+class IndentedOStream;
 
 
 class AudioFile {
@@ -25,6 +26,7 @@ class AudioFile {
 		Info	info;
 
 		void	read_json(ProjectReader* reader);
+		void	write_to_file(IndentedOStream& stream);
 		void	load_info();
 
 		OpenAudioFile*	open();

@@ -9,6 +9,7 @@ class ProjectReader;
 class AudioFile;
 class AudioFileRead;
 class AudioBuffer;
+class IndentedOStream;
 
 
 class Clip {
@@ -21,6 +22,7 @@ class Clip {
 
 		void	read_json(ProjectReader* reader);
 		void	build_api_json(std::stringstream& result);
+		void	write_to_file(IndentedOStream& stream);
 
 		AudioFile*	file;
 		ProjectPosition	start;

@@ -3,6 +3,7 @@
 #include "AudioFile.h"
 #include "ProjectReader.h"
 #include "JSONParser.h"
+#include "IndentedOStream.h"
 #include "Logger.h"
 #include <sstream>
 #include <sys/types.h>
@@ -65,6 +66,33 @@ std::string Project::api_json()
 	result << "\"master\": " << master->id;
 	result << " }";
 	return result.str();
+}
+
+
+void Project::write_to_file(IndentedOStream& stream)
+{
+	stream << "{" << '\n';
+	stream.indent();
+
+	stream << "\"master\": ";
+	master->write_to_file(stream);
+	stream << ',' << '\n' << '\n';
+
+	stream << "\"files\": {" << '\n';
+	stream.indent();
+	bool first_one = true;
+	for (auto it = files.begin(); it != files.end(); ++it) {
+		if (first_one)
+			first_one = false;
+		else
+			stream << ',' << '\n';
+		(*it)->write_to_file(stream);
+		}
+	stream << '\n' << "}" << '\n';
+	stream.unindent();
+
+	stream.unindent();
+	stream << "}" << '\n';
 }
 
 

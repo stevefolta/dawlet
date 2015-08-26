@@ -9,6 +9,7 @@ class Send;
 class AudioBuffer;
 class ProjectReader;
 class SetTrackGainProcess;
+class IndentedOStream;
 
 
 class Track {
@@ -19,6 +20,7 @@ class Track {
 		void	read_json(ProjectReader* reader);
 		std::string	api_json();
 		std::string	clips_json();
+		void	write_to_file(IndentedOStream& stream);
 
 		void	prepare_to_play();
 		void	run(AudioBuffer** buffers_out, int num_channels);

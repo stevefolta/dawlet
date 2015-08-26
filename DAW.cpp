@@ -13,10 +13,12 @@
 #include "InstallProjectProcess.h"
 #include "SelectInterfaceProcess.h"
 #include "ALSAAudioSystem.h"
+#include "IndentedOStream.h"
 #include "Exception.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -116,6 +118,8 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		string path = fields.next_field();
 		open_project(path);
 		}
+	else if (command == "save-project")
+		save_project();
 	else if (command == "list-interfaces") {
 		vector<string> interfaces = audio_system->list_interfaces();
 		stringstream reply;
@@ -206,7 +210,9 @@ void DAW::open_project(std::string path)
 		project->read_json(&reader);
 		project->load_audio_file_info();
 		engine->start_process(new InstallProjectProcess(project));
+		delete this->project;
 		this->project = project;
+		project_path = path;
 		}
 	catch (Exception& e) {
 		/***/
@@ -216,6 +222,25 @@ void DAW::open_project(std::string path)
 
 	// Clean up.
 	free(contents);
+}
+
+
+void DAW::save_project()
+{
+	if (!project || project_path.empty()) {
+		//***
+		return;
+		}
+
+	try {
+		std::ofstream file_stream(project_path);
+		IndentedOStream stream(file_stream);
+		project->write_to_file(stream);
+		}
+	catch (Exception& e) {
+		//***
+		fprintf(stderr, "Writing project file failed: %s.\n", e.type.c_str());
+		}
 }
 
 

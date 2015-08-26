@@ -3,6 +3,7 @@
 #include "WAVFile.h"
 #include "Project.h"
 #include "AudioBuffer.h"
+#include "IndentedOStream.h"
 #include "Logger.h"
 #include "Exception.h"
 
@@ -33,6 +34,14 @@ void AudioFile::read_json(ProjectReader* reader)
 		else
 			reader->ignore_value();
 		}
+}
+
+
+void AudioFile::write_to_file(IndentedOStream& stream)
+{
+	stream << "\"" << id << "\": { ";
+	stream << "\"path\": \"" << path << "\" ";
+	stream << "}";
 }
 
 

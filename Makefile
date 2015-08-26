@@ -13,6 +13,7 @@ SOURCES += SetTrackGainProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp
 SOURCES += AudioSystem.cpp
 SOURCES += ALSAAudioSystem.cpp ALSAAudioInterface.cpp
+SOURCES += IndentedOStream.cpp
 SOURCES += third-party/sha1-0.2/sha1.cpp
 SOURCES += tests/Tests.cpp
 OBJECTS_DIR := objects

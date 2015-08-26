@@ -3,6 +3,7 @@
 #include "ProjectReader.h"
 #include "AudioEngine.h"
 #include "web/Connection.h"
+#include "IndentedOStream.h"
 #include "Logger.h"
 #include <sstream>
 
@@ -56,6 +57,32 @@ std::string Playlist::clips_json()
 		}
 	result << " ]";
 	return result.str();
+}
+
+
+void Playlist::write_to_file(IndentedOStream& stream)
+{
+	if (is_empty()) {
+		stream << "{}";
+		return;
+		}
+
+	stream << "{" << '\n';
+	IndentedOStream::Indenter outer_indenter(stream);
+
+	stream << "\"clips\": [" << '\n';
+	IndentedOStream::Indenter inner_indenter(stream);
+
+	bool first_one = true;
+	for (auto it = clips.begin(); it != clips.end(); ++it) {
+		if (first_one)
+			first_one = false;
+		else
+			stream << "," << '\n';
+		(*it)->write_to_file(stream);
+		}
+
+	stream << '\n' << "]}";
 }
 
 

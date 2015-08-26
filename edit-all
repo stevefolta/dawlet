@@ -12,6 +12,7 @@ classes+=(SelectInterfaceProcess)
 classes+=(SetTrackGainProcess)
 classes+=(AudioSystem AudioInterface)
 classes+=(ALSAAudioSystem ALSAAudioInterface)
+classes+=(IndentedOStream)
 files=()
 files+=(main.cpp)
 
