@@ -238,6 +238,10 @@ void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 		}
 	if (i >= num_reads) {
 		log("Read slot allocation fail!");
+		log("  Trying to add %lu -> %lu.", start_frame, start_frame + num_frames);
+		log("  Have:");
+		for (i = 0; i < num_reads; ++i)
+			log("    %lu -> %lu", reads[i]->start_frame, reads[i]->start_frame + reads[i]->num_frames);
 		return;
 		}
 
