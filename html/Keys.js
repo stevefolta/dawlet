@@ -6,6 +6,7 @@ var key_bindings = {
 	"C-S": "save",
 	"J": "select-next-track",
 	"K": "select-prev-track",
+	"N": "change-track-name",
 	};
 
 var commands = {
@@ -16,6 +17,7 @@ var commands = {
 	"save": function() { websocket.send("save-project"); },
 	"select-next-track": function() { select_next_track(); },
 	"select-prev-track": function() { select_prev_track(); },
+	"change-track-name": function() { change_track_name(selected_track); }
 	};
 
 

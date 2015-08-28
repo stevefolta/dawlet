@@ -28,6 +28,8 @@ class Track {
 		int	id;
 		int	max_used_id();
 
+		void	set_name(std::string new_name) { name = new_name; }
+
 	protected:
 		Project*	project;
 		std::string	name;

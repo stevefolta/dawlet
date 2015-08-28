@@ -17,6 +17,13 @@ function Track(id, parent) {
 	var name_element = find_element_by_id(this.track_svg, "track-name");
 	name_element.textContent = "";
 		// Until we get the real name.
+	name_element.addEventListener('mousedown', function(event) {
+		// Use 'mousedown' so we can preventDefault(); "detail >= 2" to detect
+		// double-clicks.
+		event.preventDefault();
+		if (event.detail >= 2)
+			change_track_name(track);
+		});
 	this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
 	this.div.appendChild(this.svg);
 	this.svg.appendChild(this.track_svg);
@@ -189,6 +196,31 @@ function select_prev_track() {
 		select_track(parent);
 	else
 		select_track(parent.children[index - 1]);
+	}
+
+
+function change_track_name(track) {
+	if (!track)
+		return;
+
+	// Ask for the new name.
+	var name_element = find_element_by_id(track.track_svg, "track-name");
+	var old_name = name_element.textContent;
+	var new_name = window.prompt("New track name:", old_name);
+	if (!new_name || new_name == old_name)
+		return;
+
+	// Send the API request to set the name.
+	var request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE) {
+			if (this.status == 200)
+				name_element.textContent = new_name;
+			}
+		}
+	request.open("PUT", "/api/track/" + track.id + "/name", true);
+	request.send(new_name);
 	}
 
 

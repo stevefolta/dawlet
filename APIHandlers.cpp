@@ -5,6 +5,7 @@
 #include "DAW.h"
 #include "AudioEngine.h"
 #include "SetTrackGainProcess.h"
+#include "SetTrackNameProcess.h"
 #include "Logger.h"
 #include <map>
 
@@ -87,6 +88,8 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 			else
 				engine->start_process(new SetTrackGainProcess(track, gain, connection));
 			}
+		else if (component == "name")
+			engine->start_process(new SetTrackNameProcess(track, value, connection));
 		else
 			connection->error_out("404 Not Found");
 		}
