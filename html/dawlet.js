@@ -196,7 +196,7 @@ function load() {
 	// Unfortunately, we can't give a relative URL.
 	websocket = new WebSocket("ws://" + window.location.host + "/socket");
 	websocket.onmessage = function (event) {
-		if (!event.data.startsWith("play-head "))
+		if (!event.data.startsWith("play-head ") && !event.data.startsWith("meters"))
 			log("Got websocket message: \"" + event.data + "\"");
 		if (event.data.startsWith("interfaces ")) {
 			var json = event.data.substr(10);

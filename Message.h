@@ -20,6 +20,7 @@ struct Message {
 
 		// Engine -> DAW.
 		NeedMoreReadRequests,
+		NeedMoreMetering,
 		};
 
 	int	type;

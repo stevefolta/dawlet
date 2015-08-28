@@ -8,6 +8,7 @@ SOURCES += AudioFileRead.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 SOURCES += APIHandler.cpp APIHandlers.cpp
 SOURCES += GetPBHeadProcess.cpp SeekProcess.cpp SupplyReadsProcess.cpp InstallProjectProcess.cpp
+SOURCES += SendMeteringProcess.cpp
 SOURCES += SelectInterfaceProcess.cpp
 SOURCES += SetTrackGainProcess.cpp SetTrackNameProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp

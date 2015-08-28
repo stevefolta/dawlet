@@ -13,7 +13,7 @@
 
 
 Track::Track(Project* projectIn, int idIn)
-	: project(projectIn), playlist(nullptr)
+	: project(projectIn), playlist(nullptr), cur_peak(0.0)
 {
 	id = idIn >=0 ? idIn : project->new_id();
 	gain = 1.0;
@@ -193,31 +193,78 @@ void Track::run(AudioBuffer** buffers_out, int num_channels)
 	/***/
 
 	// Mix the track into the output buffers.
+	// Collect metering info at the same time.
+	AudioSample min_sample = 0, max_sample = 0;
 	if (sends_to_parent) {
 		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
 			AudioSample* in = track_buffers[which_channel]->samples;
 			AudioSample* out = buffers_out[which_channel]->samples;
 			for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
-				*out += amp(gain, *in++);
+				AudioSample sample = amp(gain, *in++);
+				if (sample > max_sample)
+					max_sample = sample;
+				else if (sample < min_sample)
+					min_sample = sample;
+				*out += sample;
 				++out;
 				}
 			}
 		}
+
+	// If not using the output buffers, we still want the metering info.
+	else {
+		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
+			AudioSample* in = track_buffers[which_channel]->samples;
+			for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
+				AudioSample sample = amp(gain, *in++);
+				if (sample > max_sample)
+					max_sample = sample;
+				else if (sample < min_sample)
+					min_sample = sample;
+				}
+			}
+		}
+
+	// Finish processing metering.
+	min_sample = -min_sample;
+	if (min_sample > max_sample)
+		max_sample = min_sample;
+	if (max_sample > cur_peak)
+		cur_peak = max_sample;
 
 	for (which_channel = 0; which_channel < num_channels; ++which_channel)
 		engine->free_buffer(track_buffers[which_channel]);
 }
 
 
+void Track::run_metering()
+{
+	engine->add_peak(id, cur_peak);
+	cur_peak = 0;
+
+	for (auto& child : children)
+		child->run_metering();
+}
+
+
 int Track::max_used_id()
 {
 	int max_id = id;
-	for (auto it = children.begin(); it != children.end(); ++it) {
-		int child_id = (*it)->id;
+	for (auto& child : children) {
+		int child_id = child->id;
 		if (child_id > max_id)
 			max_id = child_id;
 		}
 	return max_id;
+}
+
+
+int Track::total_num_tracks()
+{
+	int num_tracks = 1;
+	for (auto& child : children)
+		num_tracks += child->total_num_tracks();
+	return num_tracks;
 }
 
 

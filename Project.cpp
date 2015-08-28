@@ -108,6 +108,12 @@ void Project::run(AudioBuffer** buffers_out, int num_channels)
 }
 
 
+void Project::run_metering()
+{
+	master->run_metering();
+}
+
+
 int Project::new_id()
 {
 	return next_new_id++;
@@ -122,6 +128,12 @@ int Project::max_used_id()
 		if (id > max_id)
 			max_id = id;
 		}
+}
+
+
+int Project::total_num_tracks()
+{
+	return master->total_num_tracks();
 }
 
 

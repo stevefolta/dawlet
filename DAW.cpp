@@ -10,6 +10,7 @@
 #include "GetPBHeadProcess.h"
 #include "SeekProcess.h"
 #include "SupplyReadsProcess.h"
+#include "SendMeteringProcess.h"
 #include "InstallProjectProcess.h"
 #include "SelectInterfaceProcess.h"
 #include "ALSAAudioSystem.h"
@@ -92,6 +93,9 @@ bool DAW::tick()
 				break;
 			case Message::NeedMoreReadRequests:
 				engine->start_process(new SupplyReadsProcess(this, message.num));
+				break;
+			case Message::NeedMoreMetering:
+				supply_metering(message.num);
 				break;
 			}
 		if (have_messages)
@@ -241,6 +245,16 @@ void DAW::save_project()
 		//***
 		fprintf(stderr, "Writing project file failed: %s.\n", e.type.c_str());
 		}
+}
+
+
+void DAW::supply_metering(int num_tracks)
+{
+	int num_sends =
+		(num_tracks + SendMeteringProcess::peaks_per_send - 1) /
+		SendMeteringProcess::peaks_per_send;
+	for (; num_sends > 0; --num_sends)
+		engine->start_process(new SendMeteringProcess());
 }
 
 

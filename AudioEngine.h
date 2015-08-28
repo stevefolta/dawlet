@@ -6,6 +6,7 @@
 #include "AudioTypes.h"
 class MessageQueue;
 class AudioFileRead;
+class SendMeteringProcess;
 class Process;
 class Project;
 
@@ -41,6 +42,9 @@ class AudioEngine {
 		void	receive_audio_file_read(AudioFileRead* read_request);
 		AudioFileRead*	next_audio_file_read();
 
+		void	add_metering_process(SendMeteringProcess* metering_process);
+		void	add_peak(int track_id, AudioSample peak);
+
 		enum {
 			read_ahead_seconds = 2,
 			};
@@ -48,6 +52,7 @@ class AudioEngine {
 	protected:
 		int	cur_sample_rate;
 		int	cur_buffer_size;
+		int	metering_hz;
 		bool	playing;
 
 		BufferManager*	bufferManager;
@@ -57,6 +62,8 @@ class AudioEngine {
 		AudioFileRead*	free_read_requests;
 		int	num_free_read_requests;
 
+		SendMeteringProcess*	next_metering_process;
+
 		Project*	project;
 
 		void	run();
@@ -65,6 +72,10 @@ class AudioEngine {
 		void	pause();
 		void	rewind();
 		static void*	thread_start(void* arg);
+
+		unsigned long buffers_until_metering;
+		void	run_metering();
+		void	send_next_metering_process();
 	};
 
 extern AudioEngine* engine;

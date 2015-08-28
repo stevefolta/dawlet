@@ -42,6 +42,8 @@ class DAW {
 		bool	handle_file_reads();
 		void	open_project(std::string path);
 		void	save_project();
+
+		void	supply_metering(int num_tracks);
 	};
 
 

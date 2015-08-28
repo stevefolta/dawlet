@@ -22,9 +22,11 @@ class Project {
 
 		void	prepare_to_play();
 		void	run(AudioBuffer** buffers_out, int num_channels);
+		void	run_metering();
 
 		int	new_id();
 		int	max_used_id();
+		int	total_num_tracks();
 
 		void	add_file(AudioFile* file);
 

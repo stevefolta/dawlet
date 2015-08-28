@@ -2,6 +2,7 @@
 #include "MessageQueue.h"
 #include "Process.h"
 #include "AudioFileRead.h"
+#include "SendMeteringProcess.h"
 #include "AudioSystem.h"
 #include "AudioInterface.h"
 #include "Project.h"
@@ -9,6 +10,7 @@
 #include "Logger.h"
 #include <pthread.h>
 #include <unistd.h>
+#include <math.h>
 #ifdef USE_LOCAL_H
 	#include "local.h"
 #endif
@@ -25,6 +27,10 @@ AudioEngine::AudioEngine()
 	#ifdef DEFAULT_BUFFER_SIZE
 		cur_buffer_size = DEFAULT_BUFFER_SIZE;
 	#endif
+	metering_hz = 20;
+	#ifdef DEFAULT_METERING_HZ
+		metering_hz = DEFAULT_METERING_HZ;
+	#endif
 
 	play_start = play_head = 0.0;
 	playing = false;
@@ -36,6 +42,9 @@ AudioEngine::AudioEngine()
 
 	free_read_requests = nullptr;
 	num_free_read_requests = 0;
+
+	buffers_until_metering = 1;
+	next_metering_process = nullptr;
 
 	pthread_t thread;
 	pthread_create(&thread, nullptr, &thread_start, this);
@@ -175,7 +184,8 @@ void AudioEngine::run()
 						{
 							Process* process = (Process*) message->param;
 							process->next();
-							from->send(Message::ContinueProcess, process);
+							if (process->return_immediately())
+								from->send(Message::ContinueProcess, process);
 						}
 						break;
 
@@ -235,6 +245,8 @@ void AudioEngine::run()
 			for (which_channel = 0; which_channel < num_channels; ++which_channel)
 				free_buffer(out_buffers[which_channel]);
 			}
+
+		run_metering();
 		}
 }
 
@@ -287,6 +299,56 @@ void* AudioEngine::thread_start(void* arg)
 {
 	((AudioEngine*) arg)->run();
 	return nullptr;
+}
+
+
+void AudioEngine::run_metering()
+{
+	// Is it time?
+	if (--buffers_until_metering > 0)
+		return;
+	float buffers_per_second = (float) cur_sample_rate / (float) cur_buffer_size;
+	buffers_until_metering = (int) roundf(buffers_per_second / metering_hz);
+
+	if (project) {
+		// Send the metering.
+		project->run_metering();
+		if (next_metering_process && !next_metering_process->is_empty())
+			send_next_metering_process();
+
+		// Get some more processes.
+		from->send(
+			Message::NeedMoreMetering,
+			project->total_num_tracks());
+		}
+
+}
+
+
+void AudioEngine::add_metering_process(SendMeteringProcess* metering_process)
+{
+	metering_process->next_peaks = next_metering_process;
+	next_metering_process = metering_process;
+}
+
+
+void AudioEngine::add_peak(int track_id, AudioSample peak)
+{
+	if (next_metering_process == nullptr)
+		return;
+
+	next_metering_process->add_peak(track_id, peak);
+	if (next_metering_process->is_full())
+		send_next_metering_process();
+}
+
+
+void AudioEngine::send_next_metering_process()
+{
+	SendMeteringProcess* process = next_metering_process;
+	next_metering_process = process->next_peaks;
+	process->next_peaks = nullptr;
+	return_process(process);
 }
 
 
