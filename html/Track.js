@@ -19,6 +19,9 @@ function Track(id, parent) {
 	this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
 	this.div.appendChild(this.svg);
 	this.svg.appendChild(this.track_svg);
+	this.svg.addEventListener('mousedown', function(event) {
+		track.track_clicked(event);
+		});
 
 	// Add this track's elements into the document in the appropriate place.
 	// We have to do this before we start dealing with widths and heights.
@@ -107,5 +110,13 @@ Track.prototype.level = function() {
 	for (var parent = this.parent; parent; parent = parent.parent)
 		level += 1;
 	return level;
+	}
+
+
+Track.prototype.track_clicked = function(event) {
+	if (selected_track)
+		selected_track.track_svg.removeAttribute('selected');
+	selected_track = this;
+	this.track_svg.setAttribute('selected', 'selected');
 	}
 

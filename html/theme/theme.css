@@ -1,0 +1,9 @@
+rect.background {
+	fill: none;
+	}
+
+.track-controls[selected] .background {
+	fill: rgba(248, 229, 27, 0.25);
+	}
+
+

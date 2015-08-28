@@ -6,6 +6,8 @@ var track_height = 60;
 var child_track_indent = 20;
 var pixels_per_second = 5;
 var play_head = 0;
+var selected_track = null;
+var theme_css_link = null;
 
 var prefs = {
 	playhead_nudge: 0.1,
@@ -111,6 +113,34 @@ function show_entered_value(value) {
 	}
 
 
+function load_theme() {
+	// Get the templates.
+	templates = {};
+	template_names.forEach(function(name) {
+		var request = new XMLHttpRequest;
+		request.onreadystatechange = function() {
+			var DONE = this.DONE || 4;
+			if (this.readyState === DONE) {
+				var template_document = request.responseXML;
+				templates[name] = new SVGTemplate(template_document);
+				}
+			};
+		request.open('GET', 'theme/' + name + '.svg', true);
+		request.send(null);
+		});
+
+	// Insert the CSS.
+	var head = document.getElementsByTagName('head')[0];
+	if (theme_css_link)
+		head.removeChild(theme_css_link);
+	theme_css_link = document.createElement('link');
+	theme_css_link.setAttribute('href', 'theme/theme.css');
+	theme_css_link.setAttribute('rel', 'stylesheet');
+	theme_css_link.setAttribute('type', 'text/css');
+	head.appendChild(theme_css_link);
+	}
+
+
 function load() {
 	log("Loaded page.");
 
@@ -159,19 +189,7 @@ function load() {
 		},
 		200);
 
-	// Get the templates.
-	template_names.forEach(function(name) {
-		var request = new XMLHttpRequest;
-		request.onreadystatechange = function() {
-			var DONE = this.DONE || 4;
-			if (this.readyState === DONE) {
-				var template_document = request.responseXML;
-				templates[name] = new SVGTemplate(template_document);
-				}
-			};
-		request.open('GET', 'theme/' + name + '.svg', true);
-		request.send(null);
-		});
+	load_theme();
 
 	// Start the websocket.
 	// Unfortunately, we can't give a relative URL.
