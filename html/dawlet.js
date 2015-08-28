@@ -6,6 +6,7 @@ var track_height = 60;
 var child_track_indent = 20;
 var pixels_per_second = 5;
 var play_head = 0;
+var master_track = null;
 var selected_track = null;
 var theme_css_link = null;
 
@@ -102,7 +103,7 @@ function got_project_json(json) {
 		tracks.removeChild(tracks.lastChild);
 
 	// Get the master track; the rest of the tracks will follow from there.
-	new Track(json.master);
+	master_track = new Track(json.master);
 	}
 
 

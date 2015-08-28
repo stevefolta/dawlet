@@ -4,6 +4,8 @@ var key_bindings = {
 	"ArrowLeft": "playhead-left",
 	"ArrowRight": "playhead-right",
 	"C-S": "save",
+	"J": "select-next-track",
+	"K": "select-prev-track",
 	};
 
 var commands = {
@@ -12,6 +14,8 @@ var commands = {
 	"playhead-left": function() { websocket.send("seek " + (play_head - prefs.playhead_nudge)); },
 	"playhead-right": function() { websocket.send("seek " + (play_head + prefs.playhead_nudge)); },
 	"save": function() { websocket.send("save-project"); },
+	"select-next-track": function() { select_next_track(); },
+	"select-prev-track": function() { select_prev_track(); },
 	};
 
 

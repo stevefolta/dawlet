@@ -2,6 +2,7 @@ function Track(id, parent) {
 	this.id = id;
 	this.parent = parent;
 	this.children_div = null;
+	this.children = [];
 	var track = this;
 
 	var indent = 0;
@@ -27,8 +28,10 @@ function Track(id, parent) {
 	// We have to do this before we start dealing with widths and heights.
 	if (this.is_master())
 		document.getElementById('master').appendChild(this.div);
-	else if (parent.is_master())
+	else if (parent.is_master()) {
 		document.getElementById('tracks').appendChild(this.div);
+		parent.children.push(this);
+		}
 	else
 		parent.append_child(this);
 	var total_width = this.div.getBoundingClientRect().width;
@@ -102,6 +105,7 @@ Track.prototype.append_child = function(child) {
 		}
 
 	this.children_div.appendChild(child.div);
+	this.children.push(child);
 	};
 
 
@@ -113,10 +117,78 @@ Track.prototype.level = function() {
 	}
 
 
-Track.prototype.track_clicked = function(event) {
+function select_track(track) {
 	if (selected_track)
 		selected_track.track_svg.removeAttribute('selected');
-	selected_track = this;
-	this.track_svg.setAttribute('selected', 'selected');
+	selected_track = track;
+	if (track)
+		track.track_svg.setAttribute('selected', 'selected');
 	}
+
+Track.prototype.track_clicked = function(event) {
+	select_track(this);
+	}
+
+function select_next_track() {
+	if (!selected_track) {
+		if (master_track.children.length > 0)
+			select_track(master_track.children[0]);
+		else
+			select_track(master_track);
+		return;
+		}
+
+	// If there are children, select the first one.
+	if (selected_track.children.length > 1) {
+		select_track(selected_track.children[0]);
+		return;
+		}
+
+	// Select the next sibling.
+	var parent = selected_track.parent;
+	if (!parent) {
+		// The Master track is selected.
+		if (selected_track.children.length > 0)
+			select_track(selected_track.children[0]);
+		return;
+		}
+	var track = selected_track;
+	while (parent) {
+		index = parent.children.indexOf(track);
+		if (index < parent.children.length - 1) {
+			select_track(parent.children[index + 1]);
+			return;
+			}
+		else {
+			// "track" is the last track in its parent, so select the parent's
+			// next sibling.
+			track = parent;
+			parent = track.parent;
+			}
+		}
+	}
+
+function select_prev_track() {
+	if (!selected_track) {
+		if (master_track.children.length > 0)
+			select_track(master_track.children[master_track.children.length - 1]);
+		else
+			select_track(master_track);
+		return;
+		}
+
+	// Select the previous sibling.
+	var track = selected_track;
+	var parent = selected_track.parent;
+	if (!parent) {
+		// This is the master track.
+		return;
+		}
+	var index = parent.children.indexOf(track);
+	if (index == 0)
+		select_track(parent);
+	else
+		select_track(parent.children[index - 1]);
+	}
+
 
