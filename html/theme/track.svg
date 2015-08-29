@@ -76,6 +76,15 @@
          id="tspan3338"
          x="12.08021"
          y="1014.1627">Track Name</tspan></text>
+	<rect
+		id="meter-track"
+		y="1021.4237"
+		x="12.93723"
+		height="23.244606"
+		width="381.12885"
+		style="fill:none;stroke:none"
+		attach="0011"
+		/>
     <g
        id="gain-knob"
        inkscape:label="#g4207">

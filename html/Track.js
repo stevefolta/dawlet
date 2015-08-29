@@ -3,7 +3,9 @@ function Track(id, parent) {
 	this.parent = parent;
 	this.children_div = null;
 	this.children = [];
+	this.meter_rect = null;
 	var track = this;
+	tracks_by_id[id] = this;
 
 	var indent = 0;
 	var level = this.level();
@@ -58,6 +60,8 @@ function Track(id, parent) {
 		request.open("PUT", "/api/track/" + track.id + "/gain", true);
 		request.send("" + gain);
 		};
+
+	this.meter_track = find_element_by_id(this.track_svg, 'meter-track');
 
 	// Add the lane.
 	this.lane = templates['lane'].clone(
@@ -121,6 +125,36 @@ Track.prototype.level = function() {
 	for (var parent = this.parent; parent; parent = parent.parent)
 		level += 1;
 	return level;
+	}
+
+
+Track.prototype.update_meter = function(level) {
+	// Delete old meter_rect.
+	if (this.meter_rect) {
+		this.track_svg.removeChild(this.meter_rect);
+		this.meter_rect = null;
+		}
+
+	if (level == 0 || !this.meter_track)
+		return;
+
+	// Figure out the width.
+	if (level > 1.0)
+		level = 1.0;
+	var dB = gain_to_dB(level);
+	if (dB < min_dB)
+		return;
+	var max_width = parseFloat(this.meter_track.getAttribute('width'));
+	var width = max_width * (min_dB - dB) / min_dB;
+
+	// Create the new rect.
+	this.meter_rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");;
+	this.meter_rect.setAttribute('x', this.meter_track.getAttribute('x'));
+	this.meter_rect.setAttribute('y', this.meter_track.getAttribute('y'));
+	this.meter_rect.setAttribute('height', this.meter_track.getAttribute('height'));
+	this.meter_rect.setAttribute('width', "" + width);
+	this.meter_rect.setAttribute('class', 'meter');
+	this.track_svg.insertBefore(this.meter_rect, this.meter_track);
 	}
 
 

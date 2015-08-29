@@ -7,6 +7,7 @@ var child_track_indent = 20;
 var pixels_per_second = 5;
 var play_head = 0;
 var master_track = null;
+var tracks_by_id = {};
 var selected_track = null;
 var theme_css_link = null;
 
@@ -56,6 +57,19 @@ function show_play_head(play_head) {
 	var play_head_x = controls_width + play_head * pixels_per_second;
 	document.getElementById("play-head").setAttribute(
 		'transform', "translate(" + play_head_x + ", 0)");
+	}
+
+
+function update_meters(message) {
+	var data = message.split(' ');
+	data.shift();
+	while (data.length > 0) {
+		var track_id = parseInt(data.shift());
+		var peak = parseFloat(data.shift());
+		var track = tracks_by_id[track_id];
+		if (track)
+			track.update_meter(peak);
+		}
 	}
 
 
@@ -210,6 +224,8 @@ function load() {
 			play_head = parseFloat(event.data.substr(10));
 			show_play_head(play_head);
 			}
+		else if (event.data.startsWith("meters "))
+			update_meters(event.data);
 		else if (event.data == "project-loaded")
 			project_loaded();
 		};

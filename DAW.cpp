@@ -15,6 +15,7 @@
 #include "SelectInterfaceProcess.h"
 #include "ALSAAudioSystem.h"
 #include "IndentedOStream.h"
+#include "Logger.h"
 #include "Exception.h"
 #include <unistd.h>
 #include <stdio.h>

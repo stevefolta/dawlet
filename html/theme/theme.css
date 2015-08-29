@@ -6,4 +6,8 @@ rect.background {
 	fill: rgba(248, 229, 27, 0.25);
 	}
 
+rect.meter {
+	fill: rgba(0, 255, 0, 0.5);
+	}
+
 
