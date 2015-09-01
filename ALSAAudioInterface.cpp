@@ -2,10 +2,13 @@
 #include "AudioBuffer.h"
 #include "Exception.h"
 #include "Logger.h"
+#ifdef USE_LOCAL_H
+	#include "local.h"
+#endif
 
 
 ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
-	: name(name_in), out_buffer(nullptr)
+	: name(name_in), out_buffer(nullptr), initialized(false), started(false)
 {
 	int err = snd_pcm_open(&playback, name.c_str(), SND_PCM_STREAM_PLAYBACK, 0);
 	if (err < 0)
@@ -27,10 +30,17 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	this->buffer_size = buffer_size;
 	free(out_buffer);
 	out_buffer = (char*) malloc(4 * buffer_size);
+	int err;
+	auto check_err = [&err](const char* call, int value) -> void {
+		if (err >= 0)
+			return;
+		log("%s(%d) failed: %d (\"%s\").", call, value, err, snd_strerror(err));
+		throw Exception("alsa-setup-fail");
+		};
 
 	// Set the hardware params.
 	snd_pcm_hw_params_t* hw_params;
-	int err = snd_pcm_hw_params_malloc(&hw_params);
+	err = snd_pcm_hw_params_malloc(&hw_params);
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
 	err = snd_pcm_hw_params_any(playback, hw_params);
@@ -38,20 +48,20 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 		throw Exception("alsa-setup-fail");
 	err = snd_pcm_hw_params_set_access(
 		playback, hw_params, SND_PCM_ACCESS_RW_NONINTERLEAVED);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
+	check_err("snd_pcm_hw_params_set_access", SND_PCM_ACCESS_RW_NONINTERLEAVED);
 	err = snd_pcm_hw_params_set_format(playback, hw_params, SND_PCM_FORMAT_FLOAT_LE);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
+	check_err("snd_pcm_hw_params_set_format", SND_PCM_FORMAT_FLOAT_LE);
 	err = snd_pcm_hw_params_set_rate(playback, hw_params, sample_rate, 0);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
+	check_err("snd_pcm_hw_params_set_rate", sample_rate);
 	err = snd_pcm_hw_params_set_channels(playback, hw_params, num_channels);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
+	check_err("snd_pcm_hw_params_set_channels", num_channels);
+	snd_pcm_uframes_t actual_buffer_size = buffer_size;
+	err = snd_pcm_hw_params_set_buffer_size_near(playback, hw_params, &actual_buffer_size);
+	check_err("snd_pcm_hw_params_set_buffer_size", actual_buffer_size);
+	if (actual_buffer_size != buffer_size)
+		log("actual buffer size: %d", actual_buffer_size);
 	err = snd_pcm_hw_params(playback, hw_params);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
+	check_err("snd_pcm_hw_params", 0);
 	snd_pcm_hw_params_free(hw_params);
 
 	// Set the software params.
@@ -63,11 +73,9 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
 	err = snd_pcm_sw_params_set_avail_min(playback, sw_params, buffer_size);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
-	err = snd_pcm_sw_params_set_start_threshold(playback, sw_params, 0);
-	if (err < 0)
-		throw Exception("alsa-setup-fail");
+	check_err("snd_pcm_sw_params_set_avail_min", buffer_size);
+	err = snd_pcm_sw_params_set_start_threshold(playback, sw_params, buffer_size);
+	check_err("snd_pcm_sw_params_set_start_threshold", buffer_size);
 	err = snd_pcm_sw_params(playback, sw_params);
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
@@ -76,6 +84,8 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	err = snd_pcm_prepare(playback);
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
+
+	initialized = true;
 }
 
 
@@ -94,6 +104,9 @@ void ALSAAudioInterface::wait_until_ready()
 
 void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 {
+	if (!initialized)
+		return;
+
 	int frames_to_deliver = snd_pcm_avail_update(playback);
 	if (frames_to_deliver == -EPIPE)
 		throw Exception("playback-xrun");
@@ -116,6 +129,24 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 		log("buffers_sent: %d.", buffers_sent);
 		throw Exception("alsa-playback-fail");
 		}
+
+	if (!started) {
+		err = snd_pcm_start(playback);
+		if (err < 0)
+			log("snd_pcm_start() returned %d (\"%s\").", err, snd_strerror(err));
+		started = true;
+		}
+
+#ifdef DEBUG_ALSA_PLAYBACK_LATENCY
+	static int num_latencies = 600;
+	if (num_latencies > 0) {
+		snd_pcm_sframes_t delay;
+		err = snd_pcm_delay(playback, &delay);
+		if (err >= 0 && delay > 0)
+			log("Expected playback latency: %ld.", delay);
+		--num_latencies;
+		}
+#endif
 
 	buffers_sent += 1;
 }

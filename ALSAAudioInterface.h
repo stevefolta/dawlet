@@ -21,6 +21,7 @@ class ALSAAudioInterface : public AudioInterface {
 		int	buffer_size;
 		char*	out_buffer;
 		int	buffers_sent;
+		bool	initialized, started;
 	};
 
 
