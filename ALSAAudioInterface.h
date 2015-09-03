@@ -21,7 +21,10 @@ class ALSAAudioInterface : public AudioInterface {
 		int	buffer_size;
 		char*	out_buffer;
 		int	buffers_sent;
+		int	xruns;
 		bool	initialized, started;
+
+		void	got_xrun();
 	};
 
 

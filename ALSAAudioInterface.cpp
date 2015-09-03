@@ -1,5 +1,6 @@
 #include "ALSAAudioInterface.h"
 #include "AudioBuffer.h"
+#include "AudioEngine.h"
 #include "Exception.h"
 #include "Logger.h"
 #ifdef USE_LOCAL_H
@@ -8,7 +9,9 @@
 
 
 ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
-	: name(name_in), out_buffer(nullptr), initialized(false), started(false)
+	:	name(name_in),
+		out_buffer(nullptr), xruns(0),
+		initialized(false), started(false)
 {
 	int err = snd_pcm_open(&playback, name.c_str(), SND_PCM_STREAM_PLAYBACK, 0);
 	if (err < 0)
@@ -92,7 +95,9 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 void ALSAAudioInterface::wait_until_ready()
 {
 	int err = snd_pcm_wait(playback, 1000);
-	if (err < 0) {
+	if (err = -EPIPE)
+		got_xrun();
+	else if (err < 0) {
 		snd_pcm_state_t state = snd_pcm_state(playback);
 		log("snd_pcm_wait returned %d (\"%s\").", err, snd_strerror(err));
 		log("snd_pcm_state() is %d.", state);
@@ -109,7 +114,7 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 
 	int frames_to_deliver = snd_pcm_avail_update(playback);
 	if (frames_to_deliver == -EPIPE)
-		throw Exception("playback-xrun");
+		got_xrun();
 	else if (frames_to_deliver < 0)
 		throw Exception("alsa-playback-fail");
 	if (frames_to_deliver < buffer_size) {
@@ -123,7 +128,9 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 	for (int which_channel = 0; which_channel < num_channels; ++which_channel)
 		channel_buffers[which_channel] = buffers[which_channel]->samples;
 	int err = snd_pcm_writen(playback, channel_buffers, buffer_size);
-	if (err < 0) {
+	if (err == -EPIPE)
+		got_xrun();
+	else if (err < 0) {
 		log("snd_pcm_writen() returned %d (\"%s\").", err, snd_strerror(err));
 		log("state = %d", snd_pcm_state(playback));
 		log("buffers_sent: %d.", buffers_sent);
@@ -149,6 +156,14 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 #endif
 
 	buffers_sent += 1;
+}
+
+
+void ALSAAudioInterface::got_xrun()
+{
+	log("xrun");
+	xruns += 1;
+	engine->got_xrun();
 }
 
 

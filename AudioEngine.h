@@ -44,6 +44,7 @@ class AudioEngine {
 
 		void	add_metering_process(SendMeteringProcess* metering_process);
 		void	add_peak(int track_id, AudioSample peak);
+		void	got_xrun();
 
 		enum {
 			read_ahead_seconds = 2,

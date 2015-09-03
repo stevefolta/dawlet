@@ -343,6 +343,12 @@ void AudioEngine::add_peak(int track_id, AudioSample peak)
 }
 
 
+void AudioEngine::got_xrun()
+{
+	/***/
+}
+
+
 void AudioEngine::send_next_metering_process()
 {
 	SendMeteringProcess* process = next_metering_process;
