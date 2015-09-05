@@ -73,6 +73,26 @@ function update_meters(message) {
 	}
 
 
+var xrun_timeout = null;
+var xrun_display_ms = 300;
+function got_xrun() {
+	if (xrun_timeout)
+		window.clearTimeout(xrun_timeout);
+
+	var clock = document.getElementById("clock");
+	if (clock) {
+		clock.setAttribute("xrun", "xrun");
+
+		window.setTimeout(function() {
+			clock.removeAttribute("xrun");
+			xrun_timeout = null;
+			},
+			xrun_display_ms);
+		}
+
+	}
+
+
 function set_button_function(id, fn) {
 	var button = document.getElementById(id);
 	if (button)
@@ -228,6 +248,8 @@ function load() {
 			update_meters(event.data);
 		else if (event.data == "project-loaded")
 			project_loaded();
+		else if (event.data == "xrun")
+			got_xrun();
 		};
 	websocket.onopen = function (event) {
 		try {

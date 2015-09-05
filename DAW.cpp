@@ -98,6 +98,10 @@ bool DAW::tick()
 			case Message::NeedMoreMetering:
 				supply_metering(message.num);
 				break;
+			case Message::Xrun:
+				if (cur_websocket_connection)
+					cur_websocket_connection->send_websocket_message("xrun");
+				break;
 			}
 		if (have_messages)
 			did_something = true;

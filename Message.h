@@ -21,6 +21,7 @@ struct Message {
 		// Engine -> DAW.
 		NeedMoreReadRequests,
 		NeedMoreMetering,
+		Xrun,
 		};
 
 	int	type;

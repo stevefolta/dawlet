@@ -352,7 +352,7 @@ void AudioEngine::add_peak(int track_id, AudioSample peak)
 
 void AudioEngine::got_xrun()
 {
-	/***/
+	from->send(Message::Xrun);
 }
 
 
