@@ -46,8 +46,12 @@ AudioEngine::AudioEngine()
 	buffers_until_metering = 1;
 	next_metering_process = nullptr;
 
+	pthread_attr_t thread_attributes;
+	int err = pthread_attr_init(&thread_attributes);
+	err = pthread_attr_setschedpolicy(&thread_attributes, SCHED_FIFO);
 	pthread_t thread;
-	pthread_create(&thread, nullptr, &thread_start, this);
+	pthread_create(&thread, &thread_attributes, &thread_start, this);
+	err = pthread_attr_destroy(&thread_attributes);
 }
 
 
