@@ -308,7 +308,10 @@ void AudioEngine::run_metering()
 	if (--buffers_until_metering > 0)
 		return;
 	float buffers_per_second = (float) cur_sample_rate / (float) cur_buffer_size;
-	buffers_until_metering = (int) roundf(buffers_per_second / metering_hz);
+	if (buffers_per_second < metering_hz)
+		buffers_until_metering = 1;
+	else
+		buffers_until_metering = (int) roundf(buffers_per_second / metering_hz);
 
 	if (project) {
 		// Send the metering.
