@@ -58,7 +58,13 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	check_err("snd_pcm_hw_params_set_rate", sample_rate);
 	err = snd_pcm_hw_params_set_channels(playback, hw_params, num_channels);
 	check_err("snd_pcm_hw_params_set_channels", num_channels);
-	snd_pcm_uframes_t actual_buffer_size = buffer_size;
+	snd_pcm_uframes_t actual_period_size = buffer_size;
+	int dir = 0;
+	err = snd_pcm_hw_params_set_period_size_near(playback, hw_params, &actual_period_size, &dir);
+	check_err("snd_pcm_set_period_size", buffer_size);
+	err = snd_pcm_hw_params_set_periods(playback, hw_params, 2, 0);
+	check_err("snd_pcm_hw_params_set_periods", 2);
+	snd_pcm_uframes_t actual_buffer_size = buffer_size * 2;
 	err = snd_pcm_hw_params_set_buffer_size_near(playback, hw_params, &actual_buffer_size);
 	check_err("snd_pcm_hw_params_set_buffer_size", actual_buffer_size);
 	if (actual_buffer_size != buffer_size)
@@ -77,7 +83,7 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 		throw Exception("alsa-setup-fail");
 	err = snd_pcm_sw_params_set_avail_min(playback, sw_params, buffer_size);
 	check_err("snd_pcm_sw_params_set_avail_min", buffer_size);
-	err = snd_pcm_sw_params_set_start_threshold(playback, sw_params, buffer_size);
+	err = snd_pcm_sw_params_set_start_threshold(playback, sw_params, actual_period_size);
 	check_err("snd_pcm_sw_params_set_start_threshold", buffer_size);
 	err = snd_pcm_sw_params(playback, sw_params);
 	if (err < 0)
@@ -94,16 +100,6 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 
 void ALSAAudioInterface::wait_until_ready()
 {
-	int err = snd_pcm_wait(playback, 1000);
-	if (err = -EPIPE)
-		got_xrun();
-	else if (err < 0) {
-		snd_pcm_state_t state = snd_pcm_state(playback);
-		log("snd_pcm_wait returned %d (\"%s\").", err, snd_strerror(err));
-		log("snd_pcm_state() is %d.", state);
-		log("buffers_sent: %d.", buffers_sent);
-		throw Exception("playback-fail");
-		}
 }
 
 
@@ -111,17 +107,6 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 {
 	if (!initialized)
 		return;
-
-	int frames_to_deliver = snd_pcm_avail_update(playback);
-	if (frames_to_deliver == -EPIPE)
-		got_xrun();
-	else if (frames_to_deliver < 0)
-		throw Exception("alsa-playback-fail");
-	if (frames_to_deliver < buffer_size) {
-		// This happens often, but we'll be using a blocking write below.  So
-		// really, the call to snd_pcm_avail_update() is just to detect xruns.
-		// log("Short play write!: %d frames.", frames_to_deliver);
-		}
 
 	// Send the samples.
 	void* channel_buffers[num_channels];
@@ -164,6 +149,7 @@ void ALSAAudioInterface::got_xrun()
 	log("xrun");
 	xruns += 1;
 	engine->got_xrun();
+	int err = snd_pcm_recover(playback, -EPIPE, 1);
 }
 
 
