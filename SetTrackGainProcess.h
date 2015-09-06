@@ -1,14 +1,14 @@
 #ifndef SetTrackGainProcess_h
 #define SetTrackGainProcess_h
 
-#include "Process.h"
+#include "MutatingProcess.h"
 class Track;
 namespace Web {
 	class Connection;
 	}
 
 
-class SetTrackGainProcess : public Process {
+class SetTrackGainProcess : public MutatingProcess {
 	public:
 		SetTrackGainProcess(Track* track, float gain, Web::Connection* connection);
 		bool	is_done();

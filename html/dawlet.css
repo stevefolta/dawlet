@@ -2,6 +2,14 @@ p#start_message {
 	font-style: italic;
 	}
 
+span.hideable-span[hidden] {
+	display: none;
+	}
+
+span#dirty {
+	color: red;
+	}
+
 span.button {
 	font-family: Raleway, Arial Black;
 	font-weight: 800;

@@ -27,6 +27,7 @@ void SetTrackGainProcess::next()
 			break;
 		case Replying:
 			connection->send_ok_reply();
+			mutation_done();
 			state = Done;
 			break;
 		}

@@ -24,6 +24,16 @@ function log(message) {
 	console.log(message);
 	}
 
+function set_visible(id, visible) {
+	var element = document.getElementById(id);
+	if (!element)
+		return;
+	if (visible)
+		element.removeAttribute('hidden');
+	else
+		element.setAttribute('hidden', 'hidden');
+	}
+
 
 function populate_interfaces(interfaces) {
 	// Clear out existing elements.
@@ -246,6 +256,11 @@ function load() {
 			}
 		else if (event.data.startsWith("meters "))
 			update_meters(event.data);
+		else if (event.data.startsWith("dirty ")) {
+			var json = event.data.substr("dirty ".length);
+			var value = JSON.parse(json);
+			set_visible('dirty', value);
+			}
 		else if (event.data == "project-loaded")
 			project_loaded();
 		else if (event.data == "xrun")

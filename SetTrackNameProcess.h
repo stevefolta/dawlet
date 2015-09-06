@@ -1,7 +1,7 @@
 #ifndef SetTrackNameProcess_h
 #define SetTrackNameProcess_h
 
-#include "Process.h"
+#include "MutatingProcess.h"
 #include <string>
 class Track;
 namespace Web {
@@ -9,7 +9,7 @@ namespace Web {
 	}
 
 
-class SetTrackNameProcess : public Process {
+class SetTrackNameProcess : public MutatingProcess {
 	public:
 		SetTrackNameProcess(Track* track, std::string name, Web::Connection* connection);
 		bool	is_done();

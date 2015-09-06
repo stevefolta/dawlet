@@ -28,7 +28,8 @@ DAW* daw = nullptr;
 
 
 DAW::DAW(int server_port)
-	: active_reads(nullptr), project(nullptr), cur_websocket_connection(nullptr)
+	: active_reads(nullptr), project(nullptr), cur_websocket_connection(nullptr),
+	  pending_mutations(0)
 {
 	daw = this;
 
@@ -75,37 +76,7 @@ bool DAW::tick()
 	bool did_something = server->tick();
 
 	engine->tick();
-
-	// Handle messages from the engine.
-	bool have_messages = true;
-	while (have_messages) {
-		Message message = engine->next_message_from();
-		switch (message.type) {
-			case Message::None:
-				have_messages = false;
-				break;
-			case Message::ContinueProcess:
-				{
-				Process* process = (Process*) message.param;
-				process->next();
-				if (process->is_done())
-					delete process;
-				}
-				break;
-			case Message::NeedMoreReadRequests:
-				engine->start_process(new SupplyReadsProcess(this, message.num));
-				break;
-			case Message::NeedMoreMetering:
-				supply_metering(message.num);
-				break;
-			case Message::Xrun:
-				if (cur_websocket_connection)
-					cur_websocket_connection->send_websocket_message("xrun");
-				break;
-			}
-		if (have_messages)
-			did_something = true;
-		}
+	did_something |= handle_messages_from_engine();
 
 	// Read-ahead for audio files.
 	did_something |= handle_file_reads();
@@ -127,8 +98,12 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		string path = fields.next_field();
 		open_project(path);
 		}
-	else if (command == "save-project")
+	else if (command == "save-project") {
+		while (pending_mutations > 0)
+			handle_messages_from_engine();
 		save_project();
+		connection->send_websocket_message("dirty false");
+		}
 	else if (command == "list-interfaces") {
 		vector<string> interfaces = audio_system->list_interfaces();
 		stringstream reply;
@@ -169,6 +144,50 @@ void DAW::add_file_read(AudioFileRead* read)
 {
 	read->next_read = active_reads;
 	active_reads = read;
+}
+
+
+void DAW::mutation_complete()
+{
+	pending_mutations -= 1;
+	if (cur_websocket_connection)
+		cur_websocket_connection->send_websocket_message("dirty true");
+}
+
+
+bool DAW::handle_messages_from_engine()
+{
+	bool did_something = false;
+	bool have_messages = true;
+	while (have_messages) {
+		Message message = engine->next_message_from();
+		switch (message.type) {
+			case Message::None:
+				have_messages = false;
+				break;
+			case Message::ContinueProcess:
+				{
+				Process* process = (Process*) message.param;
+				process->next();
+				if (process->is_done())
+					delete process;
+				}
+				break;
+			case Message::NeedMoreReadRequests:
+				engine->start_process(new SupplyReadsProcess(this, message.num));
+				break;
+			case Message::NeedMoreMetering:
+				supply_metering(message.num);
+				break;
+			case Message::Xrun:
+				if (cur_websocket_connection)
+					cur_websocket_connection->send_websocket_message("xrun");
+				break;
+			}
+		if (have_messages)
+			did_something = true;
+		}
+	return did_something;
 }
 
 

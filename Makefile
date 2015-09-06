@@ -10,6 +10,7 @@ SOURCES += APIHandler.cpp APIHandlers.cpp
 SOURCES += GetPBHeadProcess.cpp SeekProcess.cpp SupplyReadsProcess.cpp InstallProjectProcess.cpp
 SOURCES += SendMeteringProcess.cpp
 SOURCES += SelectInterfaceProcess.cpp
+SOURCES += MutatingProcess.cpp
 SOURCES += SetTrackGainProcess.cpp SetTrackNameProcess.cpp
 SOURCES += AudioFile.cpp OpenAudioFile.cpp WAVFile.cpp RIFF.cpp
 SOURCES += AudioSystem.cpp
