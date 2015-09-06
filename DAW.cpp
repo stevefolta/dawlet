@@ -57,9 +57,14 @@ void DAW::run()
 {
 	running = true;
 	while (running) {
-		bool did_something = tick();
-		if (!did_something)
-			usleep(10000);
+		try {
+			bool did_something = tick();
+			if (!did_something)
+				usleep(10000);
+			}
+		catch (Exception& e) {
+			fprintf(stderr, "Exception: %s.\n", e.type.c_str());
+			}
 		}
 }
 
@@ -238,7 +243,7 @@ void DAW::open_project(std::string path)
 		project->read_json(&reader);
 		project->load_audio_file_info();
 		engine->start_process(new InstallProjectProcess(project));
-		delete this->project;
+		// The old project will be deleted by InstallProjectProcess.
 		this->project = project;
 		project_path = path;
 		}
