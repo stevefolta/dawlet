@@ -244,17 +244,18 @@ function change_track_name(track) {
 	if (!new_name || new_name == old_name)
 		return;
 
-	// Send the API request to set the name.
-	var request = new XMLHttpRequest();
-	request.onreadystatechange = function() {
-		var DONE = this.DONE || 4;
-		if (this.readyState === DONE) {
-			if (this.status == 200)
-				name_element.textContent = new_name;
-			}
-		}
-	request.open("PUT", "/api/track/" + track.id + "/name", true);
-	request.send(new_name);
+	do_action(new ChangeTrackNameAction(track, new_name));
+	}
+
+
+Track.prototype.name = function() {
+	var name_element = find_element_by_id(this.track_svg, "track-name");
+	return name_element.textContent;
+	}
+
+Track.prototype.name_changed_to = function(new_name) {
+	var name_element = find_element_by_id(this.track_svg, "track-name");
+	name_element.textContent = new_name;
 	}
 
 
