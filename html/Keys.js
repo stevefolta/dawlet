@@ -16,7 +16,7 @@ var commands = {
 	"pause-play": function() { websocket.send("pause-play"); },
 	"playhead-left": function() { websocket.send("seek " + (play_head - prefs.playhead_nudge)); },
 	"playhead-right": function() { websocket.send("seek " + (play_head + prefs.playhead_nudge)); },
-	"save": function() { websocket.send("save-project"); },
+	"save": function() { save_project(); },
 	"select-next-track": function() { select_next_track(); },
 	"select-prev-track": function() { select_prev_track(); },
 	"change-track-name": function() { change_track_name(selected_track); },

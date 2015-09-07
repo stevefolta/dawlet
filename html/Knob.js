@@ -87,13 +87,19 @@ KnobTracker.prototype.mouse_moved = function(x, y, event) {
 	this.knob.set_value(new_position);
 	if (this.knob.is_db_knob) {
 		show_entered_value(this.knob.db_value().toFixed(2) + "dB");
-		if (this.knob.changed)
-			this.knob.changed(this.knob.db_value());
+		if (this.knob.changed) {
+			var value = this.knob.is_db_knob ? this.knob.db_value() : this.knob.cur_value();
+			this.knob.changed(value);
+			}
 		}
 	};
 
 KnobTracker.prototype.mouse_up = function(event) {
 	show_entered_value("");
+	if (this.knob.mouse_up) {
+		var value = this.knob.is_db_knob ? this.knob.db_value() : this.knob.cur_value();
+		this.knob.mouse_up(value);
+		}
 	};
 
 

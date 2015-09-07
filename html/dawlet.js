@@ -150,6 +150,12 @@ function got_project_json(json) {
 	master_track = new Track(json.master);
 	}
 
+function save_project() {
+	if (last_action)
+		last_action.fix();
+	websocket.send("save-project");
+	}
+
 
 function show_entered_value(value) {
 	var entered_value_element = document.getElementById("entered-value");

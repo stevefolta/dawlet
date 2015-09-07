@@ -52,13 +52,15 @@ function Track(id, parent) {
 	// Set up the gain knob.
 	this.gain_knob = new Knob(find_element_by_id(this.track_svg, 'gain-knob'));
 	this.gain_knob.is_db_knob = true;
-	this.gain_knob.set_db_value(0);
+	this.set_gain(0);
 		// Until we get the real value.
 	this.gain_knob.changed = function(new_db) {
 		var gain = dB_to_gain(new_db);
-		var request = new XMLHttpRequest();
-		request.open("PUT", "/api/track/" + track.id + "/gain", true);
-		request.send("" + gain);
+		do_action(new ChangeTrackGainAction(track, gain));
+		};
+	this.gain_knob.mouse_up = function(new_db) {
+		if (last_action.type == 'change-track-gain' && last_action.track ==  track)
+			last_action.fix();
 		};
 
 	this.meter_track = find_element_by_id(this.track_svg, 'meter-track');
@@ -82,7 +84,7 @@ Track.prototype.got_json = function(json) {
 	var name_element = find_element_by_id(this.div, "track-name");
 	name_element.textContent = json.name;
 
-	this.gain_knob.set_db_value(gain_to_dB(json.gain));
+	this.set_gain(json.gain);
 
 	// Load up the children.
 	json.children.forEach(function(child_id) {
@@ -106,6 +108,11 @@ Track.prototype.got_clips_json = function(json) {
 Track.prototype.is_master = function() {
 	return this.id == 1;
 	};
+
+Track.prototype.set_gain = function(new_gain) {
+	this.gain = new_gain;
+	this.gain_knob.set_db_value(gain_to_dB(this.gain));
+	}
 
 
 Track.prototype.append_child = function(child) {
@@ -258,4 +265,85 @@ Track.prototype.name_changed_to = function(new_name) {
 	name_element.textContent = new_name;
 	}
 
+
+//===============//
+
+function ChangeTrackNameAction(track, new_name) {
+	Action.call(this);
+	this.type = 'change-track-name';
+	this.track = track;
+	this.old_name = track.name();
+	this.new_name = new_name;
+	}
+
+ChangeTrackNameAction.prototype = Object.create(Action.prototype);
+
+ChangeTrackNameAction.prototype.do = function() {
+	this.change_name(this.new_name);
+	}
+ChangeTrackNameAction.prototype.undo = function() {
+	this.change_name(this.old_name);
+	}
+
+ChangeTrackNameAction.prototype.change_name = function(new_name) {
+	// Send the API request to set the name.
+	var request = new XMLHttpRequest();
+	var action = this;
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE) {
+			if (this.status == 200)
+				action.track.name_changed_to(new_name);
+			}
+		}
+	request.open("PUT", "/api/track/" + this.track.id + "/name", true);
+	request.send(new_name);
+	}
+
+
+//===============//
+
+function ChangeTrackGainAction(track, new_gain) {
+	Action.call(this);
+	this.type = 'change-track-gain';
+	this.track = track;
+	this.old_gain = track.gain;
+	this.new_gain = new_gain;
+	this.is_fixed = false;
+	}
+
+ChangeTrackGainAction.prototype = Object.create(Action.prototype);
+
+ChangeTrackGainAction.prototype.do = function() {
+	this.change_gain(this.new_gain);
+	}
+ChangeTrackGainAction.prototype.undo = function() {
+	this.change_gain(this.old_gain);
+	this.track.set_gain(this.old_gain); 	// Update the knob too.
+	}
+ChangeTrackGainAction.prototype.redo = function() {
+	this.change_gain(this.new_gain);
+	this.track.set_gain(this.new_gain); 	// Update the knob too.
+	}
+
+ChangeTrackGainAction.prototype.can_incorporate = function(action) {
+	var result =
+		!this.is_fixed && action.type == 'change-track-gain' &&
+		action.track == this.track;
+	return result;
+	}
+ChangeTrackGainAction.prototype.incorporate = function(action) {
+log("Incorporating.");
+	this.new_gain = action.new_gain;
+	}
+ChangeTrackGainAction.prototype.fix = function() {
+	this.is_fixed = true;
+	}
+
+ChangeTrackGainAction.prototype.change_gain = function(gain) {
+	var request = new XMLHttpRequest();
+	request.open("PUT", "/api/track/" + this.track.id + "/gain", true);
+	request.send("" + gain);
+	this.track.gain = gain;
+	}
 
