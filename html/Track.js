@@ -238,6 +238,7 @@ function select_prev_track() {
 	var parent = selected_track.parent;
 	if (!parent) {
 		// This is the master track.
+		select_track(null);
 		return;
 		}
 	var index = parent.children.indexOf(track);
