@@ -18,6 +18,8 @@ Track::Track(Project* projectIn, int idIn)
 	id = idIn >=0 ? idIn : project->new_id();
 	gain = 1.0;
 	sends_to_parent = true;
+	record_armed = false;
+	monitor_input = true;
 }
 
 
@@ -75,6 +77,10 @@ void Track::read_json(ProjectReader* reader)
 			gain = reader->next_double();
 		else if (field_name == "sends_to_parent")
 			sends_to_parent = reader->next_bool();
+		else if (field_name == "record_armed")
+			record_armed = reader->next_bool();
+		else if (field_name == "monitor_input")
+			monitor_input = reader->next_bool();
 		else {
 			// This is something from the future; ignore it.
 			reader->ignore_value();
@@ -94,6 +100,10 @@ std::string Track::api_json()
 	result << "\"gain\": " << gain;
 	result << ", ";
 	result << "\"sends_to_parent\": " << sends_to_parent;
+	result << ", ";
+	result << "\"record_armed\": " << record_armed;
+	result << ", ";
+	result << "\"monitor_input\": " << monitor_input;
 	result << ", ";
 
 	// Children.
@@ -131,6 +141,8 @@ void Track::write_to_file(IndentedOStream& stream)
 	stream << "\"name\": \"" << name << "\"," << separator;
 	stream << "\"gain\": " << gain << "," << separator;
 	stream << "\"sends_to_parent\": " << (sends_to_parent ? "true" : "false") << "," << separator;
+	stream << "\"record_armed\": " << (record_armed ? "true" : "false") << "," << separator;
+	stream << "\"monitor_input\": " << (monitor_input ? "true" : "false") << "," << separator;
 
 	stream << "\"playlist\": ";
 	playlist->write_to_file(stream);

@@ -10,4 +10,11 @@ rect.meter {
 	fill: rgba(0, 255, 0, 0.5);
 	}
 
+.record-armed {
+	fill: #a8a8a8;
+	}
+.record-armed[armed] {
+	fill: rgba(255, 0, 0, 1);
+	}
+
 

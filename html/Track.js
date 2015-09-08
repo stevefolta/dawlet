@@ -7,6 +7,9 @@ function Track(id, parent) {
 	var track = this;
 	tracks_by_id[id] = this;
 
+	this.gain = 1;
+	this.record_armed = false;
+
 	var indent = 0;
 	var level = this.level();
 	if (level > 1)
@@ -64,6 +67,11 @@ function Track(id, parent) {
 		};
 
 	this.meter_track = find_element_by_id(this.track_svg, 'meter-track');
+
+	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
+	rec_arm.addEventListener('mousedown', function(event) {
+		track.toggle_record_arm();
+		});
 
 	// Add the lane.
 	this.lane = templates['lane'].clone(
@@ -266,6 +274,20 @@ Track.prototype.name_changed_to = function(new_name) {
 	}
 
 
+Track.prototype.toggle_record_arm = function() {
+	do_action(new ChangeRecordArmedAction(this, !this.record_armed));
+	}
+
+Track.prototype.set_record_armed = function(new_armed) {
+	this.record_armed = new_armed;
+	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
+	if (this.record_armed)
+		rec_arm.setAttribute("armed", "armed");
+	else
+		rec_arm.removeAttribute("armed");
+	}
+
+
 //===============//
 
 function ChangeTrackNameAction(track, new_name) {
@@ -345,5 +367,37 @@ ChangeTrackGainAction.prototype.change_gain = function(gain) {
 	request.open("PUT", "/api/track/" + this.track.id + "/gain", true);
 	request.send("" + gain);
 	this.track.gain = gain;
+	}
+
+//===============//
+
+function ChangeRecordArmedAction(track, new_armed) {
+	Action.call(this);
+	this.type = 'change-track-record-armed';
+	this.track = track;
+	this.new_armed = new_armed;
+	}
+
+ChangeRecordArmedAction.prototype = Object.create(Action.prototype);
+
+ChangeRecordArmedAction.prototype.do = function() {
+	this.change_armed(this.new_armed);
+	}
+ChangeRecordArmedAction.prototype.undo = function() {
+	this.change_armed(!this.new_armed);
+	}
+
+ChangeRecordArmedAction.prototype.change_armed = function(armed) {
+	var request = new XMLHttpRequest();
+	var action = this;
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE) {
+			if (this.status == 200)
+				action.track.set_record_armed(armed);
+			}
+		}
+	request.open("PUT", "/api/track/" + this.track.id + "/record-arm", true);
+	request.send("" + armed);
 	}
 

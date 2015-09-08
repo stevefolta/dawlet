@@ -6,6 +6,7 @@
 #include "AudioEngine.h"
 #include "SetTrackGainProcess.h"
 #include "SetTrackNameProcess.h"
+#include "SetTrackRecordArmedProcess.h"
 #include "Logger.h"
 #include <map>
 
@@ -90,6 +91,19 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 			}
 		else if (component == "name")
 			engine->start_process(new SetTrackNameProcess(track, value, connection));
+		else if (component == "record-arm") {
+			bool armed = false, ok = true;
+			if (value == "true")
+				armed = true;
+			else if (value != "false") {
+				connection->error_out("400 Bad Request");
+				ok = false;
+				}
+			if (ok) {
+				engine->start_process(
+					new SetTrackRecordArmedProcess(track, armed, connection));
+				}
+			}
 		else
 			connection->error_out("404 Not Found");
 		}

@@ -7,6 +7,7 @@ var key_bindings = {
 	"J": "select-next-track",
 	"K": "select-prev-track",
 	"N": "change-track-name",
+	"A": "toggle-record-arm",
 	"C-Z": "undo",
 	"C-S-Z": "redo",
 	};
@@ -22,6 +23,7 @@ var commands = {
 	"change-track-name": function() { change_track_name(selected_track); },
 	"undo": function() { undo_action(); },
 	"redo": function() { redo_action(); },
+	"toggle-record-arm": function() { if (selected_track) selected_track.toggle_record_arm(); },
 	};
 
 

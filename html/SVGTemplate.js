@@ -63,6 +63,8 @@ SVGTemplate.prototype.scale_svg_elements = function(element, width_delta, height
 			}
 		if (element.nodeName == 'path')
 			this.scale_svg_path(element, width_delta, height_delta, x_move, y_move);
+		else if (element.nodeName == 'circle')
+			this.scale_svg_circle(element, width_delta, height_delta, x_move, y_move);
 		else {
 			if (x_move)
 				change_attribute('x', x_move);
@@ -77,6 +79,8 @@ SVGTemplate.prototype.scale_svg_elements = function(element, width_delta, height
 	else if (x_move || y_move) {
 		if (element.nodeName == 'path')
 			this.scale_svg_path(element, 0, 0, x_move, y_move);
+		else if (element.nodeName == 'circle')
+			this.scale_svg_circle(element, 0, 0, x_move, y_move);
 		else {
 			if (x_move)
 				change_attribute('x', x_move);
@@ -361,4 +365,13 @@ SVGTemplate.prototype.scale_svg_path = function(element, width_delta, height_del
 		}
 	element.setAttribute('d', result.join(' '));
 	}
+
+
+SVGTemplate.prototype.scale_svg_circle = function(element, width_delta, height_delta, x_move, y_move) {
+	if (width_delta || height_delta)
+		log("Scaling circles is not (yet) supported.");
+	element.setAttribute('cx', "" + (parseFloat(element.getAttribute('cx')) + x_move));
+	element.setAttribute('cy', "" + (parseFloat(element.getAttribute('cy')) + y_move));
+	}
+
 
