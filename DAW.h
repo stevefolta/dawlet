@@ -28,6 +28,7 @@ class DAW {
 
 		Project*	cur_project() { return project; }
 
+		void	send_websocket_message(std::string message);
 		Web::Connection* websocket_connection() { return cur_websocket_connection; }
 		void	set_websocket_connection(Web::Connection* connection)
 			{ cur_websocket_connection = connection; }

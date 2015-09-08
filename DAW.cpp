@@ -160,6 +160,13 @@ void DAW::mutation_complete()
 }
 
 
+void DAW::send_websocket_message(std::string message)
+{
+	if (cur_websocket_connection)
+		cur_websocket_connection->send_websocket_message(message);
+}
+
+
 bool DAW::handle_messages_from_engine()
 {
 	bool did_something = false;

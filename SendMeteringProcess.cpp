@@ -61,7 +61,7 @@ void SendMeteringProcess::send()
 	message << "meters";
 	for (int i = 0; i < num_peaks; ++i)
 		message << ' ' << peaks[i].track_id << ' ' << peaks[i].peak;
-	daw->websocket_connection()->send_websocket_message(message.str());
+	daw->send_websocket_message(message.str());
 	state = Done;
 }
 

@@ -33,6 +33,8 @@ Connection::Connection(int socket_in, DAW* daw_in)
 
 Connection::~Connection()
 {
+	if (daw->websocket_connection() == this)
+		daw->set_websocket_connection(nullptr);
 	shutdown(socket, SHUT_RDWR);
 	close(socket);
 	delete send_buffer;
