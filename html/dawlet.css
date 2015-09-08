@@ -96,4 +96,11 @@ div.popup-menu a:hover {
 	background: #49A3FF;
 	cursor: pointer;
 	}
+div.popup-menu hr {
+	background: #CCC;
+	border: none;
+	height: 1px;
+	margin: 0.15em auto;
+	}
+
 

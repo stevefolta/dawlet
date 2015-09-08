@@ -71,10 +71,14 @@ function Track(id, parent) {
 	// Set up the record-arm button.
 	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
 	function pop_up_rec_menu() {
+		var popup = new PopupMenu();
+		popup.add_item("Monitor Input");
+		popup.add_divider();
+		popup.add_item("Mono Input");
+		popup.add_item("Stereo Input");
+		popup.add_item("MIDI Input");
 		var rec_arm_rect = rec_arm.getBoundingClientRect();
-		pop_up_menu(
-			rec_arm_rect.left, rec_arm_rect.top,
-			[ "foo", "bar", "baz" ]);
+		popup.open(rec_arm_rect.right, rec_arm_rect.top);
 		}
 	rec_arm.addEventListener('mousedown', function(event) {
 		if (event.button == 2) {
