@@ -29,6 +29,34 @@ class SetTrackStateProcess : public MutatingProcess {
 	};
 
 
+class SetTrackGainProcess : public SetTrackStateProcess {
+	public:
+		SetTrackGainProcess(
+			Track* track_in, double gain_in, Web::Connection* connection_in)
+			: SetTrackStateProcess(track_in, connection_in), gain(gain_in)
+			{}
+
+	protected:
+		double gain;
+
+		void set() { track->gain = gain; }
+	};
+
+
+class SetTrackNameProcess : public SetTrackStateProcess {
+	public:
+		SetTrackNameProcess(
+			Track* track_in, std::string name_in, Web::Connection* connection_in)
+			: SetTrackStateProcess(track_in, connection_in), name(name_in)
+			{}
+
+	protected:
+		std::string	name;
+
+		void set() { track->set_name(name); }
+	};
+
+
 class SetTrackRecordArmedProcess : public SetTrackStateProcess {
 	public:
 		SetTrackRecordArmedProcess(

@@ -5,8 +5,6 @@
 #include "DAW.h"
 #include "AudioEngine.h"
 #include "SetTrackStateProcesses.h"
-#include "SetTrackGainProcess.h"
-#include "SetTrackNameProcess.h"
 #include "Logger.h"
 #include <map>
 
