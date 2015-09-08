@@ -72,5 +72,19 @@ div#playhead-div {
 	height: 100%;
 	pointer-events: none;
 	}
+div.track {
+	position: relative;
+	left: 0px;
+	top: 0px;
+	}
 
+
+div.popup-menu {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: white;
+	border: 1px black solid;
+	padding: 6px;
+	}
 
