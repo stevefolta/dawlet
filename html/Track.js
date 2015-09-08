@@ -72,11 +72,8 @@ function Track(id, parent) {
 	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
 	function pop_up_rec_menu() {
 		var rec_arm_rect = rec_arm.getBoundingClientRect();
-		var div_rect = track.div.getBoundingClientRect();
 		pop_up_menu(
-			rec_arm_rect.left - div_rect.left,
-			rec_arm_rect.top - div_rect.top,
-			track.div,
+			rec_arm_rect.left, rec_arm_rect.top,
 			[ "foo", "bar", "baz" ]);
 		}
 	rec_arm.addEventListener('mousedown', function(event) {

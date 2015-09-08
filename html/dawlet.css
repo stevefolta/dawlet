@@ -94,5 +94,6 @@ div.popup-menu a {
 	}
 div.popup-menu a:hover {
 	background: #49A3FF;
+	cursor: pointer;
 	}
 
