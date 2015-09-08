@@ -355,7 +355,6 @@ ChangeTrackGainAction.prototype.can_incorporate = function(action) {
 	return result;
 	}
 ChangeTrackGainAction.prototype.incorporate = function(action) {
-log("Incorporating.");
 	this.new_gain = action.new_gain;
 	}
 ChangeTrackGainAction.prototype.fix = function() {
