@@ -1,5 +1,6 @@
 function PopupMenu(x, y, items) {
-	var popup = this;
+	this.cur_submenu = null;
+	this.parent_menu = null;
 
 	this.menu_div = document.createElement('div');
 	this.menu_div.setAttribute('class', 'popup-menu');
@@ -13,7 +14,12 @@ PopupMenu.prototype.add_item = function(title, fn) {
 	item_element.onclick = function(event) {
 		if (fn)
 			fn();
+		if (popup.parent_menu)
+			popup.parent_menu.close();
 		popup.close();
+		};
+	item_element.onmouseover = function(event) {
+		popup.open_submenu(null);
 		};
 	this.menu_div.appendChild(item_element);
 	}
@@ -21,6 +27,40 @@ PopupMenu.prototype.add_item = function(title, fn) {
 PopupMenu.prototype.add_divider = function() {
 	var element = document.createElement('hr');
 	this.menu_div.appendChild(element);
+	}
+
+PopupMenu.prototype.add_submenu = function(title, submenu) {
+	var item_element = document.createElement('table');
+	item_element.setAttribute('class', 'submenu-item');
+	var tr = document.createElement('tr');
+	item_element.appendChild(tr);
+	var title_element = document.createElement('td');
+	title_element.setAttribute('class', 'title');
+	title_element.textContent = title;
+	tr.appendChild(title_element);
+	var arrow_element = document.createElement('td');
+	arrow_element.setAttribute('class', 'arrow');
+	arrow_element.textContent = '\u25B6';
+	tr.appendChild(arrow_element);
+
+	item_element.submenu = submenu;
+	var popup = this;
+	item_element.onmouseover = function(event) {
+		popup.open_submenu(item_element);
+		};
+
+	this.menu_div.appendChild(item_element);
+	}
+
+PopupMenu.prototype.open_submenu = function(item_element) {
+	if (this.cur_submenu)
+		this.cur_submenu.close();
+	this.cur_submenu = item_element ? item_element.submenu : null;
+	if (this.cur_submenu) {
+		this.cur_submenu.parent_menu = this;
+		var item_element_rect = item_element.getBoundingClientRect();
+		this.cur_submenu.open(item_element_rect.right, item_element_rect.top);
+		}
 	}
 
 
@@ -32,7 +72,7 @@ PopupMenu.prototype.open = function(x, y) {
 
 	var popup = this;
 	this.menu_div.onmouseout = function() {
-		// body.removeChild(popup.menu_div);
+		// popup.close();
 		};
 	body.appendChild(this.menu_div);
 	}

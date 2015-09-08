@@ -85,6 +85,7 @@ div.popup-menu {
 	left: 0px;
 	background: white;
 	border: 1px black solid;
+	font-family: Arial;
 	}
 div.popup-menu a {
 	display: block;
@@ -95,6 +96,19 @@ div.popup-menu a {
 div.popup-menu a:hover {
 	background: #49A3FF;
 	cursor: pointer;
+	}
+div.popup-menu table.submenu-item {
+	padding: 4px 12px;
+	width: 100%;
+	background: white;
+	}
+div.popup-menu table.submenu-item:hover {
+	background: #49A3FF;
+	cursor: pointer;
+	}
+div.popup-menu table.submenu-item td.arrow {
+	text-align: right;
+	font-size: 0.75em;
 	}
 div.popup-menu hr {
 	background: #CCC;
