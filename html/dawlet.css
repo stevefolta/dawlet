@@ -85,6 +85,14 @@ div.popup-menu {
 	left: 0px;
 	background: white;
 	border: 1px black solid;
-	padding: 6px;
+	}
+div.popup-menu a {
+	display: block;
+	padding: 4px 12px;
+	width: auto;
+	background: white;
+	}
+div.popup-menu a:hover {
+	background: #49A3FF;
 	}
 

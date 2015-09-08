@@ -68,19 +68,16 @@ function Track(id, parent) {
 
 	this.meter_track = find_element_by_id(this.track_svg, 'meter-track');
 
+	// Set up the record-arm button.
 	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
 	function pop_up_rec_menu() {
-		var menu = document.createElement('div');
-		menu.setAttribute('class', 'popup-menu');
-		menu.textContent = "Testing...";
-		menu.onmouseout = function() {
-			track.div.removeChild(menu);
-			};
 		var rec_arm_rect = rec_arm.getBoundingClientRect();
 		var div_rect = track.div.getBoundingClientRect();
-		menu.style.left = rec_arm_rect.left - div_rect.left;
-		menu.style.top = rec_arm_rect.top - div_rect.top;
-		track.div.insertBefore(menu, this.svg);
+		pop_up_menu(
+			rec_arm_rect.left - div_rect.left,
+			rec_arm_rect.top - div_rect.top,
+			track.div,
+			[ "foo", "bar", "baz" ]);
 		}
 	rec_arm.addEventListener('mousedown', function(event) {
 		if (event.button == 2) {
