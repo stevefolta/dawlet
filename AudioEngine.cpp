@@ -112,6 +112,12 @@ void AudioEngine::return_process(Process* process)
 }
 
 
+void AudioEngine::report_error(std::string error)
+{
+	from->send(Message::Error, new std::string(error));
+}
+
+
 Project* AudioEngine::install_project(Project* new_project)
 {
 	playing = false;

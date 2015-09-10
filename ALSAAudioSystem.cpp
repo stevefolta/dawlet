@@ -1,6 +1,7 @@
 #include "ALSAAudioSystem.h"
 #include "ALSAAudioInterface.h"
 #include "AudioEngine.h"
+#include "Exception.h"
 #include "Logger.h"
 #include <alsa/asoundlib.h>
 #include <sstream>
@@ -45,9 +46,17 @@ void ALSAAudioSystem::select_interface(std::string name)
 		return;
 		}
 
-	delete interface;
-	interface = new ALSAAudioInterface(device_name);
-	interface->setup(2, engine->sample_rate(), engine->buffer_size());
+	try {
+		delete interface;
+		interface = nullptr;
+		interface = new ALSAAudioInterface(device_name);
+		interface->setup(2, engine->sample_rate(), engine->buffer_size());
+		}
+	catch (Exception& e) {
+		engine->report_error(e.type);
+		delete interface;
+		interface = nullptr;
+		}
 }
 
 

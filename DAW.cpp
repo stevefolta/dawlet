@@ -192,8 +192,14 @@ bool DAW::handle_messages_from_engine()
 				supply_metering(message.num);
 				break;
 			case Message::Xrun:
-				if (cur_websocket_connection)
-					cur_websocket_connection->send_websocket_message("xrun");
+				send_websocket_message("xrun");
+				break;
+			case Message::Error:
+				{
+				std::string* str = (std::string*) message.param;
+				send_websocket_message("error " + *str);
+				delete str;
+				}
 				break;
 			}
 		if (have_messages)

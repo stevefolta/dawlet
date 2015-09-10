@@ -22,6 +22,7 @@ struct Message {
 		NeedMoreReadRequests,
 		NeedMoreMetering,
 		Xrun,
+		Error,
 		};
 
 	int	type;

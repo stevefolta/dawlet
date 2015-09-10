@@ -4,6 +4,7 @@
 #include "BufferManager.h"
 #include "Message.h"
 #include "AudioTypes.h"
+#include <string>
 class MessageQueue;
 class AudioFileRead;
 class SendMeteringProcess;
@@ -33,6 +34,7 @@ class AudioEngine {
 			{ send(Message::ContinueProcess, process); }
 		Message	next_message_from();
 		void	return_process(Process* process);
+		void	report_error(std::string error);
 
 		Project*	install_project(Project* new_project);
 		void	seek(ProjectPosition position);

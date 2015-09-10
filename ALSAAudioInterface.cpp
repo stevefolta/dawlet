@@ -10,7 +10,7 @@
 
 ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
 	:	name(name_in),
-		out_buffer(nullptr), xruns(0),
+		playback(nullptr), out_buffer(nullptr), xruns(0),
 		initialized(false), started(false)
 {
 	int err = snd_pcm_open(&playback, name.c_str(), SND_PCM_STREAM_PLAYBACK, 0);
@@ -22,8 +22,10 @@ ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
 
 ALSAAudioInterface::~ALSAAudioInterface()
 {
-	snd_pcm_drain(playback);
-	snd_pcm_close(playback);
+	if (playback) {
+		snd_pcm_drain(playback);
+		snd_pcm_close(playback);
+		}
 	free(out_buffer);
 }
 

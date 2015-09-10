@@ -51,6 +51,16 @@ div#entered-value {
 	min-width: 4em;
 	}
 
+
+div#error {
+	display: none;
+	text-align: center;
+	color: red;
+	font-family: Arial Black;
+	margin: 0em auto 0.75em auto;
+	}
+
+
 div#master {
 	width: 100%;
 	}

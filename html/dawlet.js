@@ -99,7 +99,20 @@ function got_xrun() {
 			},
 			xrun_display_ms);
 		}
+	}
 
+function got_error(error) {
+	var error_div = document.getElementById("error");
+	if (error_div) {
+		error_div.textContent = error;
+		error_div.style.display = 'block';
+		}
+	}
+
+function hide_error() {
+	var error_div = document.getElementById("error");
+	if (error_div)
+		error_div.style.display = 'none';
 	}
 
 
@@ -233,12 +246,17 @@ function load() {
 		websocket.send("play");
 		});
 	document.getElementById("interface-popup").onchange = function(event) {
+		hide_error();
 		websocket.send("select-interface \"" + event.target.value + "\"");
 		};
 	window.setInterval(function() {
 		websocket.send("get-play-head");
 		},
 		200);
+
+	var error_div = document.getElementById("error");
+	if (error_div)
+		error_div.onclick = hide_error;
 
 	load_theme();
 
@@ -271,6 +289,8 @@ function load() {
 			project_loaded();
 		else if (event.data == "xrun")
 			got_xrun();
+		else if (event.data.startsWith("error "))
+			got_error(event.data.substr("error ".length));
 		};
 	websocket.onopen = function (event) {
 		try {
