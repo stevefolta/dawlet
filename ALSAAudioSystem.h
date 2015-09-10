@@ -15,7 +15,15 @@ class ALSAAudioSystem : public AudioSystem {
 		AudioInterface*	selected_interface();
 
 	protected:
+		struct Interface {
+			std::string name;
+			std::string device_name;
+			};
+
 		ALSAAudioInterface*	interface;
+		std::vector<Interface>	interfaces;
+
+		void	update_interfaces();
 	};
 
 
