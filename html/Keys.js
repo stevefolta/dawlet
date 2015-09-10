@@ -46,10 +46,18 @@ function handle_key_down(event) {
 		key = "A-" + key;
 	if (event.ctrlKey)
 		key = "C-" + key;
-	var command = key_bindings[key];
-	if (command) {
+
+	if (key == "Escape" && popup_menu_is_up()) {
+		close_popup_menu();
 		handled = true;
-		commands[command]();
+		}
+
+	if (!handled) {
+		var command = key_bindings[key];
+		if (command) {
+			handled = true;
+			commands[command]();
+			}
 		}
 
 	if (handled)
