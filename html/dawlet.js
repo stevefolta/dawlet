@@ -50,6 +50,51 @@ function populate_interfaces(interfaces) {
 		});
 	}
 
+function update_favorite_interfaces(new_interface) {
+	var fav_interfaces = [];
+	var json = localStorage.getItem('fav-interfaces');
+	if (json)
+		fav_interfaces = JSON.parse(json);
+	var index = fav_interfaces.indexOf(new_interface);
+	if (index == 0) {
+		// It's already the first item.  LRU is unchanged.
+		}
+	else {
+		if (index > 0) {
+			// Remove it from its current position.
+			fav_interfaces.splice(index, 1);
+			}
+		fav_interfaces.unshift(new_interface);
+		localStorage.setItem('fav-interfaces', JSON.stringify(fav_interfaces));
+		}
+	}
+
+function select_initial_interface(interfaces) {
+	// Get the favorite interfaces.
+	var fav_interfaces = [];
+	var json = localStorage.getItem('fav-interfaces');
+	if (json)
+		fav_interfaces = JSON.parse(json);
+
+	// Find the first one that's currently available.
+	var use_interface_index = 0;
+	var done = false;
+	for (var i = 0; !done && i < fav_interfaces.length; ++i) {
+		var want_interface = fav_interfaces[i];
+		for (var which_interface = 0; which_interface < interfaces.length; ++which_interface) {
+			if (interfaces[which_interface] == want_interface) {
+				use_interface_index = which_interface;
+				done = true;
+				}
+			}
+		}
+
+	websocket.send("select-interface \"" + interfaces[use_interface_index] + "\"");
+	var popup = document.getElementById("interface-popup");
+	if (popup)
+		popup.selectedIndex = use_interface_index;
+	}
+
 
 function show_play_head(play_head) {
 	// Clock.
@@ -246,8 +291,10 @@ function load() {
 		websocket.send("play");
 		});
 	document.getElementById("interface-popup").onchange = function(event) {
+		var new_interface = event.target.value;
+		websocket.send("select-interface \"" + new_interface + "\"");
+		update_favorite_interfaces(new_interface);
 		hide_error();
-		websocket.send("select-interface \"" + event.target.value + "\"");
 		};
 	window.setInterval(function() {
 		websocket.send("get-play-head");
@@ -271,7 +318,7 @@ function load() {
 			var interfaces = JSON.parse(json);
 			if (interfaces && interfaces[0]) {
 				populate_interfaces(interfaces);
-				websocket.send("select-interface \"" + interfaces[0] + "\"");
+				select_initial_interface(interfaces);
 				}
 			}
 		else if (event.data.startsWith("play-head ")) {
