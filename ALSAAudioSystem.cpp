@@ -5,6 +5,9 @@
 #include "Logger.h"
 #include <alsa/asoundlib.h>
 #include <sstream>
+#ifdef USE_LOCAL_H
+	#include "local.h"
+#endif
 
 
 ALSAAudioSystem::ALSAAudioSystem()
@@ -89,9 +92,11 @@ void ALSAAudioSystem::update_interfaces()
 
 			// Change the device_name to use the card ID, not its number.
 			device_name_builder.str("");
-			device_name_builder << "default:" << snd_ctl_card_info_get_id(info);
-			// Use this if/when we switch to MMAP access:
-			// device_name_builder << "hw:" << snd_ctl_card_info_get_id(info);
+			#ifdef USE_ALSA_MMAP
+				device_name_builder << "hw:" << snd_ctl_card_info_get_id(info);
+			#else
+				device_name_builder << "default:" << snd_ctl_card_info_get_id(info);
+			#endif
 			device_name = device_name_builder.str();
 
 			int device = -1;
@@ -108,9 +113,11 @@ void ALSAAudioSystem::update_interfaces()
 				if (snd_ctl_pcm_info(handle, pcm_info) < 0)
 					continue;
 				device_name_builder.str("");
-				device_name_builder << device_name;
-				// Use this if/when we switch to MMAP access:
-				// device_name_builder << device_name << ',' << device;
+				#ifdef USE_ALSA_MMAP
+					device_name_builder << device_name << ',' << device;
+				#else
+					device_name_builder << device_name;
+				#endif
 				Interface interface = { card_name, device_name_builder.str() };
 				interfaces.push_back(interface);
 				}

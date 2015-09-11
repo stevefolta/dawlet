@@ -4,6 +4,9 @@
 #include "AudioInterface.h"
 #include <alsa/asoundlib.h>
 #include <string>
+#ifdef USE_LOCAL_H
+	#include "local.h"
+#endif
 
 
 class ALSAAudioInterface : public AudioInterface {
@@ -16,6 +19,8 @@ class ALSAAudioInterface : public AudioInterface {
 		void	send_data(AudioBuffer** buffers, int num_channels);
 
 	protected:
+		typedef char* (*play_mover)(const AudioSample* in, char* out, int frames, int step);
+
 		std::string	name;
 		snd_pcm_t*	playback;
 		int	buffer_size;
@@ -23,6 +28,7 @@ class ALSAAudioInterface : public AudioInterface {
 		int	buffers_sent;
 		int	xruns;
 		bool	initialized, started;
+		play_mover	play_move;
 
 		void	got_xrun();
 	};
