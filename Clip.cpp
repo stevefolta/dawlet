@@ -5,21 +5,25 @@
 #include "AudioEngine.h"
 #include "IndentedOStream.h"
 #include "Logger.h"
+#ifdef USE_LOCAL_H
+	#include "local.h"
+#endif
 
 
 void Clip::init()
 {
 	file_start_frame = 0;
-	reads[0] = reads[1] = nullptr;
+	for (int i = 0; i < num_reads; ++i)
+		reads[i] = nullptr;
 }
 
 
 Clip::~Clip()
 {
-	if (reads[0])
-		delete reads[0];
-	if (reads[1])
-		delete reads[1];
+	for (int i = 0; i < num_reads; ++i) {
+		if (reads[i])
+			delete reads[i];
+		}
 }
 
 
@@ -182,6 +186,12 @@ void Clip::read_ahead()
 			next_play_frame > end_frame ||
 			reads[i]->start_frame > read_ahead_point;
 		if (unneeded) {
+#ifdef DEBUG_FILE_READ
+			log(
+				"Disposing read %lu -> %lu.",
+				reads[i]->start_frame,
+				reads[i]->start_frame + reads[i]->num_frames);
+#endif
 			reads[i]->dispose();
 			reads[i] = nullptr;
 			}
@@ -205,8 +215,8 @@ void Clip::read_ahead()
 			// We have nothing, read all the way to the read-ahead point.
 			}
 		else {
-			unsigned long max_length =
-				length_in_frames - (first_loading_frame - file_start_frame);
+			// Don't overlap the first read we already have.
+			unsigned long max_length = first_loading_frame - next_play_frame;
 			if (num_frames > max_length)
 				num_frames = max_length;
 			}
@@ -230,6 +240,11 @@ void Clip::read_ahead()
 
 void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 {
+#ifdef DEBUG_FILE_READ
+	log("Starting read %lu -> %lu.", start_frame, start_frame + num_frames);
+	log_read_slots();
+#endif
+
 	// Find where to put it.
 	int i = 0;
 	for (; i < num_reads; ++i) {
@@ -239,9 +254,6 @@ void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 	if (i >= num_reads) {
 		log("Read slot allocation fail!");
 		log("  Trying to add %lu -> %lu.", start_frame, start_frame + num_frames);
-		log("  Have:");
-		for (i = 0; i < num_reads; ++i)
-			log("    %lu -> %lu", reads[i]->start_frame, reads[i]->start_frame + reads[i]->num_frames);
 		return;
 		}
 
@@ -265,6 +277,17 @@ ProjectPosition Clip::end()
 bool Clip::contains_time(ProjectPosition time)
 {
 	return (time >= start && time < end());
+}
+
+
+void Clip::log_read_slots()
+{
+	for (int i = 0; i < num_reads; ++i) {
+		AudioFileRead* read = reads[i];
+		if (!read)
+			continue;
+		log("  %lu -> %lu", read->start_frame, read->start_frame + read->num_frames);
+		}
 }
 
 

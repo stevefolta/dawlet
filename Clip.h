@@ -50,6 +50,8 @@ class Clip {
 
 		void	init();
 		void	start_read(unsigned long start_frame, unsigned long num_frames);
+
+		void	log_read_slots();
 	};
 
 
