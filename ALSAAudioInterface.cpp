@@ -357,6 +357,9 @@ void ALSAAudioInterface::got_xrun()
 	int err = snd_pcm_recover(playback, -EPIPE, 1);
 	if (err < 0)
 		log("snd_pcm_recover() returned %d (\"%s\").", err, snd_strerror(err));
+#ifdef USE_ALSA_MMAP
+	started = false;
+#endif
 }
 
 
