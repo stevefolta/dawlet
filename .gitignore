@@ -3,6 +3,7 @@ objects
 Makefile.local
 tags
 test
+temp
 log
 local.h
 
