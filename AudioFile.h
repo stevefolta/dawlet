@@ -31,6 +31,7 @@ class AudioFile {
 
 		OpenAudioFile*	open();
 		void	close();
+		OpenAudioFile*	get_open_file() { return open_file; }
 
 		std::string	path;
 		int	id;

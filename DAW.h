@@ -23,6 +23,7 @@ class DAW {
 		void	handle_ui_message(std::string message, Web::Connection* connection);
 
 		void	add_file_read(AudioFileRead* read);
+		void	remove_file_read(AudioFileRead* read);
 		void	add_pending_mutation() { pending_mutations += 1; }
 		void	mutation_complete();
 

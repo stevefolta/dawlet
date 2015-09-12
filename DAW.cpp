@@ -152,6 +152,25 @@ void DAW::add_file_read(AudioFileRead* read)
 }
 
 
+void DAW::remove_file_read(AudioFileRead* read)
+{
+	AudioFileRead** last_link = &active_reads;
+	while (*last_link) {
+		AudioFileRead* cur_read = *last_link;
+		if (read == cur_read) {
+			// Unlink it from the list.
+			*last_link = read->next_read;
+			read->next_read = nullptr;
+			break;
+			}
+		else {
+			// Go to the next read in the list.
+			last_link = &cur_read->next_read;
+			}
+		}
+}
+
+
 void DAW::mutation_complete()
 {
 	pending_mutations -= 1;

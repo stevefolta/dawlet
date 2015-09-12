@@ -10,13 +10,23 @@
 
 
 AudioFileRead::AudioFileRead(DAW* daw_in)
-	: daw(daw_in), next_read(nullptr), state(Waiting), buffer(nullptr)
+	: daw(daw_in), next_read(nullptr), state(Waiting), is_reading(false),
+	  buffer(nullptr)
 {
 }
 
 
 AudioFileRead::~AudioFileRead()
 {
+	if (is_reading) {
+		OpenAudioFile* open_file = clip->file->get_open_file();
+		if (open_file) {
+			int result = aio_cancel(open_file->fd, &async_read);
+			if (result != AIO_CANCELED)
+				log("Couldn't cancel AIO read!  (%d: %s).", errno, strerror(errno));
+			}
+		daw->remove_file_read(this);
+		}
 	if (buffer)
 		free(buffer);
 }
@@ -35,6 +45,12 @@ void AudioFileRead::next()
 			start_read();
 			break;
 		}
+}
+
+
+bool AudioFileRead::return_immediately()
+{
+	return false;
 }
 
 
@@ -71,6 +87,7 @@ void AudioFileRead::start_read()
 		throw Exception("aio-read-fail");
 
 	state = Reading;
+	is_reading = true;
 	daw->add_file_read(this);
 }
 
@@ -83,6 +100,7 @@ bool AudioFileRead::read_is_complete()
 	clip->file->close();
 
 	state = Playing;
+	is_reading = false;
 	engine->continue_process(this);
 	return true;
 }
@@ -91,7 +109,7 @@ bool AudioFileRead::read_is_complete()
 void AudioFileRead::dispose()
 {
 	state = Done;
-	engine->continue_process(this);
+	engine->return_process(this);
 }
 
 

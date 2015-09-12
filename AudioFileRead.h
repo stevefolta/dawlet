@@ -14,6 +14,7 @@ class AudioFileRead : public Process {
 
 		bool	is_done();
 		void	next();
+		bool	return_immediately();
 
 		void	request_read(
 			Clip* clip, unsigned long start_frame, unsigned long num_frames);
@@ -45,6 +46,7 @@ class AudioFileRead : public Process {
 			Done
 			};
 		int state;
+		bool is_reading;
 
 		Clip*	clip;
 
