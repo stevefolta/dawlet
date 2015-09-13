@@ -1,0 +1,10 @@
+[2015.9.12]
+
+Ardour4's "engine" dialog is showing latency to be 1 buffer-size.  I don't see how that's possible.  That means that a captured buffer is available to send to playback in the next period.  But if we wait to read the captured buffer, we'll xrun playback because we didn't send the next period before the first period drained.
+
+Built-in audio reports min/max period size of 16-262144; ONE reports 45-87381.
+
+With a one-second buffer (44100), it takes two seconds to hear playback start or stop after hitting spacebar.  "Expected playback latency" is 88419.
+
+Unfortunately, Ardour4 won't let me set a buffer size above 8192, so I can't easily test its real roundtrip latency.  REAPER/Mac would let me request 44100 block size; real latency was about half a second somehow, and it was glitching a lot, without giving any indication of xruns.  At 22050, latency seemed a little less (maybe 1/4s), glitching was a steady once per second.  Had to go down to about 4096 to stop the glitching.  Taking block size below 32 has a serious risk of making Reaper crash.
+
