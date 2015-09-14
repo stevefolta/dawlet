@@ -25,7 +25,6 @@ class ALSAAudioInterface : public AudioInterface {
 		std::string	name;
 		snd_pcm_t*	playback;
 		int	buffer_size;
-		char*	out_buffer;
 		int	buffers_sent;
 		int	xruns;
 		bool	initialized, started;

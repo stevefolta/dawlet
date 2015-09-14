@@ -10,7 +10,7 @@
 
 ALSAAudioInterface::ALSAAudioInterface(std::string name_in)
 	:	name(name_in),
-		playback(nullptr), out_buffer(nullptr), xruns(0),
+		playback(nullptr), xruns(0),
 		initialized(false), started(false)
 {
 	int err = snd_pcm_open(&playback, name.c_str(), SND_PCM_STREAM_PLAYBACK, 0);
@@ -28,7 +28,6 @@ ALSAAudioInterface::~ALSAAudioInterface()
 		snd_pcm_drain(playback);
 		snd_pcm_close(playback);
 		}
-	free(out_buffer);
 }
 
 
@@ -257,8 +256,6 @@ static void capt_16_le(const char* in, AudioSample* out, int frames, int step)
 void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_size)
 {
 	this->buffer_size = buffer_size;
-	free(out_buffer);
-	out_buffer = (char*) malloc(4 * buffer_size);
 	int err;
 	auto check_err = [&err](const char* call, int value) -> void {
 		if (err >= 0)
