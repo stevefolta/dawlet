@@ -13,6 +13,11 @@ class AudioInterface {
 		virtual void	wait_until_ready() = 0;
 		virtual void	send_data(AudioBuffer** buffers, int num_channels) = 0;
 
+		virtual bool	capture_is_ready() = 0;
+		virtual void	capture_data(AudioBuffer** buffers, int num_channels) = 0;
+
+		virtual int	get_num_capture_channels() = 0;
+
 	protected:
 	};
 

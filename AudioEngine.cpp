@@ -46,6 +46,9 @@ AudioEngine::AudioEngine()
 	buffers_until_metering = 1;
 	next_metering_process = nullptr;
 
+	capture_buffers = nullptr;
+	num_capture_buffers = 0;
+
 	pthread_attr_t thread_attributes;
 	int err = pthread_attr_init(&thread_attributes);
 	err = pthread_attr_setschedpolicy(&thread_attributes, SCHED_FIFO);
@@ -71,6 +74,10 @@ AudioEngine::~AudioEngine()
 			break;
 		from->pop();
 		}
+
+	for (int i = 0; i < num_capture_buffers; ++i)
+		free_buffer(capture_buffers[i]);
+	delete capture_buffers;
 
 	delete to;
 	delete from;
@@ -223,6 +230,31 @@ void AudioEngine::run()
 			continue;
 			}
 
+		// Capture the next buffer.
+		int num_capture_channels = interface->get_num_capture_channels();
+		if (num_capture_channels > 0) {
+			if (num_capture_channels > num_capture_buffers) {
+				// (Re-)allocate the buffers.
+				AudioBuffer** new_capture_buffers =
+					new AudioBuffer*[num_capture_channels];
+				int which_buffer = 0;
+				for (; which_buffer < num_capture_buffers; ++which_buffer)
+					new_capture_buffers[which_buffer] = capture_buffers[which_buffer];
+				for (; which_buffer < num_capture_channels; ++which_buffer)
+					new_capture_buffers[which_buffer] = get_buffer();
+				delete capture_buffers;
+				capture_buffers = new_capture_buffers;
+				num_capture_buffers = num_capture_channels;
+				}
+
+			if (interface->capture_is_ready())
+				interface->capture_data(capture_buffers, num_capture_buffers);
+			else {
+				for (int i = 0; i < num_capture_buffers; ++i)
+					capture_buffers[i]->clear();
+				}
+			}
+
 		// Prepare the next buffer.
 		int num_channels = 2;
 		AudioBuffer* out_buffers[num_channels];
@@ -237,11 +269,10 @@ void AudioEngine::run()
 			else
 				missing_buffers = true;
 			}
-		if (playing) {
-			if (!missing_buffers)
-				project->run(out_buffers, num_channels);
+		if (!missing_buffers)
+			project->run(out_buffers, num_channels);
+		if (playing)
 			play_head += (ProjectPosition) cur_buffer_size / cur_sample_rate;
-			}
 
 		// Send the buffers to the interface.
 		if (!missing_buffers) {
@@ -359,6 +390,14 @@ void AudioEngine::add_peak(int track_id, AudioSample peak)
 void AudioEngine::got_xrun()
 {
 	from->send(Message::Xrun);
+}
+
+
+AudioBuffer* AudioEngine::get_capture_buffer(int which_capture_channel)
+{
+	if (which_capture_channel > num_capture_buffers)
+		return nullptr;
+	return capture_buffers[which_capture_channel];
 }
 
 

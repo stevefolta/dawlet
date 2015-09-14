@@ -19,6 +19,7 @@ class AudioEngine {
 
 		int	sample_rate() { return cur_sample_rate; }
 		int	buffer_size() { return cur_buffer_size; }
+		bool	is_playing() { return playing; }
 
 		void	tick();
 
@@ -48,6 +49,8 @@ class AudioEngine {
 		void	add_peak(int track_id, AudioSample peak);
 		void	got_xrun();
 
+		AudioBuffer*	get_capture_buffer(int which_capture_channel);
+
 		enum {
 			read_ahead_seconds = 2,
 			};
@@ -68,6 +71,9 @@ class AudioEngine {
 		SendMeteringProcess*	next_metering_process;
 
 		Project*	project;
+
+		AudioBuffer**	capture_buffers;
+		int	num_capture_buffers;
 
 		void	run();
 		void	play();

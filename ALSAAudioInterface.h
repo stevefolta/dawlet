@@ -17,6 +17,10 @@ class ALSAAudioInterface : public AudioInterface {
 		void	setup(int num_channels, int sample_rate, int buffer_size);
 		void	wait_until_ready();
 		void	send_data(AudioBuffer** buffers, int num_channels);
+		bool	capture_is_ready();
+		void	capture_data(AudioBuffer** buffers, int num_channels);
+
+		int	get_num_capture_channels() { return num_capture_channels; }
 
 	protected:
 		typedef void (*play_mover)(const AudioSample* in, char* out, int frames, int step);
@@ -24,14 +28,17 @@ class ALSAAudioInterface : public AudioInterface {
 
 		std::string	name;
 		snd_pcm_t*	playback;
+		snd_pcm_t*	capture;
 		int	buffer_size;
 		int	buffers_sent;
 		int	xruns;
-		bool	initialized, started;
+		bool	initialized, started, synced;
+		int	num_capture_channels;
 		play_mover	play_move;
 		capt_mover	capture_move;
 
 		void	got_xrun();
+		void	got_capture_xrun();
 	};
 
 

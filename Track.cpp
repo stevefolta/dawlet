@@ -178,6 +178,8 @@ void Track::prepare_to_play()
 
 void Track::run(AudioBuffer** buffers_out, int num_channels)
 {
+	AudioSample min_sample = 0, max_sample = 0;
+
 	// Get buffers for the track.
 	int buffer_size = engine->buffer_size();
 	AudioBuffer* track_buffers[num_channels];
@@ -188,8 +190,30 @@ void Track::run(AudioBuffer** buffers_out, int num_channels)
 		track_buffers[which_channel] = buffer;
 		}
 
+	// Record-arm.
+	if (record_armed) {
+		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
+			AudioBuffer* in_buffer = engine->get_capture_buffer(0); 	//*** TODO
+			if (in_buffer) {
+				AudioSample* in = in_buffer->samples;
+				AudioSample* out = track_buffers[which_channel]->samples;
+				for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
+					AudioSample sample = *in++;
+					if (sample < min_sample)
+						min_sample = sample;
+					else if (sample > max_sample)
+						max_sample = sample;
+					if (monitor_input) {
+						*out += sample;
+						++out;
+						}
+					}
+				}
+			}
+		}
+
 	// Playlist.
-	if (playlist)
+	if (engine->is_playing() && playlist)
 		playlist->run(track_buffers, num_channels);
 
 	// Children.
@@ -206,14 +230,17 @@ void Track::run(AudioBuffer** buffers_out, int num_channels)
 
 	// Mix the track into the output buffers.
 	// Collect metering info at the same time.
-	AudioSample min_sample = 0, max_sample = 0;
 	if (sends_to_parent) {
 		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
 			AudioSample* in = track_buffers[which_channel]->samples;
 			AudioSample* out = buffers_out[which_channel]->samples;
 			for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
 				AudioSample sample = amp(gain, *in++);
-				if (sample > max_sample)
+				if (record_armed) {
+					// We're showing input rather than output, and we got the peaks
+					// above.
+					}
+				else if (sample > max_sample)
 					max_sample = sample;
 				else if (sample < min_sample)
 					min_sample = sample;
@@ -224,7 +251,7 @@ void Track::run(AudioBuffer** buffers_out, int num_channels)
 		}
 
 	// If not using the output buffers, we still want the metering info.
-	else {
+	else if (!record_armed) {
 		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
 			AudioSample* in = track_buffers[which_channel]->samples;
 			for (int samples_left = buffer_size; samples_left > 0; --samples_left) {
