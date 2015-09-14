@@ -19,7 +19,8 @@ class ALSAAudioInterface : public AudioInterface {
 		void	send_data(AudioBuffer** buffers, int num_channels);
 
 	protected:
-		typedef char* (*play_mover)(const AudioSample* in, char* out, int frames, int step);
+		typedef void (*play_mover)(const AudioSample* in, char* out, int frames, int step);
+		typedef void (*capt_mover)(const char* in, AudioSample* out, int frames, int step);
 
 		std::string	name;
 		snd_pcm_t*	playback;
@@ -29,6 +30,7 @@ class ALSAAudioInterface : public AudioInterface {
 		int	xruns;
 		bool	initialized, started;
 		play_mover	play_move;
+		capt_mover	capture_move;
 
 		void	got_xrun();
 	};
