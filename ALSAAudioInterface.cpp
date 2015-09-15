@@ -610,7 +610,7 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 	int err;
 	auto check_err = [&err, this](const char* call) -> void {
 		if (err == -EPIPE)
-			got_xrun();
+			got_capture_xrun();
 		else if (err < 0) {
 			log("%s failed for capture: %d (\"%s\").", call, err, snd_strerror(err));
 			throw Exception("alsa-capture-fail");
@@ -649,7 +649,7 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 		channel_buffers[which_channel] = buffers[which_channel]->samples;
 	int err = snd_pcm_readn(capture, channel_buffers, buffer_size);
 	if (err == -EPIPE)
-		got_xrun();
+		got_capture_xrun();
 	else if (err < 0) {
 		log("snd_pcm_readn() returned %d (\"%s\").", err, snd_strerror(err));
 		log("state = %d", snd_pcm_state(capture));
