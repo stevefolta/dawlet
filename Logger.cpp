@@ -43,3 +43,26 @@ void log(const char* message, ...)
 
 
 
+Stopwatch::Stopwatch(const char* msg_in, int min_reported_us_in)
+	: msg(msg_in), min_reported_us(min_reported_us_in), running(true)
+{
+	clock_gettime(CLOCK_MONOTONIC, &start_time);
+}
+
+
+Stopwatch::~Stopwatch()
+{
+	if (running)
+		stop();
+}
+
+void Stopwatch::stop()
+{
+	struct timespec end_time;
+	clock_gettime(CLOCK_MONOTONIC, &end_time);
+	int us = (end_time.tv_nsec - start_time.tv_nsec) / 1000 + (end_time.tv_sec - start_time.tv_sec) * 1000000;
+	if (us > min_reported_us)
+		log("%dus for %s.", us, msg);
+	running = false;
+}
+
