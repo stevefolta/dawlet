@@ -514,7 +514,7 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 	int err;
 	auto check_err = [&err, this](const char* call) -> void {
 		if (err == -EPIPE)
-			got_xrun();
+			got_xrun(call);
 		else if (err < 0) {
 			log("%s failed: %d (\"%s\").", call, err, snd_strerror(err));
 			throw Exception("alsa-playback-fail");
@@ -555,7 +555,7 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 		channel_buffers[which_channel] = buffers[which_channel]->samples;
 	int err = snd_pcm_writen(playback, channel_buffers, buffer_size);
 	if (err == -EPIPE)
-		got_xrun();
+		got_xrun("snd_pcm_writen");
 	else if (err < 0) {
 		log("snd_pcm_writen() returned %d (\"%s\").", err, snd_strerror(err));
 		log("state = %d", snd_pcm_state(playback));
@@ -610,7 +610,7 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 	int err;
 	auto check_err = [&err, this](const char* call) -> void {
 		if (err == -EPIPE)
-			got_capture_xrun();
+			got_capture_xrun(call);
 		else if (err < 0) {
 			log("%s failed for capture: %d (\"%s\").", call, err, snd_strerror(err));
 			throw Exception("alsa-capture-fail");
@@ -649,7 +649,7 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 		channel_buffers[which_channel] = buffers[which_channel]->samples;
 	int err = snd_pcm_readn(capture, channel_buffers, buffer_size);
 	if (err == -EPIPE)
-		got_capture_xrun();
+		got_capture_xrun("snd_pcm_readn");
 	else if (err < 0) {
 		log("snd_pcm_readn() returned %d (\"%s\").", err, snd_strerror(err));
 		log("state = %d", snd_pcm_state(capture));
@@ -661,9 +661,9 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 }
 
 
-void ALSAAudioInterface::got_xrun()
+void ALSAAudioInterface::got_xrun(const char* call)
 {
-	log("xrun");
+	log("xrun from %s()", call);
 	xruns += 1;
 	engine->got_xrun();
 	int err = snd_pcm_recover(playback, -EPIPE, 1);
@@ -675,9 +675,9 @@ void ALSAAudioInterface::got_xrun()
 }
 
 
-void ALSAAudioInterface::got_capture_xrun()
+void ALSAAudioInterface::got_capture_xrun(const char* call)
 {
-	log("capture xrun");
+	log("capture xrun from %s()", call);
 	xruns += 1;
 	engine->got_xrun();
 	int err = snd_pcm_recover(capture, -EPIPE, 1);

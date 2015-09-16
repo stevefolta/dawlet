@@ -37,8 +37,8 @@ class ALSAAudioInterface : public AudioInterface {
 		play_mover	play_move;
 		capt_mover	capture_move;
 
-		void	got_xrun();
-		void	got_capture_xrun();
+		void	got_xrun(const char* call);
+		void	got_capture_xrun(const char* call);
 	};
 
 
