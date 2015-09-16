@@ -494,7 +494,6 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	err = snd_pcm_prepare(playback);
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
-	if (capture)
 
 	initialized = true;
 }
