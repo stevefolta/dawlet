@@ -44,3 +44,8 @@ SFX log("snd_pcm_wait() took %dms.", ms);
 
 On the ONE, 45 seems to be the minimum buffer size to prevent xrun death.  For the built-in interface, it's 48.
 
+
+[2015.9.15]
+
+Since adding capture, it can get into a state where it has a continuous flurry of xruns.  Capture's snd_pcm_wait() call doesn't seem to be the culprit... nor mmap_{begin,commit}.  Nor the mmaps on the playback side.  Interestingly, *all* xruns, flurry or no, seem to be preceded by "!capture_is_ready".  No, not on the next run.  Next run, sometimes it does and sometimes it doesn't, it did for the flurry.  But all xruns I'm seeing come from snd_pcm_wait().  Neither snd_pcm_wait() seems to take inordinately long.  It is the send-buffers part of the engine that takes longest during a flurry (dominated by snd_pcm_recover()), but not longer than a non-flurry xrun.
+
