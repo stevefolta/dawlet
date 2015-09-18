@@ -691,12 +691,33 @@ void ALSAAudioInterface::got_capture_xrun(const char* call)
 	log("capture xrun from %s()", call);
 	xruns += 1;
 	engine->got_xrun();
+
+#ifdef USE_ALSA_MMAP
+
+	int err = snd_pcm_prepare(playback);
+	if (err < 0)
+		log("snd_pcm_prepare(playback) returned %d (\"%s\").", err, snd_strerror(err));
+	if (capture && !synced) {
+		err = snd_pcm_prepare(capture);
+		if (err < 0)
+			log("snd_pcm_prepare(capture) returned %d (\"%s\").", err, snd_strerror(err));
+		}
+
+	started = false;
+	send_empty_buffer(2);
+
+#else 	// !USE_ALSA_MMAP
+
 	int err = snd_pcm_recover(capture, -EPIPE, 1);
 	if (err < 0)
 		log("snd_pcm_recover() returned %d (\"%s\").", err, snd_strerror(err));
 #ifdef USE_ALSA_MMAP
-	snd_pcm_start(capture);
+	err = snd_pcm_start(capture);
+	if (err < 0)
+		log("capture snd_pcm_start() returned %d (\"%s\").", err, snd_strerror(err));
 #endif
+
+#endif 	// !USE_ALSA_MMAP
 }
 
 
