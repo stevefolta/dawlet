@@ -8,6 +8,10 @@
 	#include "local.h"
 #endif
 
+#ifndef DONT_USE_ALSA_MMAP
+	#define USE_ALSA_MMAP
+#endif
+
 
 class ALSAAudioInterface : public AudioInterface {
 	public:
