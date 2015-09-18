@@ -495,6 +495,11 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	if (err < 0)
 		throw Exception("alsa-setup-fail");
 
+	// We'll start by sending one blank buffer.
+#ifdef USE_ALSA_MMAP
+	send_empty_buffer(num_channels);
+#endif
+
 	initialized = true;
 }
 
@@ -596,7 +601,7 @@ bool ALSAAudioInterface::capture_is_ready()
 	if (!initialized || !capture)
 		return false;
 
-	return snd_pcm_avail(capture) >= buffer_size;
+	return started;
 }
 
 
@@ -618,6 +623,12 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 
 	// Wait for the interface to be ready.
 	err = snd_pcm_wait(capture, 1000);
+	if (err == -EPIPE) {
+		got_capture_xrun("snd_pcm_wait");
+		for (int which_channel = 0; which_channel < num_channels; ++which_channel)
+			buffers[which_channel]->clear();
+		return;
+		}
 	check_err("snd_pcm_wait");
 
 	// Set up MMAP.
@@ -669,6 +680,7 @@ void ALSAAudioInterface::got_xrun(const char* call)
 	if (err < 0)
 		log("snd_pcm_recover() returned %d (\"%s\").", err, snd_strerror(err));
 #ifdef USE_ALSA_MMAP
+	send_empty_buffer(2);
 	started = false;
 #endif
 }
@@ -684,6 +696,47 @@ void ALSAAudioInterface::got_capture_xrun(const char* call)
 		log("snd_pcm_recover() returned %d (\"%s\").", err, snd_strerror(err));
 #ifdef USE_ALSA_MMAP
 	snd_pcm_start(capture);
+#endif
+}
+
+
+void ALSAAudioInterface::send_empty_buffer(int num_channels)
+{
+#ifdef USE_ALSA_MMAP
+	int err;
+	auto check_err = [&err](const char* call) -> void {
+		if (err >= 0)
+			return;
+		log("%s() failed: %d (\"%s\").", call, err, snd_strerror(err));
+		throw Exception("alsa-setup-fail");
+		};
+
+	AudioBuffer* buffer = engine->get_buffer();
+
+	err = snd_pcm_wait(playback, 1000);
+	check_err("snd_pcm_wait");
+
+	// Set up MMAP.
+	const snd_pcm_channel_area_t* areas;
+	snd_pcm_uframes_t offset, frames = buffer_size;
+	err = snd_pcm_mmap_begin(playback, &areas, &offset, &frames);
+	check_err("snd_pcm_mmap_begin");
+
+	// Copy the samples.
+	const snd_pcm_channel_area_t* area = areas;
+	for (int which_channel = 0; which_channel < num_channels; ++which_channel, ++area) {
+		char* out_buffer =
+			(char*) area->addr + ((area->first + area->step * offset) >> 3);
+		play_move(
+			buffer->samples, out_buffer,
+			buffer_size, area->step >> 3);
+		}
+
+	// Send the samples to the hardware.
+	err = snd_pcm_mmap_commit(playback, offset, frames);
+	check_err("snd_pcm_mmap_commit");
+
+	engine->free_buffer(buffer);
 #endif
 }
 

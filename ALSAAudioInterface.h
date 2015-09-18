@@ -39,6 +39,7 @@ class ALSAAudioInterface : public AudioInterface {
 
 		void	got_xrun(const char* call);
 		void	got_capture_xrun(const char* call);
+		void	send_empty_buffer(int num_channels);
 	};
 
 
