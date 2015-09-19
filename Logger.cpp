@@ -56,6 +56,15 @@ Stopwatch::~Stopwatch()
 		stop();
 }
 
+void Stopwatch::start(const char* new_msg, int new_min_reported_us)
+{
+	msg = new_msg;
+	min_reported_us = new_min_reported_us;
+	running = true;
+	clock_gettime(CLOCK_MONOTONIC, &start_time);
+}
+
+
 void Stopwatch::stop()
 {
 	struct timespec end_time;

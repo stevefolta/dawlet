@@ -37,6 +37,7 @@ class Stopwatch {
 		Stopwatch(const char* msg_in, int min_reported_us_in = 0);
 		~Stopwatch();
 
+		void start(const char* new_msg, int new_min_reported_us = 0);
 		void stop();
 
 	protected:
