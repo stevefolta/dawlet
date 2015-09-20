@@ -13,3 +13,10 @@ Unfortunately, Ardour4 won't let me set a buffer size above 8192, so I can't eas
 
 I tried sending an empty buffer at startup, then starting capture (and waiting for it) after the first real buffer is sent.  This seems to help: round-trip latency with a 44100 buffer is about 2 seconds.  Before, it was about 4.5s.  But with low buffer sizes, it can xrun on the first capture, and then it doesn't recover well.  We don't see more xruns, but capture's snd_pcm_wait() times out every time from then on.
 
+
+[2015.9.20]
+
+Finally actually set the priority of the engine thread; that really seems to help.  Way fewer xruns with a 96-sample buffer, maybe even none.  Buffer of 64 is still unusable, though.  Actually, I got it all the way down to 45 (the minimum that ONE reports it can do, see above), it's just that sometimes it gets a flurry on startup that it can't seem to recover from (not that I let it try for long).  But a reload or two gets you to a good state, and then it's fine.
+
+Ability to switch between interfaces is gone, at 128-sample buffer size.  I can switch from ONE to built-in, but the reverse crashes in capture_move after "10011466us for message handling".
+
