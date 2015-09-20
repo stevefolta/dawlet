@@ -52,6 +52,11 @@ AudioEngine::AudioEngine()
 	pthread_attr_t thread_attributes;
 	int err = pthread_attr_init(&thread_attributes);
 	err = pthread_attr_setschedpolicy(&thread_attributes, SCHED_FIFO);
+	int max_priority = sched_get_priority_max(SCHED_FIFO);
+	struct sched_param param;
+	param.sched_priority = max_priority;
+	err = pthread_attr_setschedparam(&thread_attributes, &param);
+	err = pthread_attr_setinheritsched(&thread_attributes, PTHREAD_EXPLICIT_SCHED);
 	pthread_t thread;
 	pthread_create(&thread, &thread_attributes, &thread_start, this);
 	err = pthread_attr_destroy(&thread_attributes);
