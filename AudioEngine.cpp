@@ -49,6 +49,8 @@ AudioEngine::AudioEngine()
 	capture_buffers = nullptr;
 	num_capture_buffers = 0;
 
+	stats.reset();
+
 	pthread_attr_t thread_attributes;
 	int err = pthread_attr_init(&thread_attributes);
 	err = pthread_attr_setschedpolicy(&thread_attributes, SCHED_FIFO);
@@ -395,6 +397,14 @@ void AudioEngine::add_peak(int track_id, AudioSample peak)
 void AudioEngine::got_xrun()
 {
 	from->send(Message::Xrun);
+	stats.playback_xruns += 1;
+}
+
+
+void AudioEngine::got_capture_xrun()
+{
+	from->send(Message::Xrun);
+	stats.capture_xruns += 1;
 }
 
 

@@ -1,13 +1,13 @@
 PROGRAM := dawlet
 SOURCES := main.cpp DAW.cpp
 SOURCES += ProjectReader.cpp JSONParser.cpp FieldParser.cpp
-SOURCES += Logger.cpp Base64.cpp
+SOURCES += Logger.cpp Base64.cpp Stats.cpp
 SOURCES += Project.cpp Track.cpp Playlist.cpp Clip.cpp Send.cpp
 SOURCES += AudioEngine.cpp AudioBuffer.cpp BufferManager.cpp MessageQueue.cpp
 SOURCES += AudioFileRead.cpp
 SOURCES += web/Server.cpp web/Connection.cpp web/Request.cpp
 SOURCES += APIHandler.cpp APIHandlers.cpp
-SOURCES += GetPBHeadProcess.cpp SeekProcess.cpp SupplyReadsProcess.cpp InstallProjectProcess.cpp
+SOURCES += GetPBHeadProcess.cpp GetStatsProcess.cpp SeekProcess.cpp SupplyReadsProcess.cpp InstallProjectProcess.cpp
 SOURCES += SendMeteringProcess.cpp
 SOURCES += SelectInterfaceProcess.cpp
 SOURCES += MutatingProcess.cpp SetTrackStateProcesses.cpp

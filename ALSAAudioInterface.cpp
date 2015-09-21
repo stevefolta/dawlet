@@ -690,7 +690,7 @@ void ALSAAudioInterface::got_capture_xrun(const char* call)
 {
 	log("capture xrun from %s()", call);
 	xruns += 1;
-	engine->got_xrun();
+	engine->got_capture_xrun();
 
 #ifdef USE_ALSA_MMAP
 

@@ -10,6 +10,7 @@ var key_bindings = {
 	"A": "toggle-record-arm",
 	"C-Z": "undo",
 	"C-S-Z": "redo",
+	"S-&": "toggle-stats-visibility",
 	};
 
 var commands = {
@@ -24,6 +25,7 @@ var commands = {
 	"undo": function() { undo_action(); },
 	"redo": function() { redo_action(); },
 	"toggle-record-arm": function() { if (selected_track) selected_track.toggle_record_arm(); },
+	"toggle-stats-visibility": function() { toggle_stats_visibility(); },
 	};
 
 

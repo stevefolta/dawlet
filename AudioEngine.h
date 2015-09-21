@@ -4,6 +4,7 @@
 #include "BufferManager.h"
 #include "Message.h"
 #include "AudioTypes.h"
+#include "Stats.h"
 #include <string>
 class MessageQueue;
 class AudioFileRead;
@@ -47,7 +48,13 @@ class AudioEngine {
 
 		void	add_metering_process(SendMeteringProcess* metering_process);
 		void	add_peak(int track_id, AudioSample peak);
+
 		void	got_xrun();
+		void	got_capture_xrun();
+		void	got_missing_file_read() { stats.missing_file_reads += 1; }
+		void	got_read_slot_overflow() { stats.read_slot_overflows += 1; }
+		void	got_exhausted_reads() { stats.exhausted_reads += 1; }
+		Stats	get_stats() { return stats; }
 
 		AudioBuffer*	get_capture_buffer(int which_capture_channel);
 
@@ -74,6 +81,8 @@ class AudioEngine {
 
 		AudioBuffer**	capture_buffers;
 		int	num_capture_buffers;
+
+		Stats	stats;
 
 		void	run();
 		void	play();

@@ -132,6 +132,7 @@ void Clip::run(AudioBuffer** buffers_out, int num_channels)
 			// We didn't read it in time, we'll have to skip it.  Try to go to the
 			// next available read.
 			log("Missing read at %d!", play_frame);
+			engine->got_missing_file_read();
 			unsigned long buffer_end_frame =
 				play_frame + buffer_size - start_out_frame;
 			which_read = -1;
@@ -254,6 +255,7 @@ void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 	if (i >= num_reads) {
 		log("Read slot allocation fail!");
 		log("  Trying to add %lu -> %lu.", start_frame, start_frame + num_frames);
+		engine->got_read_slot_overflow();
 		return;
 		}
 
@@ -261,6 +263,7 @@ void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 	AudioFileRead* read = engine->next_audio_file_read();
 	if (read == nullptr) {
 		log("Reads exhausted!");
+		engine->got_exhausted_reads();
 		return;
 		}
 	reads[i] = read;

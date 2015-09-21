@@ -5,6 +5,7 @@
 #include "DAW.h"
 #include "AudioEngine.h"
 #include "SetTrackStateProcesses.h"
+#include "GetStatsProcess.h"
 #include "Logger.h"
 #include <map>
 
@@ -110,8 +111,7 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 
 void APIHandler_stats::handle(std::string url_remainder, Web::Connection* connection)
 {
-	connection->error_out("501 Not Implemented");
-	/***/
+	engine->start_process(new GetStatsProcess(connection));
 }
 
 

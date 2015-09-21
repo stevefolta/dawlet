@@ -138,7 +138,7 @@ function got_xrun() {
 	if (clock) {
 		clock.setAttribute("xrun", "xrun");
 
-		window.setTimeout(function() {
+		xrun_timeout = window.setTimeout(function() {
 			clock.removeAttribute("xrun");
 			xrun_timeout = null;
 			},
@@ -158,6 +158,56 @@ function hide_error() {
 	var error_div = document.getElementById("error");
 	if (error_div)
 		error_div.style.display = 'none';
+	}
+
+
+var stats_timer = null;
+
+function show_stats() {
+	if (stats_timer)
+		return;
+
+	var stats_div = document.getElementById("stats");
+	if (stats_div) {
+		stats_div.style.display = 'block';
+		update_stats();
+		stats_timer = window.setInterval(update_stats, 1000);
+		}
+	}
+
+function hide_stats() {
+	var stats_div = document.getElementById("stats");
+	stats_div.style.display = 'none';
+	if (stats_timer) {
+		window.clearInterval(stats_timer);
+		stats_timer = null;
+		}
+	}
+
+function toggle_stats_visibility() {
+	if (stats_timer)
+		hide_stats();
+	else
+		show_stats();
+	}
+
+function update_stats() {
+	api_get("/api/stats", function(stats) {
+		var stats_div = document.getElementById("stats");
+		if (stats_div) {
+			var stats_str = "";
+			var started = false;
+			var stat_names = [ "playback_xruns", "capture_xruns", "missing_file_reads", "read_slot_overflows", "exhausted_reads" ];
+			stat_names.forEach(function(stat_name) {
+				if (started)
+					stats_str += "  ";
+				else
+					started = true;
+				stats_str += stat_name + ": " + stats[stat_name];
+				});
+			stats_div.textContent = stats_str;
+			}
+		});
 	}
 
 

@@ -60,6 +60,13 @@ div#error {
 	margin: 0em auto 0.75em auto;
 	}
 
+div#stats {
+	display: none;
+	font-family: monospace;
+	margin: 0em auto 0.75em auto;
+	white-space: pre-wrap;
+	}
+
 
 div#master {
 	width: 100%;
