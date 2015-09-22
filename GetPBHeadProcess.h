@@ -1,32 +1,18 @@
 #ifndef GetPBHeadProcess_h
 #define GetPBHeadProcess_h
 
-#include "Process.h"
-namespace Web {
-	class Connection;
-	}
+#include "GetProcess.h"
 
 
-class GetPBHeadProcess : public Process {
+class GetPBHeadProcess : public GetProcess {
 	public:
 		GetPBHeadProcess(Web::Connection* connection_in)
-			: connection(connection_in), state(InEngine) {}
-
-		bool	is_done();
-		void	next();
+			: GetProcess(connection_in) {}
 
 	protected:
-		enum {
-			InEngine,
-			Replying,
-			Done,
-			};
-		int state;
-
-		Web::Connection*	connection;
+		double	position;
 
 		void	in_engine();
-		double	position;
 		void	replying();
 	};
 

@@ -5,21 +5,6 @@
 #include <sstream>
 
 
-bool GetStatsProcess::is_done()
-{
-	return state == Done;
-}
-
-
-void GetStatsProcess::next()
-{
-	switch (state) {
-		case InEngine:	in_engine();	break;
-		case Replying:	replying();	break;
-		}
-}
-
-
 void GetStatsProcess::in_engine()
 {
 	stats = engine->get_stats();

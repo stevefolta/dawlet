@@ -4,21 +4,6 @@
 #include <stdio.h>
 
 
-bool GetPBHeadProcess::is_done()
-{
-	return state == Done;
-}
-
-
-void GetPBHeadProcess::next()
-{
-	switch (state) {
-		case InEngine:	in_engine();	break;
-		case Replying:	replying();	break;
-		}
-}
-
-
 void GetPBHeadProcess::in_engine()
 {
 	position = engine->play_head;

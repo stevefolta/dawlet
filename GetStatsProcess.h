@@ -1,30 +1,16 @@
 #ifndef GetStatsProcess_h
 #define GetStatsProcess_h
 
-#include "Process.h"
+#include "GetProcess.h"
 #include "Stats.h"
-namespace Web {
-	class Connection;
-	}
 
 
-class GetStatsProcess : public Process {
+class GetStatsProcess : public GetProcess {
 	public:
 		GetStatsProcess(Web::Connection* connection_in)
-			: connection(connection_in), state(InEngine) {}
-
-		bool	is_done();
-		void	next();
+			: GetProcess(connection_in) {}
 
 	protected:
-		enum {
-			InEngine,
-			Replying,
-			Done,
-			};
-		int state;
-
-		Web::Connection*	connection;
 		Stats	stats;
 
 		void	in_engine();
