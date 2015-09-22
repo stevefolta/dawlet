@@ -1,6 +1,7 @@
 #include "ALSAAudioInterface.h"
 #include "AudioBuffer.h"
 #include "AudioEngine.h"
+#include "SampleConversion.h"
 #include "Exception.h"
 #include "Logger.h"
 #ifdef USE_LOCAL_H
@@ -45,219 +46,6 @@ bool try_format(snd_pcm_t* pcm, snd_pcm_hw_params_t* hw_params, snd_pcm_format_t
 	int err = snd_pcm_hw_params_set_format(pcm, hw_params, format);
 	return err >= 0;
 }
-
-static void play_float(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		*(float*) out = *in++;
-		out += step;
-		}
-}
-static void play_32(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		*(int32_t*) out = (int32_t) (sample * 0x7FFFFFFF);
-		out += step;
-		}
-}
-static void play_32_be(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		int32_t sample_out = (int32_t) (sample * 0x7FFFFFFF);
-		out[0] = sample_out >> 24;
-		out[1] = sample_out >> 16;
-		out[2] = sample_out >> 8;
-		out[3] = sample_out;
-		out += step;
-		}
-}
-static void play_32_le(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		int32_t sample_out = (int32_t) (sample * 0x7FFFFFFF);
-		out[0] = sample_out;
-		out[1] = sample_out >> 8;
-		out[2] = sample_out >> 16;
-		out[3] = sample_out >> 24;
-		out += step;
-		}
-}
-static void play_24_le(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		int32_t sample_out = (int32_t) (sample * 0x007FFFFF);
-		out[0] = sample_out;
-		out[1] = sample_out >> 8;
-		out[2] = sample_out >> 16;
-		out += step;
-		}
-}
-static void play_24_be(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		int32_t sample_out = (int32_t) (sample * 0x007FFFFF);
-		out[0] = sample_out >> 16;
-		out[1] = sample_out >> 8;
-		out[2] = sample_out;
-		out += step;
-		}
-}
-static void play_16(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		*out++ = (int16_t) (sample * 0x7FFF);
-		}
-}
-static void play_16_be(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		int16_t sample_out = (sample * 0x7FFF);
-		out[0] = sample_out >> 8;
-		out[1] = sample_out;
-		out += step;
-		}
-}
-static void play_16_le(const AudioSample* in, char* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		AudioSample sample = *in++;
-		if (sample > 1.0)
-			sample = 1.0;
-		else if (sample < -1.0)
-			sample = -1.0;
-		int16_t sample_out = (sample * 0x7FFF);
-		out[0] = sample_out;
-		out[1] = sample_out >> 8;
-		out += step;
-		}
-}
-
-static void capt_float(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		*out++ = *(float*) in;
-		in += step;
-		}
-}
-static void capt_32(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		*out++ = *(int32_t*) in / (AudioSample) 0x7FFFFFFF;
-		in += step;
-		}
-}
-static void capt_32_be(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		int32_t sample =
-			(in[0] & 0xFF) << 24 |
-			(in[1] & 0xFF) << 16 |
-			(in[2] & 0xFF) << 8 |
-			(in[3] & 0xFF);
-		*out++ = sample / (AudioSample) 0x7FFFFFFF;
-		in += step;
-		}
-}
-static void capt_32_le(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		int32_t sample =
-			(in[0] & 0xFF) |
-			(in[1] & 0xFF) << 8 |
-			(in[2] & 0xFF) << 16 |
-			(in[3] & 0xFF) << 24;
-		*out++ = sample / (AudioSample) 0x7FFFFFFF;
-		in += step;
-		}
-}
-static void capt_24_le(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		int32_t sample =
-			(in[0] & 0xFF) |
-			(in[1] & 0xFF) << 8 |
-			(in[2] & 0xFF) << 16;
-		if (sample & 0x00800000)
-			sample -= 0x01000000;
-		*out++ = sample / (AudioSample) 0x007FFFFF;
-		in += step;
-		}
-}
-static void capt_24_be(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		int32_t sample =
-			(in[0] & 0xFF) << 16 |
-			(in[1] & 0xFF) << 8 |
-			(in[3] & 0xFF);
-		if (sample & 0x00800000)
-			sample -= 0x01000000;
-		*out++ = sample / (AudioSample) 0x007FFFFF;
-		in += step;
-		}
-}
-static void capt_16(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		*out++ = *(int16_t*) in / (AudioSample) 0x7FFF;
-		in += step;
-		}
-}
-static void capt_16_be(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		int16_t sample =
-			(in[0] & 0xFF) << 8 |
-			(in[1] & 0xFF);
-		*out++ = sample / (AudioSample) 0x7FFF;
-		in += step;
-		}
-}
-static void capt_16_le(const char* in, AudioSample* out, int frames, int step)
-{
-	while (frames-- > 0) {
-		int16_t sample =
-			(in[0] & 0xFF) |
-			(in[1] & 0xFF) << 8;
-		*out++ = sample / (AudioSample) 0x7FFF;
-		in += step;
-		}
-}
 #endif 	// USE_ALSA_MMAP
 
 
@@ -293,21 +81,21 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 		#if __BYTE_ORDER == __LITTLE_ENDIAN
 			#ifdef AUDIO_SAMPLE_FLOAT
 			if (try_format(playback, hw_params, SND_PCM_FORMAT_FLOAT_LE))
-				play_move = play_float;
+				play_move = to_float;
 			else
 			#endif
 			if (try_format(playback, hw_params, SND_PCM_FORMAT_S32_LE))
-				play_move = play_32;
+				play_move = to_32;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S32_BE))
-				play_move = play_32_be;
+				play_move = to_32_be;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S24_3LE))
-				play_move = play_24_le;
+				play_move = to_24_le;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S24_3BE))
-				play_move = play_24_be;
+				play_move = to_24_be;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S16_LE))
-				play_move = play_16;
+				play_move = to_16;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S16_BE))
-				play_move = play_16_be;
+				play_move = to_16_be;
 			else {
 				err = -1;
 				check_err("snd_pcm_hw_params_set_format", 0);
@@ -315,21 +103,21 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 		#else /* __BYTE_ORDER == __BIG_ENDIAN */
 			#ifdef AUDIO_SAMPLE_FLOAT
 			if (try_format(playback, hw_params, SND_PCM_FORMAT_FLOAT_BE))
-				play_move = play_float;
+				play_move = to_float;
 			else
 			#endif
 			if (try_format(playback, hw_params, SND_PCM_FORMAT_S32_BE))
-				play_move = play_32;
+				play_move = to_32;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S32_LE))
-				play_move = play_32_le;
+				play_move = to_32_le;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S24_3BE))
-				play_move = play_24_be;
+				play_move = to_24_be;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S24_3LE))
-				play_move = play_24_le;
+				play_move = to_24_le;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S16_BE))
-				play_move = play_16;
+				play_move = to_16;
 			else if (try_format(playback, hw_params, SND_PCM_FORMAT_S16_LE))
-				play_move = play_16_le;
+				play_move = to_16_le;
 			else {
 				err = -1;
 				check_err("snd_pcm_hw_params_set_format", 0);
@@ -393,21 +181,21 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 			#if __BYTE_ORDER == __LITTLE_ENDIAN
 				#ifdef AUDIO_SAMPLE_FLOAT
 				if (try_format(capture, hw_params, SND_PCM_FORMAT_FLOAT_LE))
-					capture_move = capt_float;
+					capture_move = from_float;
 				else
 				#endif
 				if (try_format(capture, hw_params, SND_PCM_FORMAT_S32_LE))
-					capture_move = capt_32;
+					capture_move = from_32;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S32_BE))
-					capture_move = capt_32_be;
+					capture_move = from_32_be;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S24_3LE))
-					capture_move = capt_24_le;
+					capture_move = from_24_le;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S24_3BE))
-					capture_move = capt_24_be;
+					capture_move = from_24_be;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S16_LE))
-					capture_move = capt_16;
+					capture_move = from_16;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S16_BE))
-					capture_move = capt_16_be;
+					capture_move = from_16_be;
 				else {
 					err = -1;
 					check_err("snd_pcm_hw_params_set_format", 0);
@@ -415,21 +203,21 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 			#else /* __BYTE_ORDER == __BIG_ENDIAN */
 				#ifdef AUDIO_SAMPLE_FLOAT
 				if (try_format(capture, hw_params, SND_PCM_FORMAT_FLOAT_BE))
-					capture_move = capt_float;
+					capture_move = from_float;
 				else
 				#endif
 				if (try_format(capture, hw_params, SND_PCM_FORMAT_S32_BE))
-					capture_move = capt_32;
+					capture_move = from_32;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S32_LE))
-					capture_move = capt_32_le;
+					capture_move = from_32_le;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S24_3BE))
-					capture_move = capt_24_be;
+					capture_move = from_24_be;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S24_3LE))
-					capture_move = capt_24_le;
+					capture_move = from_24_le;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S16_BE))
-					capture_move = capt_16;
+					capture_move = from_16;
 				else if (try_format(capture, hw_params, SND_PCM_FORMAT_S16_LE))
-					capture_move = capt_16_le;
+					capture_move = from_16_le;
 				else {
 					err = -1;
 					check_err("snd_pcm_hw_params_set_format", 0);
