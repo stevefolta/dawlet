@@ -35,6 +35,7 @@ extern Logger* logger;
 class Stopwatch {
 	public:
 		Stopwatch(const char* msg_in, int min_reported_us_in = 0);
+		Stopwatch();
 		~Stopwatch();
 
 		void start(const char* new_msg, int new_min_reported_us = 0);

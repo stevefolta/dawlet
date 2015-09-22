@@ -50,6 +50,12 @@ Stopwatch::Stopwatch(const char* msg_in, int min_reported_us_in)
 }
 
 
+Stopwatch::Stopwatch()
+	: running(false)
+{
+}
+
+
 Stopwatch::~Stopwatch()
 {
 	if (running)
@@ -67,6 +73,9 @@ void Stopwatch::start(const char* new_msg, int new_min_reported_us)
 
 void Stopwatch::stop()
 {
+	if (!running)
+		return;
+
 	struct timespec end_time;
 	clock_gettime(CLOCK_MONOTONIC, &end_time);
 	int us = (end_time.tv_nsec - start_time.tv_nsec) / 1000 + (end_time.tv_sec - start_time.tv_sec) * 1000000;

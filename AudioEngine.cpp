@@ -165,8 +165,16 @@ AudioFileRead* AudioEngine::next_audio_file_read()
 
 void AudioEngine::run()
 {
+	#ifdef TIME_ENGINE
+	int32_t max_us = 500000 * (int64_t) cur_buffer_size / cur_sample_rate;
+	Stopwatch timer;
+	#endif
+
 	while (true) {
 		// First, handle messages from the non-realtime thread.
+		#ifdef TIME_ENGINE
+		timer.start("message handling", max_us);
+		#endif
 		while (!to->is_empty()) {
 			Message* message = to->front();
 
@@ -221,6 +229,13 @@ void AudioEngine::run()
 
 			to->pop();
 			}
+		#ifdef TIME_ENGINE
+		timer.stop();
+		#endif
+
+		#ifdef TIME_ENGINE
+		timer.start("read requests/buffers", max_us);
+		#endif
 
 		// Make sure we have enough free AudioFileReadRequests.
 		if (num_free_read_requests < 40 /* TODO: project->num_tracks() * factor */) {
@@ -231,6 +246,10 @@ void AudioEngine::run()
 
 		bufferManager->run();
 
+		#ifdef TIME_ENGINE
+		timer.stop();
+		#endif
+
 		AudioInterface* interface = audio_system->selected_interface();
 		if (interface == nullptr) {
 			usleep(10000);
@@ -238,6 +257,9 @@ void AudioEngine::run()
 			}
 
 		// Capture the next buffer.
+		#ifdef TIME_ENGINE
+		timer.start("capture", 2 * max_us + 200);
+		#endif
 		int num_capture_channels = interface->get_num_capture_channels();
 		if (num_capture_channels > 0) {
 			if (num_capture_channels > num_capture_buffers) {
@@ -261,8 +283,14 @@ void AudioEngine::run()
 					capture_buffers[i]->clear();
 				}
 			}
+		#ifdef TIME_ENGINE
+		timer.stop();
+		#endif
 
 		// Prepare the next buffer.
+		#ifdef TIME_ENGINE
+		timer.start("run", max_us);
+		#endif
 		int num_channels = 2;
 		AudioBuffer* out_buffers[num_channels];
 		bool missing_buffers = false;
@@ -280,8 +308,14 @@ void AudioEngine::run()
 			project->run(out_buffers, num_channels);
 		if (playing)
 			play_head += (ProjectPosition) cur_buffer_size / cur_sample_rate;
+		#ifdef TIME_ENGINE
+		timer.stop();
+		#endif
 
 		// Send the buffers to the interface.
+		#ifdef TIME_ENGINE
+		timer.start("send", max_us);
+		#endif
 		if (!missing_buffers) {
 			try {
 				interface->wait_until_ready();
@@ -293,8 +327,17 @@ void AudioEngine::run()
 			for (which_channel = 0; which_channel < num_channels; ++which_channel)
 				free_buffer(out_buffers[which_channel]);
 			}
+		#ifdef TIME_ENGINE
+		timer.stop();
+		#endif
 
+		#ifdef TIME_ENGINE
+		timer.start("metering", max_us);
+		#endif
 		run_metering();
+		#ifdef TIME_ENGINE
+		timer.stop();
+		#endif
 		}
 }
 
