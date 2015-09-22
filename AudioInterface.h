@@ -2,6 +2,7 @@
 #define AudioInterface_h
 
 #include "AudioTypes.h"
+#include <string>
 class AudioBuffer;
 
 
@@ -17,6 +18,10 @@ class AudioInterface {
 		virtual void	capture_data(AudioBuffer** buffers, int num_channels) = 0;
 
 		virtual int	get_num_capture_channels() = 0;
+
+		// DAW thread only:
+		virtual std::string	input_names_json() = 0;
+		virtual int	capture_channel_for_input_name(std::string name) = 0;
 
 	protected:
 	};

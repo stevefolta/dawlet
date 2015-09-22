@@ -26,6 +26,10 @@ class ALSAAudioInterface : public AudioInterface {
 
 		int	get_num_capture_channels() { return num_capture_channels; }
 
+		// DAW thread only:
+		std::string	input_names_json();
+		int	capture_channel_for_input_name(std::string name);
+
 	protected:
 		typedef void (*play_mover)(const AudioSample* in, char* out, int frames, int step);
 		typedef void (*capt_mover)(const char* in, AudioSample* out, int frames, int step);

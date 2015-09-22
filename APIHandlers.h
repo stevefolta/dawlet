@@ -20,6 +20,11 @@ class APIHandler_stats : public APIHandler {
 		void	handle(std::string url_remainder, Web::Connection* connection);
 	};
 
+class APIHandler_inputs : public APIHandler {
+	public:
+		void	handle(std::string url_remainder, Web::Connection* connection);
+	};
+
 void	dispatch_top_level_api(std::string url_remainder, Web::Connection* connection);
 void	dispatch_top_level_api_put(
 	std::string url_remainder, std::string content, Web::Connection* connection);

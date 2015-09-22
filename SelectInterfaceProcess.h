@@ -16,11 +16,14 @@ class SelectInterfaceProcess : public Process {
 	protected:
 		enum {
 			Selecting,
+			Replying,
 			Done,
 			};
 
 		std::string	name;
 		int state;
+
+		void	reply();
 	};
 
 

@@ -10,6 +10,7 @@ var master_track = null;
 var tracks_by_id = {};
 var selected_track = null;
 var theme_css_link = null;
+var interface_inputs = [];
 
 var prefs = {
 	playhead_nudge: 0.1,
@@ -93,6 +94,13 @@ function select_initial_interface(interfaces) {
 	var popup = document.getElementById("interface-popup");
 	if (popup)
 		popup.selectedIndex = use_interface_index;
+	}
+
+function update_inputs() {
+	interface_inputs = [];
+	api_get("/api/inputs", function(inputs) {
+		interface_inputs = inputs;
+		});
 	}
 
 
@@ -386,6 +394,8 @@ function load() {
 			project_loaded();
 		else if (event.data == "xrun")
 			got_xrun();
+		else if (event.data.startsWith("interface-selected "))
+			update_inputs();
 		else if (event.data.startsWith("error "))
 			got_error(event.data.substr("error ".length));
 		};

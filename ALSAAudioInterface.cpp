@@ -4,6 +4,8 @@
 #include "SampleConversion.h"
 #include "Exception.h"
 #include "Logger.h"
+#include <sstream>
+#include <stdlib.h>
 #ifdef USE_LOCAL_H
 	#include "local.h"
 #endif
@@ -456,6 +458,64 @@ void ALSAAudioInterface::capture_data(AudioBuffer** buffers, int num_channels)
 		}
 
 #endif 	//  !USE_ALSA_MMAP
+}
+
+
+std::string ALSAAudioInterface::input_names_json()
+{
+	std::stringstream json;
+	json << "[";
+
+	// Mono.
+	if (num_capture_channels > 0) {
+		json << "{ \"category\": \"Mono\", \"inputs\": [ ";
+		bool started = false;
+		for (int index = 0; index < num_capture_channels; ++index) {
+			if (started)
+				json << ", ";
+			else
+				started = true;
+			json << "\"In " << (index + 1) << "\"";
+			}
+		json << " ] }";
+		}
+
+	// Stereo.
+	if (num_capture_channels > 1) {
+		json << ", ";
+		json << "{ \"category\": \"Stereo\", \"inputs\": [ ";
+		bool started = false;
+		for (int index = 0; index < num_capture_channels - 1; index += 2) {
+			if (started)
+				json << ", ";
+			else
+				started = true;
+			json << "\"Stereo " << (index + 1) << "/" << (index + 2)  << "\"";
+			}
+		json << " ] }";
+		}
+
+	json << "]";
+	return json.str();
+}
+
+
+int ALSAAudioInterface::capture_channel_for_input_name(std::string name)
+{
+	if (name.find("In ") == 0) {
+		return atoi(name.substr(3).c_str());
+		}
+
+	else if (name.find("Stereo ") == 0) {
+		std::string channels = name.substr(7);
+		size_t index = channels.find('/');
+		if (index == std::string::npos)
+			return -1;
+		else
+			return atoi(channels.substr(0, index).c_str());
+		}
+
+	return -1;
 }
 
 

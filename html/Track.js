@@ -74,16 +74,13 @@ function Track(id, parent) {
 		var popup = new PopupMenu();
 		popup.add_item("Monitor Input");
 		popup.add_divider();
-		var mono_inputs_menu = new PopupMenu();
-		mono_inputs_menu.add_item("Input 1");
-		mono_inputs_menu.add_item("Input 2");
-		popup.add_submenu("Mono Input", mono_inputs_menu);
-		var stereo_inputs_menu = new PopupMenu();
-		stereo_inputs_menu.add_item("Inputs 1/2");
-		popup.add_submenu("Stereo Input", stereo_inputs_menu);
-		var midi_inputs_menu = new PopupMenu();
-		midi_inputs_menu.add_item("All Inputs");
-		popup.add_submenu("MIDI Input", midi_inputs_menu);
+		interface_inputs.forEach(function(category) {
+			var category_menu = new PopupMenu();
+			category.inputs.forEach(function(name) {
+				category_menu.add_item(name);
+				});
+			popup.add_submenu(category.category, category_menu);
+			});
 		var rec_arm_rect = rec_arm.getBoundingClientRect();
 		popup.open(rec_arm_rect.right, rec_arm_rect.top);
 		}

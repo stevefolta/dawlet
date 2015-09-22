@@ -4,6 +4,8 @@
 #include "Track.h"
 #include "DAW.h"
 #include "AudioEngine.h"
+#include "AudioSystem.h"
+#include "AudioInterface.h"
 #include "SetTrackStateProcesses.h"
 #include "GetStatsProcess.h"
 #include "Logger.h"
@@ -112,6 +114,21 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 void APIHandler_stats::handle(std::string url_remainder, Web::Connection* connection)
 {
 	engine->start_process(new GetStatsProcess(connection));
+}
+
+
+void APIHandler_inputs::handle(std::string url_remainder, Web::Connection* connection)
+{
+	if (!url_remainder.empty()) {
+		connection->error_out("404 Not Found");
+		return;
+		}
+
+	AudioInterface* interface = audio_system->selected_interface();
+	if (interface == nullptr)
+		connection->error_out("404 Not Found");
+	else
+		send_json_reply(connection, interface->input_names_json());
 }
 
 
