@@ -586,6 +586,7 @@ void ALSAAudioInterface::send_empty_buffer(int num_channels)
 		};
 
 	AudioBuffer* buffer = engine->get_buffer();
+	buffer->clear();
 
 	err = snd_pcm_wait(playback, 1000);
 	check_err("snd_pcm_wait");
