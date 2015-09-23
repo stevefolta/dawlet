@@ -54,6 +54,7 @@ void ALSAAudioSystem::select_interface(std::string name)
 		interface = nullptr;
 		interface = new ALSAAudioInterface(device_name);
 		interface->setup(2, engine->sample_rate(), engine->buffer_size());
+		interface->setup_armed_channels();
 		}
 	catch (Exception& e) {
 		engine->report_error(e.type);

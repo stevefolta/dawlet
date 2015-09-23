@@ -8,7 +8,9 @@ class AudioBuffer;
 
 class AudioInterface {
 	public:
-		virtual ~AudioInterface() {}
+		AudioInterface()
+			: armed_channels(nullptr) {}
+		virtual ~AudioInterface();
 
 		virtual void	setup(int num_channels, int sample_rate, int buffer_size) = 0;
 		virtual void	wait_until_ready() = 0;
@@ -23,7 +25,10 @@ class AudioInterface {
 		virtual std::string	input_names_json() = 0;
 		virtual int	capture_channel_for_input_name(std::string name) = 0;
 
+		void	setup_armed_channels();
+
 	protected:
+		bool*	armed_channels;
 	};
 
 
