@@ -6,6 +6,7 @@
 class AudioEngine;
 class AudioFileRead;
 class Project;
+class Recorder;
 namespace Web {
 	class Server;
 	class Connection;
@@ -28,6 +29,7 @@ class DAW {
 		void	mutation_complete();
 
 		Project*	cur_project() { return project; }
+		Recorder*	get_recorder() { return recorder; }
 
 		void	send_websocket_message(std::string message);
 		Web::Connection* websocket_connection() { return cur_websocket_connection; }
@@ -37,6 +39,7 @@ class DAW {
 	protected:
 		AudioEngine*	engine;
 		Web::Server*	server;
+		Recorder*	recorder;
 		Web::Connection*	cur_websocket_connection;
 		Project*	project;
 		AudioFileRead*	active_reads;

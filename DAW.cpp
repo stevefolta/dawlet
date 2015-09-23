@@ -1,6 +1,7 @@
 #include "DAW.h"
 #include "AudioEngine.h"
 #include "AudioFileRead.h"
+#include "Recorder.h"
 #include "Project.h"
 #include "ProjectReader.h"
 #include "web/Server.h"
@@ -35,6 +36,7 @@ DAW::DAW(int server_port)
 
 	audio_system = new ALSAAudioSystem();
 
+	recorder = new Recorder();
 	engine = new AudioEngine();
 
 	// Give the audio engine some of what it needs.
@@ -50,6 +52,7 @@ DAW::~DAW()
 {
 	delete server;
 	delete engine;
+	delete recorder;
 }
 
 

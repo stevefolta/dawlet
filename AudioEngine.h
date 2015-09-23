@@ -9,6 +9,7 @@
 class MessageQueue;
 class AudioFileRead;
 class SendMeteringProcess;
+class RecordBuffers;
 class Process;
 class Project;
 
@@ -58,6 +59,8 @@ class AudioEngine {
 
 		AudioBuffer*	get_capture_buffer(int which_capture_channel);
 
+		void	add_free_record_buffers(RecordBuffers* record_buffers);
+
 		enum {
 			read_ahead_seconds = 2,
 			};
@@ -66,7 +69,7 @@ class AudioEngine {
 		int	cur_sample_rate;
 		int	cur_buffer_size;
 		int	metering_hz;
-		bool	playing;
+		bool	playing, recording;
 
 		BufferManager*	bufferManager;
 		MessageQueue*	to;
@@ -81,6 +84,7 @@ class AudioEngine {
 
 		AudioBuffer**	capture_buffers;
 		int	num_capture_buffers;
+		RecordBuffers*	free_record_buffers;
 
 		Stats	stats;
 

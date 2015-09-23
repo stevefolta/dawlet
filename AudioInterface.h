@@ -27,6 +27,8 @@ class AudioInterface {
 		virtual std::vector<int>*	capture_channels_for_input_name(std::string name) = 0;
 
 		void	setup_armed_channels();
+		bool	channel_is_armed(int capture_channel)
+			{ return armed_channels[capture_channel]; }
 
 	protected:
 		bool*	armed_channels;

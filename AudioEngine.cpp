@@ -2,6 +2,7 @@
 #include "MessageQueue.h"
 #include "Process.h"
 #include "AudioFileRead.h"
+#include "RecordBuffers.h"
 #include "SendMeteringProcess.h"
 #include "AudioSystem.h"
 #include "AudioInterface.h"
@@ -34,6 +35,7 @@ AudioEngine::AudioEngine()
 
 	play_start = play_head = 0.0;
 	playing = false;
+	recording = false;
 	project = nullptr;
 
 	bufferManager = new BufferManager;
@@ -48,6 +50,7 @@ AudioEngine::AudioEngine()
 
 	capture_buffers = nullptr;
 	num_capture_buffers = 0;
+	free_record_buffers = nullptr;
 
 	stats.reset();
 
@@ -331,6 +334,7 @@ void AudioEngine::run()
 		timer.stop();
 		#endif
 
+		// Metering.
 		#ifdef TIME_ENGINE
 		timer.start("metering", max_us);
 		#endif
@@ -338,6 +342,31 @@ void AudioEngine::run()
 		#ifdef TIME_ENGINE
 		timer.stop();
 		#endif
+
+		// Recording.
+		if (recording) {
+			#ifdef TIME_ENGINE
+			timer.start("recording", max_us);
+			#endif
+			RecordBuffers* record_buffers = free_record_buffers;
+			if (record_buffers) {
+				free_record_buffers = record_buffers->next_free;
+				for (int capture_channel = 0; capture_channel < num_capture_channels; ++capture_channel) {
+					if (interface->channel_is_armed(capture_channel)) {
+						record_buffers->add(capture_channel, capture_buffers[capture_channel]);
+						capture_buffers[capture_channel] = get_buffer();
+						}
+					}
+				record_buffers->start_write();
+				}
+			else {
+				log("Record-buffers exhausted.");
+				stats.exhausted_record_buffers += 1;
+				}
+			#ifdef TIME_ENGINE
+			timer.stop();
+			#endif
+			}
 		}
 }
 
@@ -456,6 +485,13 @@ AudioBuffer* AudioEngine::get_capture_buffer(int which_capture_channel)
 	if (which_capture_channel > num_capture_buffers)
 		return nullptr;
 	return capture_buffers[which_capture_channel];
+}
+
+
+void AudioEngine::add_free_record_buffers(RecordBuffers* record_buffers)
+{
+	record_buffers->next_free = free_record_buffers;
+	free_record_buffers = record_buffers;
 }
 
 
