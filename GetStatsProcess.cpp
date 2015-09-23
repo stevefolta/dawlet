@@ -21,6 +21,7 @@ void GetStatsProcess::replying()
 	json << "\"missing_file_reads\": " << stats.missing_file_reads << ", ";
 	json << "\"read_slot_overflows\": " << stats.read_slot_overflows << ", ";
 	json << "\"exhausted_reads\": " << stats.exhausted_reads << ", ";
+	json << "\"exhausted_record_buffers\": " << stats.exhausted_record_buffers << ", ";
 	json << "\"ignore_this\": false ";
 		// Just so we can easily add new fields without worrying about the
 		// trailing comma.
