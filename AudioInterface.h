@@ -3,6 +3,7 @@
 
 #include "AudioTypes.h"
 #include <string>
+#include <vector>
 class AudioBuffer;
 
 
@@ -23,7 +24,7 @@ class AudioInterface {
 
 		// DAW thread only:
 		virtual std::string	input_names_json() = 0;
-		virtual int	capture_channel_for_input_name(std::string name) = 0;
+		virtual std::vector<int>*	capture_channels_for_input_name(std::string name) = 0;
 
 		void	setup_armed_channels();
 

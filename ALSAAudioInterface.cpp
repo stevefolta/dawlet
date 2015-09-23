@@ -500,22 +500,27 @@ std::string ALSAAudioInterface::input_names_json()
 }
 
 
-int ALSAAudioInterface::capture_channel_for_input_name(std::string name)
+std::vector<int>* ALSAAudioInterface::capture_channels_for_input_name(std::string name)
 {
 	if (name.find("In ") == 0) {
-		return atoi(name.substr(3).c_str());
+		std::vector<int>* result = new std::vector<int>();
+		result->push_back(atoi(name.substr(3).c_str()) - 1);
+		return result;
 		}
 
 	else if (name.find("Stereo ") == 0) {
 		std::string channels = name.substr(7);
 		size_t index = channels.find('/');
 		if (index == std::string::npos)
-			return -1;
-		else
-			return atoi(channels.substr(0, index).c_str());
+			return nullptr;
+		int first_channel = atoi(channels.substr(0, index).c_str()) - 1;
+		std::vector<int>* result = new std::vector<int>();
+		result->push_back(first_channel);
+		result->push_back(first_channel + 1);
+		return result;
 		}
 
-	return -1;
+	return nullptr;
 }
 
 
