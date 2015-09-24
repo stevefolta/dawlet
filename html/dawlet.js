@@ -207,7 +207,7 @@ function update_stats() {
 			var started = false;
 			var stat_names = [
 				"playback_xruns", "capture_xruns", "missing_file_reads", "read_slot_overflows",
-				"exhausted_reads", "exhausted_record_buffers"
+				"exhausted_buffers", "exhausted_reads", "exhausted_record_buffers"
 				];
 			stat_names.forEach(function(stat_name) {
 				if (started)

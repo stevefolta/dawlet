@@ -50,6 +50,7 @@ AudioBuffer* BufferManager::get_buffer()
 {
 	if (first_free_buffer == NULL) {
 		had_overrun = true;
+		engine->got_exhausted_buffers();
 		return NULL;
 		}
 

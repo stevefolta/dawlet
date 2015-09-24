@@ -55,6 +55,7 @@ class AudioEngine {
 		void	got_missing_file_read() { stats.missing_file_reads += 1; }
 		void	got_read_slot_overflow() { stats.read_slot_overflows += 1; }
 		void	got_exhausted_reads() { stats.exhausted_reads += 1; }
+		void	got_exhausted_buffers() { stats.exhausted_buffers += 1; }
 		Stats	get_stats() { return stats; }
 
 		AudioBuffer*	get_capture_buffer(int which_capture_channel);
