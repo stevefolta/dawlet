@@ -3,9 +3,13 @@
 
 #include <vector>
 #include <map>
+#include <string>
 class AudioBuffer;
 class RecordBuffers;
 class Track;
+namespace Web {
+	class Connection;
+	}
 
 
 class Recorder {
@@ -13,13 +17,15 @@ class Recorder {
 		Recorder();
 		~Recorder();
 
-		void	arm_track(Track* track);
-		void	unarm_track(Track* track);
+		void	arm_track(Track* track, Web::Connection* reply_connection = nullptr);
+		void	unarm_track(Track* track, Web::Connection* reply_connection = nullptr);
+		void	set_track_input(Track* track, std::string input, Web::Connection* reply_connection = nullptr);
 
 		void	start();
 		void	stop();
 
 		void	interface_changed();
+		void	project_changed();
 
 		void	write_buffers(RecordBuffers* record_buffers);
 

@@ -8,7 +8,8 @@ SetTrackStateProcess::SetTrackStateProcess(
 	Track* track_in, Web::Connection* connection_in)
 	: track(track_in), connection(connection_in), state(Setting)
 {
-	connection->start_replying();
+	if (connection)
+		connection->start_replying();
 }
 
 
@@ -26,8 +27,13 @@ void SetTrackStateProcess::next()
 			state = Replying;
 			break;
 		case Replying:
-			connection->send_ok_reply();
-			mutation_done();
+			// If there wasn't a reply connection, this is happening on project
+			// load (eg. ArmTrackProcess) and doesn't represent a real mutation,
+			// so we don't call mutation_done() in that case.
+			if (connection) {
+				connection->send_ok_reply();
+				mutation_done();
+				}
 			state = Done;
 			break;
 		}

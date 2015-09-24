@@ -9,6 +9,7 @@ class AudioFile;
 class AudioBuffer;
 class ProjectReader;
 class IndentedOStream;
+class Recorder;
 
 
 class Project {
@@ -23,6 +24,7 @@ class Project {
 		void	prepare_to_play();
 		void	run(AudioBuffer** buffers_out, int num_channels);
 		void	run_metering();
+		void	arm_armed_tracks(Recorder* recorder);
 
 		int	new_id();
 		int	max_used_id();

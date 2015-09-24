@@ -57,17 +57,58 @@ class SetTrackNameProcess : public SetTrackStateProcess {
 	};
 
 
-class SetTrackRecordArmedProcess : public SetTrackStateProcess {
+class ArmTrackProcess : public SetTrackStateProcess {
 	public:
-		SetTrackRecordArmedProcess(
-			Track* track_in, bool new_armed_in, Web::Connection* connection_in)
-			: SetTrackStateProcess(track_in, connection_in), new_armed(new_armed_in)
+		ArmTrackProcess(
+			Track* track_in, Web::Connection* connection_in, std::vector<int>* capture_channels_in)
+			: SetTrackStateProcess(track_in, connection_in),
+			  new_capture_channels(capture_channels_in), old_capture_channels(nullptr)
 			{}
+		~ArmTrackProcess() {
+			delete old_capture_channels;
+			}
 
 	protected:
-		bool	new_armed;
+		std::vector<int>*	new_capture_channels;
+		std::vector<int>*	old_capture_channels;
 
-		void	set() { track->record_armed = new_armed; }
+		void set() {
+			track->record_armed = true;
+			old_capture_channels = track->capture_channels;
+			track->capture_channels = new_capture_channels;
+			}
+	};
+
+class UnarmTrackProcess : public SetTrackStateProcess {
+	public:
+		UnarmTrackProcess(Track* track_in, Web::Connection* connection_in)
+			: SetTrackStateProcess(track_in, connection_in) {}
+
+	protected:
+		void	set() { track->record_armed = false; }
+	};
+
+class SetTrackInputProcess : public SetTrackStateProcess {
+	public:
+		SetTrackInputProcess(
+			Track* track_in, std::string input_in,
+			Web::Connection* connection_in, std::vector<int>* capture_channels_in)
+			: SetTrackStateProcess(track_in, connection_in),
+			  input(input_in), new_capture_channels(capture_channels_in)
+			{}
+		~SetTrackInputProcess()
+			{ delete old_capture_channels; }
+
+	protected:
+		std::string	input;
+		std::vector<int>*	new_capture_channels;
+		std::vector<int>*	old_capture_channels;
+
+		void set() {
+			track->input = input;
+			old_capture_channels = track->capture_channels;
+			track->capture_channels = new_capture_channels;
+			}
 	};
 
 

@@ -3,6 +3,7 @@
 #include "Project.h"
 #include "Track.h"
 #include "DAW.h"
+#include "Recorder.h"
 #include "AudioEngine.h"
 #include "AudioSystem.h"
 #include "AudioInterface.h"
@@ -101,10 +102,14 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 				ok = false;
 				}
 			if (ok) {
-				engine->start_process(
-					new SetTrackRecordArmedProcess(track, armed, connection));
+				if (armed)
+					daw->get_recorder()->arm_track(track, connection);
+				else
+					daw->get_recorder()->unarm_track(track, connection);
 				}
 			}
+		else if (component == "input")
+			daw->get_recorder()->set_track_input(track, value, connection);
 		else
 			connection->error_out("404 Not Found");
 		}

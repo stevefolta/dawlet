@@ -281,6 +281,7 @@ void DAW::open_project(std::string path)
 		// The old project will be deleted by InstallProjectProcess.
 		this->project = project;
 		project_path = path;
+		recorder->project_changed();
 		}
 	catch (Exception& e) {
 		/***/

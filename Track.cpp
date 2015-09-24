@@ -7,13 +7,15 @@
 #include "Amp.h"
 #include "ProjectReader.h"
 #include "IndentedOStream.h"
+#include "Recorder.h"
 #include "Logger.h"
 #include "Exception.h"
 #include <sstream>
 
 
 Track::Track(Project* projectIn, int idIn)
-	: project(projectIn), playlist(nullptr), cur_peak(0.0)
+	: project(projectIn), playlist(nullptr), cur_peak(0.0),
+	  capture_channels(nullptr)
 {
 	id = idIn >=0 ? idIn : project->new_id();
 	gain = 1.0;
@@ -35,6 +37,7 @@ Track::~Track()
 		children.pop_back();
 		}
 	delete playlist;
+	delete capture_channels;
 }
 
 
@@ -81,6 +84,8 @@ void Track::read_json(ProjectReader* reader)
 			record_armed = reader->next_bool();
 		else if (field_name == "monitor_input")
 			monitor_input = reader->next_bool();
+		else if (field_name == "input")
+			input = reader->next_string();
 		else {
 			// This is something from the future; ignore it.
 			reader->ignore_value();
@@ -105,6 +110,10 @@ std::string Track::api_json()
 	result << ", ";
 	result << "\"monitor_input\": " << monitor_input;
 	result << ", ";
+	if (!input.empty()) {
+		result << "\"input\": \"" << input << "\"";
+		result << ", ";
+		}
 
 	// Children.
 	result << "\"children\": [";
@@ -143,6 +152,8 @@ void Track::write_to_file(IndentedOStream& stream)
 	stream << "\"sends_to_parent\": " << (sends_to_parent ? "true" : "false") << "," << separator;
 	stream << "\"record_armed\": " << (record_armed ? "true" : "false") << "," << separator;
 	stream << "\"monitor_input\": " << (monitor_input ? "true" : "false") << "," << separator;
+	if (!input.empty())
+		stream << "\"input\": \"" << input << "\"," << separator;
 
 	stream << "\"playlist\": ";
 	playlist->write_to_file(stream);
@@ -191,9 +202,16 @@ void Track::run(AudioBuffer** buffers_out, int num_channels)
 		}
 
 	// Record-arm.
-	if (record_armed) {
+	if (record_armed && capture_channels) {
+		int num_capture_channels = capture_channels->size();
+		bool mono_capture = num_capture_channels == 1;
 		for (which_channel = 0; which_channel < num_channels; ++which_channel) {
-			AudioBuffer* in_buffer = engine->get_capture_buffer(0); 	//*** TODO
+			if (!mono_capture && which_channel >= num_capture_channels)
+				break;
+			int capture_channel_index = (mono_capture ? 0 : which_channel);
+			AudioBuffer* in_buffer =
+				engine->get_capture_buffer(
+					(*capture_channels)[capture_channel_index]);
 			if (in_buffer) {
 				AudioSample* in = in_buffer->samples;
 				AudioSample* out = track_buffers[which_channel]->samples;
@@ -283,6 +301,15 @@ void Track::run_metering()
 
 	for (auto& child : children)
 		child->run_metering();
+}
+
+
+void Track::arm_armed_tracks(Recorder* recorder)
+{
+	if (record_armed)
+		recorder->arm_track(this);
+	for (auto& child : children)
+		child->arm_armed_tracks(recorder);
 }
 
 

@@ -114,6 +114,12 @@ void Project::run_metering()
 }
 
 
+void Project::arm_armed_tracks(Recorder* recorder)
+{
+	master->arm_armed_tracks(recorder);
+}
+
+
 int Project::new_id()
 {
 	return next_new_id++;
