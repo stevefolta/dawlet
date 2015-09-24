@@ -74,10 +74,7 @@ void RecordBuffers::write()
 {
 	// We're in the DAW thread.
 
-	for (int i = 0; i < num_buffers; ++num_buffers) {
-		daw->get_recorder()->write_buffer(
-			buffers[i].capture_channel, buffers[i].buffer);
-		}
+	daw->get_recorder()->write_buffers(this);
 
 	state = Resupplying;
 	engine->continue_process(this);

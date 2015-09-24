@@ -20,6 +20,14 @@ class RecordBuffers : public Process {
 		void	start_write();
 		void	dispose();
 
+		struct Buffer {
+			int	capture_channel;
+			AudioBuffer*	buffer;
+			};
+
+		Buffer*	begin() { return buffers; }
+		Buffer*	end() { return &buffers[num_buffers]; }
+
 		RecordBuffers*	next_free;
 
 	protected:
@@ -29,11 +37,6 @@ class RecordBuffers : public Process {
 			Resupplying,
 			Disposing,
 			Done
-			};
-
-		struct Buffer {
-			int	capture_channel;
-			AudioBuffer*	buffer;
 			};
 
 		int	state;

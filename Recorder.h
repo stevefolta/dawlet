@@ -1,7 +1,9 @@
 #ifndef Recorder_h
 #define Recorder_h
 
+#include <vector>
 class AudioBuffer;
+class RecordBuffers;
 
 
 class Recorder {
@@ -12,10 +14,11 @@ class Recorder {
 		void	start();
 		void	stop();
 
-		void	write_buffer(int capture_channel, AudioBuffer* buffer);
+		void	write_buffers(RecordBuffers* record_buffers);
 
 	protected:
-		int num_armed_channels;
+		int	num_armed_channels;
+		std::vector<AudioBuffer*>	capture_buffers;
 	};
 
 
