@@ -19,6 +19,8 @@ class Recorder {
 		void	start();
 		void	stop();
 
+		void	interface_changed();
+
 		void	write_buffers(RecordBuffers* record_buffers);
 
 	protected:
@@ -26,8 +28,11 @@ class Recorder {
 			ArmedTrack(Track* track);
 			~ArmedTrack();
 
+			Track*	track;
 			std::vector<int>*	capture_channels;
 			//... file, etc...
+
+			void	update_capture_channels();
 			};
 
 		std::map<int, ArmedTrack>	armed_tracks;

@@ -31,13 +31,28 @@ void Recorder::unarm_track(Track* track)
 
 void Recorder::start()
 {
-	/***/
+	for (auto& track_pair: armed_tracks) {
+		ArmedTrack& track = track_pair.second;
+		//... open file...
+		/***/
+		}
 }
 
 
 void Recorder::stop()
 {
-	/***/
+	for (auto& track_pair: armed_tracks) {
+		ArmedTrack& track = track_pair.second;
+		//... close file...
+		/***/
+		}
+}
+
+
+void Recorder::interface_changed()
+{
+	for (auto& track_pair: armed_tracks)
+		track_pair.second.update_capture_channels();
 }
 
 
@@ -54,7 +69,8 @@ void Recorder::write_buffers(RecordBuffers* record_buffers)
 		capture_buffers[buffer.capture_channel] = buffer.buffer;
 
 	// Write to each file.
-	for (auto& track: armed_tracks) {
+	for (auto& track_pair: armed_tracks) {
+		ArmedTrack& track = track_pair.second;
 		/***/
 		}
 
@@ -64,18 +80,27 @@ void Recorder::write_buffers(RecordBuffers* record_buffers)
 }
 
 
-Recorder::ArmedTrack::ArmedTrack(Track* track)
-	: capture_channels(nullptr)
+Recorder::ArmedTrack::ArmedTrack(Track* track_in)
+	: track(track_in), capture_channels(nullptr)
 {
-	AudioInterface* interface = audio_system->selected_interface();
-	if (interface)
-		capture_channels = interface->capture_channels_for_input_name("In 1" /*** track->input_name() ***/);
+	update_capture_channels();
 }
 
 
 Recorder::ArmedTrack::~ArmedTrack()
 {
 	delete capture_channels;
+}
+
+
+void Recorder::ArmedTrack::update_capture_channels()
+{
+	delete capture_channels;
+	AudioInterface* interface = audio_system->selected_interface();
+	if (interface)
+		capture_channels = interface->capture_channels_for_input_name("In 1" /*** track->input_name() ***/);
+	else
+		capture_channels = nullptr;
 }
 
 
