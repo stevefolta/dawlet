@@ -2,15 +2,18 @@
 #include "DAW.h"
 
 
-MutatingProcess::MutatingProcess()
+MutatingProcess::MutatingProcess(bool really_mutating_in)
+	: really_mutating(really_mutating_in)
 {
-	daw->add_pending_mutation();
+	if (really_mutating)
+		daw->add_pending_mutation();
 }
 
 
 void MutatingProcess::mutation_done()
 {
-	daw->mutation_complete();
+	if (really_mutating)
+		daw->mutation_complete();
 }
 
 

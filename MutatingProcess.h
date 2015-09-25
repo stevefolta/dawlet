@@ -6,9 +6,12 @@
 
 class MutatingProcess : public Process {
 	public:
-		MutatingProcess();
+		MutatingProcess(bool really_mutating = true);
 
 		void	mutation_done();
+
+	protected:
+		bool	really_mutating;
 	};
 
 

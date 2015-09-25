@@ -10,7 +10,7 @@ namespace Web {
 
 class SetTrackStateProcess : public MutatingProcess {
 	public:
-		SetTrackStateProcess(Track* track, Web::Connection* connection);
+		SetTrackStateProcess(Track* track, Web::Connection* connection, bool really_mutating = true);
 		bool	is_done();
 		void	next();
 
@@ -61,7 +61,7 @@ class ArmTrackProcess : public SetTrackStateProcess {
 	public:
 		ArmTrackProcess(
 			Track* track_in, Web::Connection* connection_in, std::vector<int>* capture_channels_in)
-			: SetTrackStateProcess(track_in, connection_in),
+			: SetTrackStateProcess(track_in, connection_in, (connection_in != nullptr)),
 			  new_capture_channels(capture_channels_in), old_capture_channels(nullptr)
 			{}
 		~ArmTrackProcess() {
