@@ -57,6 +57,7 @@ class Track {
 		friend class ArmTrackProcess;
 		friend class UnarmTrackProcess;
 		friend class SetTrackInputProcess;
+		friend class SetTrackMonitorInputProcess;
 	};
 
 

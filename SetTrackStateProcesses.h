@@ -111,6 +111,19 @@ class SetTrackInputProcess : public SetTrackStateProcess {
 			}
 	};
 
+class SetTrackMonitorInputProcess : public SetTrackStateProcess {
+	public:
+		SetTrackMonitorInputProcess(
+			Track* track_in, bool monitor_input_in, Web::Connection* connection_in)
+			: SetTrackStateProcess(track_in, connection_in), monitor_input(monitor_input_in)
+			{}
+
+	protected:
+		bool	monitor_input;
+
+		void set() { track->monitor_input = monitor_input; }
+	};
+
 
 #endif	// !SetTrackStateProcesses_h
 

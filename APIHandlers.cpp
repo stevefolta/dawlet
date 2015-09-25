@@ -110,6 +110,19 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 			}
 		else if (component == "input")
 			daw->get_recorder()->set_track_input(track, value, connection);
+		else if (component == "monitor-input") {
+			bool monitor = false, ok = true;
+			if (value == "true")
+				monitor = true;
+			else if (value != "false") {
+				connection->error_out("400 Bad Request");
+				ok = false;
+				}
+			if (ok) {
+				engine->start_process(
+					new SetTrackMonitorInputProcess(track, monitor, connection));
+				}
+			}
 		else
 			connection->error_out("404 Not Found");
 		}

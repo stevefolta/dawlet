@@ -74,7 +74,14 @@ function Track(id, parent) {
 	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
 	function pop_up_rec_menu() {
 		var popup = new PopupMenu(true);
-		popup.add_item("Monitor Input", null /***/ , track.monitor_input);
+		popup.add_item(
+			"Monitor Input",
+			function() {
+				do_action(
+					new ChangeTrackMonitorInputAction(
+						track, !track.monitor_input));
+				},
+			track.monitor_input);
 		popup.add_divider();
 		interface_inputs.forEach(function(category) {
 			var category_menu = new PopupMenu(true);
@@ -436,6 +443,38 @@ ChangeRecordArmedAction.prototype.change_armed = function(armed) {
 		}
 	request.open("PUT", "/api/track/" + this.track.id + "/record-arm", true);
 	request.send("" + armed);
+	}
+
+//===============//
+
+function ChangeTrackMonitorInputAction(track, new_monitor) {
+	Action.call(this);
+	this.type = 'change-track-monitor-input';
+	this.track = track;
+	this.new_monitor = new_monitor;
+	}
+
+ChangeTrackMonitorInputAction.prototype = Object.create(Action.prototype);
+
+ChangeTrackMonitorInputAction.prototype.do = function() {
+	this.change_monitor(this.new_monitor);
+	}
+ChangeTrackMonitorInputAction.prototype.undo = function() {
+	this.change_monitor(!this.new_monitor);
+	}
+
+ChangeTrackMonitorInputAction.prototype.change_monitor = function(monitor) {
+	var request = new XMLHttpRequest();
+	var action = this;
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE) {
+			if (this.status == 200)
+				action.track.monitor_input = monitor;
+			}
+		}
+	request.open("PUT", "/api/track/" + this.track.id + "/monitor-input", true);
+	request.send("" + monitor);
 	}
 
 //===============//
