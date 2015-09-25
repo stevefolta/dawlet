@@ -104,11 +104,11 @@ std::string Track::api_json()
 	result << ", ";
 	result << "\"gain\": " << gain;
 	result << ", ";
-	result << "\"sends_to_parent\": " << sends_to_parent;
+	result << "\"sends_to_parent\": " << (sends_to_parent ? "true" : "false");
 	result << ", ";
-	result << "\"record_armed\": " << record_armed;
+	result << "\"record_armed\": " << (record_armed ? "true" : "false");
 	result << ", ";
-	result << "\"monitor_input\": " << monitor_input;
+	result << "\"monitor_input\": " << (monitor_input ? "true" : "false");
 	result << ", ";
 	if (!input.empty()) {
 		result << "\"input\": \"" << input << "\"";

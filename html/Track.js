@@ -9,6 +9,8 @@ function Track(id, parent) {
 
 	this.gain = 1;
 	this.record_armed = false;
+	this.monitor_input = true;
+	this.input = null;
 
 	var indent = 0;
 	var level = this.level();
@@ -71,13 +73,16 @@ function Track(id, parent) {
 	// Set up the record-arm button.
 	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
 	function pop_up_rec_menu() {
-		var popup = new PopupMenu();
-		popup.add_item("Monitor Input");
+		var popup = new PopupMenu(true);
+		popup.add_item("Monitor Input", null /***/ , track.monitor_input);
 		popup.add_divider();
 		interface_inputs.forEach(function(category) {
-			var category_menu = new PopupMenu();
+			var category_menu = new PopupMenu(true);
 			category.inputs.forEach(function(name) {
-				category_menu.add_item(name);
+				category_menu.add_item(name, function(name) {
+					do_action(new ChangeTrackInputAction(track, name));
+					},
+					name == track.input);
 				});
 			popup.add_submenu(category.category, category_menu);
 			});
@@ -119,6 +124,12 @@ Track.prototype.got_json = function(json) {
 	name_element.textContent = json.name;
 
 	this.set_gain(json.gain);
+	this.record_armed = json.record_armed || false;
+	if (json['monitor_input'] == undefined)
+		this.monitor_input = true;
+	else
+		this.monitor_input = json.monitor_input;
+	this.input = json.input || null;
 
 	// Load up the children.
 	json.children.forEach(function(child_id) {
@@ -425,5 +436,38 @@ ChangeRecordArmedAction.prototype.change_armed = function(armed) {
 		}
 	request.open("PUT", "/api/track/" + this.track.id + "/record-arm", true);
 	request.send("" + armed);
+	}
+
+//===============//
+
+function ChangeTrackInputAction(track, new_input) {
+	Action.call(this);
+	this.type = 'change-track-input';
+	this.track = track;
+	this.old_input = track.input;
+	this.new_input = new_input;
+	}
+
+ChangeTrackInputAction.prototype = Object.create(Action.prototype);
+
+ChangeTrackInputAction.prototype.do = function() {
+	this.change_input(this.new_input);
+	}
+ChangeTrackInputAction.prototype.undo = function() {
+	this.change_input(this.old_input);
+	}
+
+ChangeTrackInputAction.prototype.change_input = function(input) {
+	var request = new XMLHttpRequest();
+	var action = this;
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE) {
+			if (this.status == 200)
+				action.track.input = input;
+			}
+		}
+	request.open("PUT", "/api/track/" + this.track.id + "/input", true);
+	request.send(input || "- none -"); 	// Can't send an empty string for some reason.
 	}
 

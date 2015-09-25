@@ -114,6 +114,13 @@ div.popup-menu a:hover {
 	background: #49A3FF;
 	cursor: pointer;
 	}
+div.popup-menu a span.checkmark {
+	visibility: hidden;
+	text-align: center;
+	}
+div.popup-menu a span.checkmark[selected] {
+	visibility: visible;
+	}
 div.popup-menu table.submenu-item {
 	padding: 4px 12px;
 	width: 100%;

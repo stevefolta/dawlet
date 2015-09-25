@@ -1,21 +1,32 @@
 var cur_popup = null;
 
-function PopupMenu(x, y, items) {
+function PopupMenu(selectable) {
 	this.cur_submenu = null;
 	this.parent_menu = null;
+	this.selectable = selectable;
 
 	this.menu_div = document.createElement('div');
 	this.menu_div.setAttribute('class', 'popup-menu');
 	};
 
 
-PopupMenu.prototype.add_item = function(title, fn) {
+PopupMenu.prototype.add_item = function(title, fn, selected) {
 	var item_element = document.createElement('a');
 	var popup = this;
-	item_element.textContent = title;
+	if (this.selectable) {
+		var checkmark_span = document.createElement('span');
+		checkmark_span.setAttribute('class', 'checkmark');
+		checkmark_span.textContent = '\u2713';
+		if (selected)
+			checkmark_span.setAttribute('selected', 'selected');
+		item_element.appendChild(checkmark_span);
+		}
+	var title_span = document.createElement('span');
+	title_span.textContent = title;
+	item_element.appendChild(title_span);
 	item_element.onclick = function(event) {
 		if (fn)
-			fn();
+			fn(title);
 		close_popup_menu();
 		};
 	item_element.onmouseover = function(event) {
