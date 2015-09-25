@@ -189,6 +189,13 @@ void DAW::send_websocket_message(std::string message)
 }
 
 
+void DAW::interface_changed()
+{
+	if (recorder)
+		recorder->interface_changed();
+}
+
+
 bool DAW::handle_messages_from_engine()
 {
 	bool did_something = false;

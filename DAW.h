@@ -36,6 +36,8 @@ class DAW {
 		void	set_websocket_connection(Web::Connection* connection)
 			{ cur_websocket_connection = connection; }
 
+		void	interface_changed();
+
 	protected:
 		AudioEngine*	engine;
 		Web::Server*	server;

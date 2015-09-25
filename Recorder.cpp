@@ -7,17 +7,16 @@
 #include "SetTrackStateProcesses.h"
 #include "DAW.h"
 #include "AudioEngine.h"
+#include "Logger.h"
 
 
 Recorder::Recorder()
 {
-	/***/
 }
 
 
 Recorder::~Recorder()
 {
-	/***/
 }
 
 
@@ -82,8 +81,9 @@ void Recorder::stop()
 
 void Recorder::interface_changed()
 {
-	for (auto& track_pair: armed_tracks)
-		track_pair.second.update_capture_channels();
+	Project* project = daw->cur_project();
+	armed_tracks.clear();
+	project->arm_armed_tracks(this);
 }
 
 

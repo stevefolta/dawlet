@@ -28,6 +28,8 @@ void SelectInterfaceProcess::next()
 
 void SelectInterfaceProcess::reply()
 {
+	daw->interface_changed();
+
 	Web::Connection* connection = daw->websocket_connection();
 	if (connection == nullptr)
 		return;

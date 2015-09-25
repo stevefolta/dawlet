@@ -130,8 +130,14 @@ Track.prototype.got_json = function(json) {
 	var name_element = find_element_by_id(this.div, "track-name");
 	name_element.textContent = json.name;
 
-	this.set_gain(json.gain);
 	this.record_armed = json.record_armed || false;
+	var rec_arm = find_element_by_id(this.track_svg, 'record-arm');
+	if (this.record_armed)
+		rec_arm.setAttribute("armed", "armed");
+	else
+		rec_arm.removeAttribute("armed");
+
+	this.set_gain(json.gain);
 	if (json['monitor_input'] == undefined)
 		this.monitor_input = true;
 	else
