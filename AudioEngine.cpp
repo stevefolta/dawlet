@@ -381,6 +381,13 @@ void AudioEngine::stop()
 {
 	playing = false;
 	play_head = play_start;
+
+	if (recording) {
+		from->send(Message::RecordingStopped);
+		dispose_record_buffers();
+		}
+	recording = false;
+
 	if (project)
 		project->prepare_to_play();
 }
@@ -401,6 +408,13 @@ void AudioEngine::rewind()
 	play_start = play_head = 0;
 	if (project)
 		project->prepare_to_play();
+}
+
+
+void AudioEngine::record()
+{
+	recording = true;
+	playing = true;
 }
 
 
@@ -492,6 +506,16 @@ void AudioEngine::add_free_record_buffers(RecordBuffers* record_buffers)
 {
 	record_buffers->next_free = free_record_buffers;
 	free_record_buffers = record_buffers;
+}
+
+
+void AudioEngine::dispose_record_buffers()
+{
+	while (free_record_buffers) {
+		RecordBuffers* next = free_record_buffers->next_free;
+		free_record_buffers->dispose();
+		free_record_buffers = next;
+		}
 }
 
 

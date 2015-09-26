@@ -17,10 +17,12 @@ struct Message {
 		StopPlay,
 		PausePlay,
 		Rewind,
+		Record,
 
 		// Engine -> DAW.
 		NeedMoreReadRequests,
 		NeedMoreMetering,
+		RecordingStopped,
 		Xrun,
 		Error,
 		};

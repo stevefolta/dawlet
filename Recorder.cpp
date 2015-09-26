@@ -9,6 +9,10 @@
 #include "AudioEngine.h"
 #include "Logger.h"
 
+enum {
+	num_record_buffers = 4,
+	};
+
 
 Recorder::Recorder()
 {
@@ -61,16 +65,25 @@ void Recorder::set_track_input(Track* track, std::string input, Web::Connection*
 
 void Recorder::start()
 {
+	// Open the files.
 	for (auto& track_pair: armed_tracks) {
 		ArmedTrack& track = track_pair.second;
 		//... open file...
 		/***/
 		}
+
+	// Supply the engine with RecordBuffers.
+	for (int i = 0; i < num_record_buffers; ++i)
+		engine->start_process(new RecordBuffers(armed_tracks.size()));
+
+	// Start recording.
+	engine->send(Message::Record);
 }
 
 
 void Recorder::stop()
 {
+	// Close the files.
 	for (auto& track_pair: armed_tracks) {
 		ArmedTrack& track = track_pair.second;
 		//... close file...

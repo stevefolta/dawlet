@@ -141,6 +141,8 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		engine->send(Message::PausePlay);
 	else if (command == "rewind")
 		engine->send(Message::Rewind);
+	else if (command == "record")
+		recorder->start();
 	else if (command == "seek") {
 		ProjectPosition position = strtod(fields.next_field().c_str(), NULL);
 		engine->start_process(new SeekProcess(position));
@@ -219,6 +221,9 @@ bool DAW::handle_messages_from_engine()
 				break;
 			case Message::NeedMoreMetering:
 				supply_metering(message.num);
+				break;
+			case Message::RecordingStopped:
+				recorder->stop();
 				break;
 			case Message::Xrun:
 				send_websocket_message("xrun");

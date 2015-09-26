@@ -58,18 +58,6 @@ void RecordBuffers::start_write()
 }
 
 
-void RecordBuffers::dispose()
-{
-	// Called from the engine.
-
-	// Return the buffers to the engine.
-	free_buffers();
-
-	state = Disposing;
-	engine->return_process(this);
-}
-
-
 void RecordBuffers::write()
 {
 	// We're in the DAW thread.
@@ -87,6 +75,18 @@ void RecordBuffers::resupply()
 
 	engine->add_free_record_buffers(this);
 	state = Filling;
+}
+
+
+void RecordBuffers::dispose()
+{
+	// Called from the engine.
+
+	// Return the buffers to the engine.
+	free_buffers();
+
+	state = Disposing;
+	engine->return_process(this);
 }
 
 
