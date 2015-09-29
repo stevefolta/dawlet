@@ -12,6 +12,10 @@ class WAVFile : public OpenAudioFile {
 		unsigned long	offset_for_frame(unsigned long which_frame);
 		unsigned long	size_of_frames(unsigned long num_frames);
 
+		enum {
+			WAVE_FORMAT_PCM = 1,
+			};
+
 	protected:
 		long	samples_offset, file_end, data_chunk_size;
 		AudioFile::Info	info;

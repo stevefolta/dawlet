@@ -33,6 +33,7 @@ class Track {
 		int	id;
 		int	max_used_id();
 		int	total_num_tracks();
+		std::string	get_name() { return name; }
 		std::string	get_input() { return input; }
 
 		void	set_name(std::string new_name) { name = new_name; }

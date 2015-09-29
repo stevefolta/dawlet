@@ -6,6 +6,10 @@
 class AudioBuffer;
 
 
+// The "RecordBuffers" object manages the passing of AudioBuffers from the DAW
+// thread to the Engine thread (and back) for recording.  It holds buffers for
+// all the channels that are being recorded for a single capture period.
+
 class RecordBuffers : public Process {
 	public:
 		RecordBuffers(int num_channels);

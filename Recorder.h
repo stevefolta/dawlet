@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <stdio.h>
 class AudioBuffer;
 class RecordBuffers;
 class Track;
@@ -11,6 +12,9 @@ namespace Web {
 	class Connection;
 	}
 
+
+// "Recorder" is simply the parts of the "DAW" object/thread dealing with
+// recording, segregated into their own object for clarity.
 
 class Recorder {
 	public:
@@ -36,9 +40,14 @@ class Recorder {
 
 			Track*	track;
 			std::vector<int>*	capture_channels;
-			//... file, etc...
+
+			// While open:
+			FILE*	file;
+			long data_chunk_start;
 
 			void	update_capture_channels();
+			void	create_wav_file(std::string file_name);
+			void	finish_wav_file();
 			};
 
 		std::map<int, ArmedTrack>	armed_tracks;

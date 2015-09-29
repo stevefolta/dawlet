@@ -4,10 +4,6 @@
 #include "Exception.h"
 #include <unistd.h>
 
-enum {
-	WAVE_FORMAT_PCM = 1,
-	};
-
 
 WAVFile::WAVFile(std::string path, int dirfd)
 	: OpenAudioFile(path, dirfd)

@@ -34,4 +34,24 @@ int16_t read_word(const void* data_in)
 }
 
 
+void* write_dword(int32_t value, void* data_in)
+{
+	uint8_t* data = (uint8_t*) data_in;
+	data[3] = value >> 24;
+	data[2] = value >> 16;
+	data[1] = value >> 8;
+	data[0] = value;
+	return data;
+}
+
+
+void* write_word(int16_t value, void* data_in)
+{
+	uint8_t* data = (uint8_t*) data_in;
+	data[1] = value >> 8;
+	data[0] = value;
+	return data;
+}
+
+
 
