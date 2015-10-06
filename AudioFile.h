@@ -12,8 +12,8 @@ class IndentedOStream;
 
 class AudioFile {
 	public:
-		AudioFile(int id_in)
-			: id(id_in), open_file(nullptr), num_opens(0)
+		AudioFile(Project* project_in, int id_in)
+			: project(project_in), id(id_in), open_file(nullptr), num_opens(0)
 			{ init(); }
 		virtual ~AudioFile();
 

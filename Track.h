@@ -13,6 +13,7 @@ class SetTrackGainProcess;
 class ArmTrackProcess;
 class IndentedOStream;
 class Recorder;
+class Clip;
 
 
 class Track {
@@ -29,6 +30,7 @@ class Track {
 		void	run(AudioBuffer** buffers_out, int num_channels);
 		void	run_metering();
 		void	arm_armed_tracks(Recorder* recorder);
+		void	add_clip(Clip* clip);
 
 		int	id;
 		int	max_used_id();

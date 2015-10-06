@@ -3,10 +3,13 @@
 #include "Process.h"
 #include "AudioFileRead.h"
 #include "RecordBuffers.h"
+#include "RecordingClip.h"
 #include "SendMeteringProcess.h"
 #include "AudioSystem.h"
 #include "AudioInterface.h"
 #include "Project.h"
+#include "Track.h"
+#include "Clip.h"
 #include "Exception.h"
 #include "Logger.h"
 #include <pthread.h>
@@ -51,6 +54,7 @@ AudioEngine::AudioEngine()
 	capture_buffers = nullptr;
 	num_capture_buffers = 0;
 	free_record_buffers = nullptr;
+	recording_clips = nullptr;
 
 	stats.reset();
 
@@ -88,6 +92,7 @@ AudioEngine::~AudioEngine()
 	for (int i = 0; i < num_capture_buffers; ++i)
 		free_buffer(capture_buffers[i]);
 	delete capture_buffers;
+	delete recording_clips;
 
 	delete to;
 	delete from;
@@ -348,6 +353,8 @@ void AudioEngine::run()
 			#ifdef TIME_ENGINE
 			timer.start("recording", max_us);
 			#endif
+
+			// Send the record buffers up to the DAW thread to be written to disk.
 			RecordBuffers* record_buffers = free_record_buffers;
 			if (record_buffers) {
 				free_record_buffers = record_buffers->next_free;
@@ -363,6 +370,13 @@ void AudioEngine::run()
 				log("Record-buffers exhausted.");
 				stats.exhausted_record_buffers += 1;
 				}
+
+			// Update the clips.
+			if (recording_clips) {
+				for (auto& clip: *recording_clips)
+					clip.clip->length_in_frames += cur_buffer_size;
+				}
+
 			#ifdef TIME_ENGINE
 			timer.stop();
 			#endif
@@ -408,13 +422,6 @@ void AudioEngine::rewind()
 	play_start = play_head = 0;
 	if (project)
 		project->prepare_to_play();
-}
-
-
-void AudioEngine::record()
-{
-	recording = true;
-	playing = true;
 }
 
 
@@ -499,6 +506,22 @@ AudioBuffer* AudioEngine::get_capture_buffer(int which_capture_channel)
 	if (which_capture_channel > num_capture_buffers)
 		return nullptr;
 	return capture_buffers[which_capture_channel];
+}
+
+
+void AudioEngine::start_recording(std::vector<RecordingClip>* recording_clips_in)
+{
+	delete recording_clips;
+	recording_clips = recording_clips_in;
+
+	// Install the clips.
+	for (auto& clip: *recording_clips) {
+		clip.clip->start = play_head;
+		clip.track->add_clip(clip.clip);
+		}
+
+	playing = true;
+	recording = true;
 }
 
 

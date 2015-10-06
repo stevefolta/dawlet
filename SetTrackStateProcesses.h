@@ -3,6 +3,8 @@
 
 #include "MutatingProcess.h"
 #include "Track.h"
+#include "AudioSystem.h"
+#include "AudioInterface.h"
 namespace Web {
 	class Connection;
 	}
@@ -76,6 +78,11 @@ class ArmTrackProcess : public SetTrackStateProcess {
 			track->record_armed = true;
 			old_capture_channels = track->capture_channels;
 			track->capture_channels = new_capture_channels;
+			if (new_capture_channels) {
+				AudioInterface* interface = audio_system->selected_interface();
+				for (int capture_channel: *new_capture_channels)
+					interface->set_channel_armed(capture_channel, true);
+				}
 			}
 	};
 
@@ -108,6 +115,11 @@ class SetTrackInputProcess : public SetTrackStateProcess {
 			track->input = input;
 			old_capture_channels = track->capture_channels;
 			track->capture_channels = new_capture_channels;
+			if (new_capture_channels) {
+				AudioInterface* interface = audio_system->selected_interface();
+				for (int capture_channel: *new_capture_channels)
+					interface->set_channel_armed(capture_channel, false);
+				}
 			}
 	};
 

@@ -149,15 +149,25 @@ void Project::add_file(AudioFile* file)
 }
 
 
-int Project::get_dirfd()
+std::string Project::get_dir_path()
 {
-	if (dirfd == -1) {
-		std::string dir_path = path;
+	if (dir_path.empty()) {
+		dir_path = path;
 		size_t slash_pos = path.rfind('/');
 		if (slash_pos == std::string::npos)
 			dir_path = ".";
 		else
 			dir_path = path.substr(0, slash_pos);
+		}
+
+	return dir_path;
+}
+
+
+int Project::get_dirfd()
+{
+	if (dirfd == -1) {
+		std::string dir_path = get_dir_path();
 		dirfd = open(dir_path.c_str(), O_RDONLY | O_DIRECTORY);
 		}
 	return dirfd;

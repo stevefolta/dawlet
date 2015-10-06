@@ -24,6 +24,8 @@ class Playlist {
 
 		bool	is_empty() { return clips.empty(); }
 
+		void	add_clip(Clip* clip) { clips.push_back(clip); }
+
 	protected:
 		std::vector<Clip*>	clips;
 

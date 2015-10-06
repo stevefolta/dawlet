@@ -136,6 +136,12 @@ function update_meters(message) {
 	}
 
 
+function start_recording() {
+	do_action(new RecordAction());
+	//***
+	}
+
+
 var xrun_timeout = null;
 var xrun_display_ms = 300;
 function got_xrun() {

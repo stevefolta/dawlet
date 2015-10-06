@@ -231,7 +231,7 @@ void Track::run(AudioBuffer** buffers_out, int num_channels)
 		}
 
 	// Playlist.
-	if (engine->is_playing() && playlist)
+	if (engine->is_playing() && !(record_armed && engine->is_recording()) && playlist)
 		playlist->run(track_buffers, num_channels);
 
 	// Children.
@@ -310,6 +310,12 @@ void Track::arm_armed_tracks(Recorder* recorder)
 		recorder->arm_track(this);
 	for (auto& child : children)
 		child->arm_armed_tracks(recorder);
+}
+
+
+void Track::add_clip(Clip* clip)
+{
+	playlist->add_clip(clip);
 }
 
 

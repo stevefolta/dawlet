@@ -6,10 +6,12 @@
 #include "AudioTypes.h"
 #include "Stats.h"
 #include <string>
+#include <vector>
 class MessageQueue;
 class AudioFileRead;
 class SendMeteringProcess;
 class RecordBuffers;
+class RecordingClip;
 class Process;
 class Project;
 
@@ -22,6 +24,7 @@ class AudioEngine {
 		int	sample_rate() { return cur_sample_rate; }
 		int	buffer_size() { return cur_buffer_size; }
 		bool	is_playing() { return playing; }
+		bool	is_recording() { return recording; }
 
 		void	tick();
 
@@ -60,6 +63,7 @@ class AudioEngine {
 
 		AudioBuffer*	get_capture_buffer(int which_capture_channel);
 
+		void	start_recording(std::vector<RecordingClip>* recording_clips);
 		void	add_free_record_buffers(RecordBuffers* record_buffers);
 		void	dispose_record_buffers();
 
@@ -86,7 +90,10 @@ class AudioEngine {
 
 		AudioBuffer**	capture_buffers;
 		int	num_capture_buffers;
+
+		// While recording:
 		RecordBuffers*	free_record_buffers;
+		std::vector<RecordingClip>*	recording_clips;
 
 		Stats	stats;
 
@@ -95,7 +102,6 @@ class AudioEngine {
 		void	stop();
 		void	pause();
 		void	rewind();
-		void	record();
 		static void*	thread_start(void* arg);
 
 		unsigned long buffers_until_metering;

@@ -2,6 +2,7 @@
 #include "AudioEngine.h"
 #include "DAW.h"
 #include "Recorder.h"
+#include "Logger.h"
 
 
 RecordBuffers::RecordBuffers(int num_channels)
@@ -73,6 +74,7 @@ void RecordBuffers::resupply()
 {
 	// We're in the engine.
 
+	free_buffers();
 	engine->add_free_record_buffers(this);
 	state = Filling;
 }
@@ -92,7 +94,7 @@ void RecordBuffers::dispose()
 
 void RecordBuffers::free_buffers()
 {
-	for (int i = 0; i < num_buffers; ++num_buffers)
+	for (int i = 0; i < num_buffers; ++i)
 		engine->free_buffer(buffers[i].buffer);
 	num_buffers = 0;
 }

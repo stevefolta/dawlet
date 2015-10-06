@@ -21,7 +21,7 @@ AudioFile* ProjectReader::file_for_id(int id)
 {
 	AudioFile* file = files[id];
 	if (file == nullptr) {
-		file = new AudioFile(id);
+		file = new AudioFile(project, id);
 		project->add_file(file);
 		files[id] = file;
 		}

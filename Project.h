@@ -27,11 +27,13 @@ class Project {
 		void	arm_armed_tracks(Recorder* recorder);
 
 		int	new_id();
+			// Called from DAW thread.
 		int	max_used_id();
 		int	total_num_tracks();
 
 		void	add_file(AudioFile* file);
 
+		std::string	get_dir_path();
 		int	get_dirfd();
 		void	load_audio_file_info();
 
@@ -44,6 +46,7 @@ class Project {
 		Track*	master;
 		std::vector<AudioFile*>	files;
 		int	next_new_id;
+		std::string	dir_path;
 		int	dirfd;
 		std::map<int, Track*>	tracks_by_id;
 	};

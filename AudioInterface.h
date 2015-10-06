@@ -29,6 +29,8 @@ class AudioInterface {
 		void	setup_armed_channels();
 		bool	channel_is_armed(int capture_channel)
 			{ return armed_channels[capture_channel]; }
+		void	set_channel_armed(int capture_channel, bool armed)
+			{ armed_channels[capture_channel] = armed; }
 
 	protected:
 		bool*	armed_channels;

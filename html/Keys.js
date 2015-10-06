@@ -8,6 +8,7 @@ var key_bindings = {
 	"K": "select-prev-track",
 	"N": "change-track-name",
 	"A": "toggle-record-arm",
+	"R": "record",
 	"C-Z": "undo",
 	"C-S-Z": "redo",
 	"S-&": "toggle-stats-visibility",
@@ -25,6 +26,7 @@ var commands = {
 	"undo": function() { undo_action(); },
 	"redo": function() { redo_action(); },
 	"toggle-record-arm": function() { if (selected_track) selected_track.toggle_record_arm(); },
+	"record": function() { start_recording(); },
 	"toggle-stats-visibility": function() { toggle_stats_visibility(); },
 	};
 

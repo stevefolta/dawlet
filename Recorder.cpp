@@ -1,7 +1,10 @@
 #include "Recorder.h"
 #include "RecordBuffers.h"
+#include "RecordingClip.h"
+#include "StartRecordingProcess.h"
 #include "Track.h"
 #include "Project.h"
+#include "Clip.h"
 #include "AudioSystem.h"
 #include "AudioInterface.h"
 #include "SetTrackStateProcesses.h"
@@ -17,7 +20,7 @@
 #include <string.h>
 
 enum {
-	num_record_buffers = 4,
+	num_record_buffers = 16,
 	};
 
 
@@ -72,6 +75,9 @@ void Recorder::set_track_input(Track* track, std::string input, Web::Connection*
 
 void Recorder::start()
 {
+	std::vector<RecordingClip>* recording_clips = new std::vector<RecordingClip>;
+	Project* project = daw->cur_project();
+
 	// Open the files.
 	std::string date = compact_iso8601_date();
 	for (auto& track_pair: armed_tracks) {
@@ -87,19 +93,28 @@ void Recorder::start()
 		file_name << date << ".wav";
 
 		// Open the file.
-		track.create_wav_file(file_name.str());
+		track.create_wav_file(project->get_dir_path() + "/" + file_name.str());
 		if (track.file == nullptr)
 			continue;
 
-		/***/
+		// Create a Clip for the file.
+		AudioFile* audio_file = new AudioFile(project, project->new_id());
+		project->add_file(audio_file);
+		audio_file->path = file_name.str();
+		Clip* clip = new Clip(audio_file);
+		clip->start = 0;	// Will be filled in by the engine.
+		clip->length_in_frames = 0;	// Will be filled in by the engine.
+		recording_clips->emplace_back(track.track, clip);
 		}
+
+	StartRecordingProcess* process = new StartRecordingProcess(recording_clips);
 
 	// Supply the engine with RecordBuffers.
 	for (int i = 0; i < num_record_buffers; ++i)
-		engine->start_process(new RecordBuffers(armed_tracks.size()));
+		process->add_recording_buffers(new RecordBuffers(armed_tracks.size()));
 
 	// Start recording.
-	engine->send(Message::Record);
+	engine->start_process(process);
 }
 
 
@@ -153,7 +168,9 @@ void Recorder::write_buffers(RecordBuffers* record_buffers)
 			max_channels = num_channels;
 		}
 	int max_bytes_per_sample = 3;
-	char* write_buffer = (char*) malloc(max_channels * max_bytes_per_sample);
+	char* write_buffer =
+		(char*) malloc(
+			max_channels * max_bytes_per_sample * engine->buffer_size());
 
 	// Write to each file.
 	for (auto& track_pair: armed_tracks) {
@@ -172,7 +189,9 @@ void Recorder::write_buffers(RecordBuffers* record_buffers)
 			channel_start += bytes_per_sample;
 			}
 		// Write.
-		fwrite(write_buffer, 1, num_channels * bytes_per_sample, track.file);
+		int bytes_to_write =
+			num_channels * bytes_per_sample * engine->buffer_size();
+		fwrite(write_buffer, 1, bytes_to_write, track.file);
 		}
 
 	free(write_buffer);
@@ -223,8 +242,8 @@ void Recorder::ArmedTrack::create_wav_file(std::string file_name)
 			if (result != length) {
 				int error = ferror(file);
 				log("WAV file write fail: %d (\"%s\").", error, strerror(error));
+				throw Exception("wav-file-write-fail");
 				}
-			throw Exception("wav-file-write-fail");
 			};
 		char data[8];
 
@@ -243,9 +262,9 @@ void Recorder::ArmedTrack::create_wav_file(std::string file_name)
 		write(write_dword(engine->sample_rate(), &data), 4);
 		int byte_rate = num_channels * engine->sample_rate() * bytes_per_sample;
 		write(write_dword(byte_rate, &data), 4);
-		int block_align = num_channels * byte_rate;
-		write(write_dword(block_align, &data), 2);
-		write(write_dword(bytes_per_sample * 8, &data), 2);
+		int block_align = num_channels * bytes_per_sample;
+		write(write_word(block_align, &data), 2);
+		write(write_word(bytes_per_sample * 8, &data), 2);
 
 		// "data" chunk.
 		data_chunk_start = ftell(file);
