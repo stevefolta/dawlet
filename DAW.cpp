@@ -268,10 +268,16 @@ bool DAW::handle_file_reads()
 
 void DAW::open_project(std::string path)
 {
+	if (path.find("..") != std::string::npos) {
+		send_websocket_message("error bad-project-path");
+		return;
+		}
+
 	// Read the file into "text".
+	path = "projects/" + path;
 	FILE* file = fopen(path.c_str(), "r");
 	if (file == NULL) {
-		/***/
+		send_websocket_message("error no-such-project");
 		fprintf(stderr, "Couldn't open %s!\n", path.c_str());
 		return;
 		}
