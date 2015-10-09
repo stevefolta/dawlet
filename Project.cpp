@@ -134,6 +134,7 @@ int Project::max_used_id()
 		if (id > max_id)
 			max_id = id;
 		}
+	return max_id;
 }
 
 
