@@ -14,7 +14,7 @@
 Project::Project(std::string path_in)
 	: path(path_in), next_new_id(1), dirfd(-1)
 {
-	master = new Track(this, new_id());
+	master = new Track(this, nullptr, new_id());
 	add_track_by_id(master);
 }
 

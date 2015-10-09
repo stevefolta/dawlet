@@ -13,8 +13,8 @@
 #include <sstream>
 
 
-Track::Track(Project* projectIn, int idIn)
-	: project(projectIn), playlist(nullptr), cur_peak(0.0),
+Track::Track(Project* project_in, Track* parent_in, int idIn)
+	: project(project_in), parent(parent_in), playlist(nullptr), cur_peak(0.0),
 	  capture_channels(nullptr)
 {
 	id = idIn >=0 ? idIn : project->new_id();
@@ -22,6 +22,7 @@ Track::Track(Project* projectIn, int idIn)
 	sends_to_parent = true;
 	record_armed = false;
 	monitor_input = true;
+	playlist = new Playlist();
 }
 
 
@@ -60,7 +61,7 @@ void Track::read_json(ProjectReader* reader)
 		else if (field_name == "children") {
 			reader->start_array();
 			while (!reader->array_is_done()) {
-				Track* track = new Track(project);
+				Track* track = new Track(project, this);
 				try {
 					track->read_json(reader);
 					project->add_track_by_id(track);
@@ -316,6 +317,23 @@ void Track::arm_armed_tracks(Recorder* recorder)
 void Track::add_clip(Clip* clip)
 {
 	playlist->add_clip(clip);
+}
+
+
+void Track::add_child(Track* track, Track* after_child)
+{
+	// Find where to put it.
+	auto before_iterator = children.end();
+	if (after_child) {
+		for (before_iterator = children.begin(); before_iterator != children.end(); ++before_iterator) {
+			if (*before_iterator == after_child) {
+				++before_iterator;
+				break;
+				}
+			}
+		}
+
+	children.insert(before_iterator, track);
 }
 
 

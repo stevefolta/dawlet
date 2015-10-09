@@ -258,6 +258,17 @@ function api_get(url, when_done) {
 	request.send(null);
 	}
 
+function api_post(url, when_done) {
+	var request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		var DONE = this.DONE || 4;
+		if (this.readyState === DONE && this.status == 200)
+			when_done(JSON.parse(this.responseText));
+		}
+	request.open("POST", url, true);
+	request.send(null);
+	}
+
 function project_loaded() {
 	api_get("/api/project", got_project_json);
 	}

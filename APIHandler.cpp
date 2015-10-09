@@ -26,7 +26,20 @@ bool APIHandler::can_put()
 
 void APIHandler::handle_put(std::string url_remainder, std::string value, Web::Connection* connection)
 {
-	// Default: doesn't handle put.
+	// Default: doesn't handle PUT.
+}
+
+
+bool APIHandler::can_post()
+{
+	// Default: no:
+	return false;
+}
+
+
+void APIHandler::handle_post(std::string url_remainder, Web::Connection* connection)
+{
+	// Default: doesn't handle POST.
 }
 
 
@@ -52,8 +65,15 @@ std::string pop_url_front(std::string* url_remainder)
 		url_remainder->erase(0, slash_pos + 1);
 		}
 	else {
-		front = *url_remainder;
-		*url_remainder = "";
+		int question_pos = url_remainder->find('?');
+		if (question_pos != std::string::npos) {
+			front = url_remainder->substr(0, question_pos);
+			url_remainder->erase(0, question_pos);
+			}
+		else {
+			front = *url_remainder;
+			*url_remainder = "";
+			}
 		}
 	return front;
 }

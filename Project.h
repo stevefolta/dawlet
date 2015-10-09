@@ -40,6 +40,7 @@ class Project {
 		void	add_track_by_id(Track* track);
 		void	remove_track_by_id(int id) { tracks_by_id.erase(id); }
 		Track*	track_by_id(int id) { return tracks_by_id[id]; }
+		Track*	get_master() { return master; }
 
 	protected:
 		std::string	path;

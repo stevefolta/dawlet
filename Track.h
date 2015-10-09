@@ -18,7 +18,7 @@ class Clip;
 
 class Track {
 	public:
-		Track(Project* project, int id = -1);
+		Track(Project* project, Track* parent_in, int id = -1);
 		~Track();
 
 		void	read_json(ProjectReader* reader);
@@ -31,17 +31,20 @@ class Track {
 		void	run_metering();
 		void	arm_armed_tracks(Recorder* recorder);
 		void	add_clip(Clip* clip);
+		void	add_child(Track* track, Track* after_child = nullptr);
 
 		int	id;
 		int	max_used_id();
 		int	total_num_tracks();
 		std::string	get_name() { return name; }
 		std::string	get_input() { return input; }
+		Track*	get_parent() { return parent; }
 
 		void	set_name(std::string new_name) { name = new_name; }
 
 	protected:
 		Project*	project;
+		Track*	parent;
 		std::string	name;
 		Playlist*	playlist;
 		std::vector<Track*>	children;

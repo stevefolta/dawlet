@@ -1,4 +1,4 @@
-function Track(id, parent) {
+function Track(id, parent, json, after_track) {
 	this.id = id;
 	this.parent = parent;
 	this.children_div = null;
@@ -42,6 +42,8 @@ function Track(id, parent) {
 	// We have to do this before we start dealing with widths and heights.
 	if (this.is_master())
 		document.getElementById('master').appendChild(this.div);
+	else if (after_track)
+		parent.insert_child_after(this, after_track);
 	else if (parent.is_master()) {
 		document.getElementById('tracks').appendChild(this.div);
 		parent.children.push(this);
@@ -117,7 +119,10 @@ function Track(id, parent) {
 	this.svg.appendChild(this.lane);
 
 	// Call the API to get our data.
-	api_get("/api/track/" + this.id, function(json) { track.got_json(json); });
+	if (json)
+		this.got_json(json);
+	else
+		api_get("/api/track/" + this.id, function(json) { track.got_json(json); });
 	api_get(
 		"/api/track/" + this.id + "/clips",
 		function(json) { track.got_clips_json(json); });
@@ -183,6 +188,28 @@ Track.prototype.append_child = function(child) {
 	this.children_div.appendChild(child.div);
 	this.children.push(child);
 	};
+
+
+Track.prototype.insert_child_after = function(child, after_child) {
+	var children_div = null;
+	if (this.is_master())
+		children_div = document.getElementById('tracks');
+	else {
+		if (!this.children_div) {
+			this.children_div = document.createElement('div');
+			this.children_div.setAttribute('class', 'track-children');
+			this.div.appendChild(this.children_div);
+			}
+		children_div = this.children_div;
+		}
+
+	children_div.insertBefore(child.div, after_child.div.nextSibling);
+	var index = this.children.indexOf(after_child);
+	if (index < 0)
+		this.children.push(child);
+	else
+		this.children.splice(index + 1, 0, child);
+	}
 
 
 Track.prototype.level = function() {
@@ -515,4 +542,40 @@ ChangeTrackInputAction.prototype.change_input = function(input) {
 	request.open("PUT", "/api/track/" + this.track.id + "/input", true);
 	request.send(input || "- none -"); 	// Can't send an empty string for some reason.
 	}
+
+//===============//
+
+function NewTrackAction() {
+	Action.call(this);
+	this.type = 'new-track';
+
+	this.new_track = null;
+	this.after_track = null;
+	this.parent_track = null;
+	if (selected_track && selected_track != master_track) {
+		this.after_track = selected_track;
+		this.parent_track = this.after_track.parent;
+		}
+	else
+		this.parent_track = master_track;
+	}
+
+NewTrackAction.prototype = Object.create(Action.prototype);
+
+NewTrackAction.prototype.do = function() {
+	var action = this;
+	var url = "/api/track";
+	if (this.after_track)
+		url += "?after=" + this.after_track.id;
+	api_post(url, function(json) {
+		action.new_track =
+			new Track(json.id, action.parent_track, json, action.after_track);
+		});
+	}
+
+NewTrackAction.prototype.undo = function() {
+	// Delete the track.
+	//***
+	}
+
 

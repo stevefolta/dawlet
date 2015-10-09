@@ -8,9 +8,11 @@
 #include "AudioSystem.h"
 #include "AudioInterface.h"
 #include "SetTrackStateProcesses.h"
+#include "NewTrackProcess.h"
 #include "GetStatsProcess.h"
 #include "Logger.h"
 #include <map>
+#include <string.h>
 
 
 std::string APIHandler_project::json_value()
@@ -129,6 +131,49 @@ void APIHandler_track::handle_put(std::string url_remainder, std::string value, 
 }
 
 
+bool APIHandler_track::can_post()
+{
+	return true;
+}
+
+
+void APIHandler_track::handle_post(
+	std::string url_remainder, Web::Connection* connection)
+{
+	Project* project = daw->cur_project();
+	if (project == nullptr) {
+		connection->error_out("404 Not Found");
+		return;
+		}
+
+	// Get the "?after=" track, if there is one.
+	Track* after_track = nullptr;
+	if (!url_remainder.empty()) {
+		if (url_remainder.front() != '?') {
+			connection->error_out("400 Bad Request");
+			return;
+			}
+		url_remainder.erase(0, 1);
+		if (url_remainder.find("after=") != 0) {
+			connection->error_out("400 Bad Request");
+			return;
+			}
+		url_remainder.erase(0, strlen("after="));
+		int id = strtol(url_remainder.c_str(), nullptr, 0);
+		if (id > 0)
+			after_track = project->track_by_id(id);
+		if (after_track == nullptr) {
+			connection->error_out("404 Not Found");
+			return;
+			}
+		}
+
+	engine->start_process(new NewTrackProcess(after_track, connection));
+}
+
+
+
+
 void APIHandler_stats::handle(std::string url_remainder, Web::Connection* connection)
 {
 	engine->start_process(new GetStatsProcess(connection));
@@ -206,6 +251,24 @@ void dispatch_top_level_api_put(
 	if (handler) {
 		if (handler->can_put())
 			handler->handle_put(url_remainder, content, connection);
+		else
+			connection->error_out("405 Method Not Allowed");
+		}
+	else
+		connection->error_out("404 Not Found");
+}
+
+
+void	dispatch_top_level_api_post(
+	std::string url_remainder, Web::Connection* connection)
+{
+	initialize_handlers_map();
+
+	std::string api = pop_url_front(&url_remainder);
+	APIHandler* handler = handlers_map[api];
+	if (handler) {
+		if (handler->can_post())
+			handler->handle_post(url_remainder, connection);
 		else
 			connection->error_out("405 Method Not Allowed");
 		}

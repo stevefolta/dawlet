@@ -203,6 +203,15 @@ void Connection::handle_request()
 			}
 		}
 
+	else if (cur_request->type() == "POST") {
+		if (cur_request->path().find("/api/") == 0)
+			handle_api_post();
+		else {
+			error_out("405 Method Not Allowed");
+			state = StartingRequest;
+			}
+		}
+
 	else {
 		error_out("501 Not Implemented");
 		state = StartingRequest;
@@ -288,6 +297,15 @@ void Connection::handle_api_put()
 	// Start reading.
 	state = ReadingRequestContent;
 	read_request_content();
+}
+
+
+void Connection::handle_api_post()
+{
+	static int prefix_len = strlen("/api/");
+	string path = cur_request->path().substr(prefix_len);
+	dispatch_top_level_api_post(path, this);
+	state = StartingRequest;
 }
 
 
