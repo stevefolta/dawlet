@@ -2,6 +2,7 @@ dawlet
 objects
 Makefile.local
 tags
+projects
 test
 temp
 log

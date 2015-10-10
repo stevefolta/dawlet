@@ -6,6 +6,14 @@ function setup_menus() {
 
 function file_menu_clicked() {
 	var menu = new PopupMenu(false);
+	menu.add_item("New project...", function() {
+		var name = window.prompt("New project name:", "");
+		if (name) {
+			websocket.send("new-project \"" + name + "\"");
+			update_project_title(name);
+			}
+		});
+	menu.add_divider();
 	menu.add_item("Shut down", function() {
 		websocket.send("shutdown");
 		project_closed();

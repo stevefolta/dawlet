@@ -300,6 +300,22 @@ function save_project() {
 	websocket.send("save-project");
 	}
 
+function update_project_title(project_path) {
+	// Update the project title.
+	var project_title_element = document.getElementById('project-title');
+	if (project_title_element) {
+		var title = project_path;
+		var slash_pos = project_path.indexOf("/");
+		if (slash_pos >= 0) {
+			title = project_path.substr(0, slash_pos);
+			var filename = project_path.substr(slash_pos + 1);
+			if (filename != "project.json")
+				title = filename;
+			}
+		project_title_element.textContent = title;
+		}
+	}
+
 
 function show_entered_value(value) {
 	var entered_value_element = document.getElementById("entered-value");
@@ -371,12 +387,14 @@ function load() {
 		});
 	set_button_function("open-project", function() {
 		websocket.send("open-project \"test/project.json\"");
+		update_project_title("test/project.json");
 		});
 	set_button_function("list-interfaces", function() {
 		websocket.send("list-interfaces");
 		});
 	set_button_function("go", function() {
 		websocket.send("open-project \"test/project.json\"");
+		update_project_title("test/project.json");
 		websocket.send("play");
 		});
 	document.getElementById("interface-popup").onchange = function(event) {
@@ -435,7 +453,7 @@ function load() {
 			websocket.send("ping");
 			websocket.send("list-interfaces");
 			websocket.send("open-project \"test/project.json\"");
-			document.getElementById('project-title').textContent = "Test Project";
+			update_project_title("test/project.json");
 			}
 		catch (e) {
 			log("Websocket send failed!");

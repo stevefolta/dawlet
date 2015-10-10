@@ -33,6 +33,7 @@ class Project {
 
 		void	add_file(AudioFile* file);
 
+		std::string	get_path() { return path; }
 		std::string	get_dir_path();
 		int	get_dirfd();
 		void	load_audio_file_info();

@@ -46,13 +46,14 @@ class DAW {
 		Project*	project;
 		AudioFileRead*	active_reads;
 		bool	running;
-		std::string	project_path;
 		int	pending_mutations;
 
 		bool	handle_messages_from_engine();
 		bool	handle_file_reads();
 		void	open_project(std::string path);
+		void	new_project(std::string name);
 		void	save_project();
+		void	save_project(Project* project);
 
 		void	supply_metering(int num_tracks);
 	};

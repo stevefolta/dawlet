@@ -18,6 +18,8 @@
 #include "IndentedOStream.h"
 #include "Logger.h"
 #include "Exception.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <sstream>
@@ -26,6 +28,8 @@
 using namespace std;
 
 DAW* daw = nullptr;
+
+static const char* projects_dir = "projects/";
 
 
 DAW::DAW(int server_port)
@@ -111,6 +115,10 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 			handle_messages_from_engine();
 		save_project();
 		connection->send_websocket_message("dirty false");
+		}
+	else if (command == "new-project") {
+		string name = fields.next_field();
+		new_project(name);
 		}
 	else if (command == "list-interfaces") {
 		vector<string> interfaces = audio_system->list_interfaces();
@@ -276,7 +284,7 @@ void DAW::open_project(std::string path)
 		}
 
 	// Read the file into "text".
-	path = "projects/" + path;
+	path = projects_dir + path;
 	FILE* file = fopen(path.c_str(), "r");
 	if (file == NULL) {
 		send_websocket_message("error no-such-project");
@@ -300,7 +308,6 @@ void DAW::open_project(std::string path)
 		engine->start_process(new InstallProjectProcess(project));
 		// The old project will be deleted by InstallProjectProcess.
 		this->project = project;
-		project_path = path;
 		recorder->project_changed();
 		}
 	catch (Exception& e) {
@@ -314,20 +321,71 @@ void DAW::open_project(std::string path)
 }
 
 
+void DAW::new_project(std::string name)
+{
+	if (name.find("..") != std::string::npos || name.find('/') != std::string::npos) {
+		send_websocket_message("error bad-project-name");
+		return;
+		}
+
+	// Make sure the project doesn't already exist.
+	std::string path = projects_dir + name;
+	struct stat stat_info;
+	if (stat(path.c_str(), &stat_info) == 0) {
+		send_websocket_message("error project-already-exists");
+		return;
+		}
+	else if (errno != ENOENT) {
+		send_websocket_message("error project-path-error");
+		return;
+		}
+
+	// Make the directories.
+	if (mkdir(path.c_str(), 0777) != 0) {
+		send_websocket_message("error project-creation-fail");
+		return;
+		}
+	if (mkdir((path + "/Audio").c_str(), 0777) != 0) {
+		send_websocket_message("error project-creation-fail");
+		return;
+		}
+
+	Project* new_project = nullptr;
+	try {
+		std::string project_path = path + "/project.json";
+		Project* new_project = new Project(project_path);
+		save_project(new_project);
+		engine->start_process(new InstallProjectProcess(new_project));
+		// The old project will be deleted by InstallProjectProcess.
+		this->project = new_project;
+		recorder->project_changed();
+		}
+	catch (Exception& e) {
+		delete new_project;
+		}
+}
+
+
 void DAW::save_project()
 {
-	if (!project || project_path.empty()) {
+	save_project(project);
+}
+
+
+void DAW::save_project(Project* project)
+{
+	if (!project || project->get_path().empty()) {
 		//***
 		return;
 		}
 
 	try {
-		std::ofstream file_stream(project_path);
+		std::ofstream file_stream(project->get_path());
 		IndentedOStream stream(file_stream);
 		project->write_to_file(stream);
 		}
 	catch (Exception& e) {
-		//***
+		send_websocket_message("error project-save-failed");
 		fprintf(stderr, "Writing project file failed: %s.\n", e.type.c_str());
 		}
 }
