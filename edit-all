@@ -25,7 +25,7 @@ for class in "${classes[@]}"; do
 
 files+=(Message.h AudioTypes.h Amp.h)
 files+=(html/index.html html/dawlet.css html/dawlet.js)
-js_classes=(Keys Actions SVGTemplate Track Knob MouseTracker PopupMenu dB)
+js_classes=(Keys Menus Actions SVGTemplate Track Knob MouseTracker PopupMenu dB)
 js_classes+=(RecordAction)
 for class in "${js_classes[@]}"; do
 	files+=(html/${class}.js)

@@ -147,6 +147,8 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		ProjectPosition position = strtod(fields.next_field().c_str(), NULL);
 		engine->start_process(new SeekProcess(position));
 		}
+	else if (command == "shutdown")
+		running = false;
 }
 
 

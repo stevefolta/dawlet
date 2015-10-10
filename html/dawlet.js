@@ -275,15 +275,23 @@ function project_loaded() {
 
 function got_project_json(json) {
 	// Clear out any existing elements.
+	clear_project_ui();
+
+	// Get the master track; the rest of the tracks will follow from there.
+	master_track = new Track(json.master);
+	}
+
+function clear_project_ui() {
 	var master = document.getElementById('master');
 	while (master.hasChildNodes())
 		master.removeChild(master.lastChild);
 	var tracks = document.getElementById('tracks');
 	while (tracks.hasChildNodes())
 		tracks.removeChild(tracks.lastChild);
+	}
 
-	// Get the master track; the rest of the tracks will follow from there.
-	master_track = new Track(json.master);
+function project_closed() {
+	clear_project_ui();
 	}
 
 function save_project() {
@@ -344,6 +352,9 @@ function load() {
 
 	// Keys.
 	window.addEventListener("keydown", handle_key_down);
+
+	// Menus.
+	setup_menus();
 
 	// Buttons.
 	set_button_function("play", function() {

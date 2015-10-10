@@ -51,6 +51,12 @@ div#entered-value {
 	min-width: 4em;
 	}
 
+div.menubar span.menu {
+	font-family: Arial Black;
+	text-align: left;
+	padding: 0.1em 0.5em;
+	}
+
 
 div#error {
 	display: none;
