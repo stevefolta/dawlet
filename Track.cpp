@@ -337,6 +337,21 @@ void Track::add_child(Track* track, Track* after_child)
 }
 
 
+void Track::remove_child(Track* track)
+{
+	// Find the track.
+	auto it = children.begin();
+	for (; it != children.end(); ++it) {
+		if (*it == track)
+			break;
+		}
+	if (it == children.end())
+		return;
+
+	children.erase(it);
+}
+
+
 int Track::max_used_id()
 {
 	int max_id = id;

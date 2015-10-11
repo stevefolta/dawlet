@@ -211,6 +211,21 @@ Track.prototype.insert_child_after = function(child, after_child) {
 		this.children.splice(index + 1, 0, child);
 	}
 
+Track.prototype.remove_child = function(track) {
+	// Remove from the DOM.
+	var children_div = null;
+	if (this.is_master())
+		children_div = document.getElementById('tracks');
+	else
+		children_div = this.children_div;
+	children_div.removeChild(track.div);
+
+	// Remove from this.children.
+	var index = this.children.indexOf(track);
+	if (index >= 0)
+		this.children.splice(index, 1);
+	}
+
 
 Track.prototype.level = function() {
 	var level = 0;
@@ -575,7 +590,34 @@ NewTrackAction.prototype.do = function() {
 
 NewTrackAction.prototype.undo = function() {
 	// Delete the track.
-	//***
+	var action = this;
+	var url = "/api/track/" + this.new_track.id;
+	api_delete(url, function() {
+		action.new_track.parent.remove_child(action.new_track);
+		});
 	}
 
+
+//===============//
+
+function DeleteTrackAction(track) {
+	Action.call(this);
+	this.type = 'new-track';
+
+	this.track = track;
+	}
+
+DeleteTrackAction.prototype = Object.create(Action.prototype);
+
+DeleteTrackAction.prototype.do = function() {
+	var action = this;
+	var url = "/api/track/" + this.new_track.id;
+	api_delete(url, function() {
+		action.track.parent.remove_child(track);
+		});
+	}
+
+DeleteTrackAction.prototype.undo = function() {
+	//***
+	}
 

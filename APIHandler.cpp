@@ -43,6 +43,20 @@ void APIHandler::handle_post(std::string url_remainder, Web::Connection* connect
 }
 
 
+bool APIHandler::can_delete()
+{
+	// Default: no:
+	return false;
+}
+
+
+void APIHandler::handle_delete(std::string url_remainder, Web::Connection* connection)
+{
+	// Default: doesn't handle DELETE.
+}
+
+
+
 void APIHandler::send_json_reply(Web::Connection* connection, std::string json)
 {
 	connection->send_json_reply(json);

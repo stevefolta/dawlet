@@ -93,6 +93,7 @@ namespace Web {
 			void	handle_api_get();
 			void	handle_api_put();
 			void	handle_api_post();
+			void	handle_api_delete();
 
 			void	start_websocket();
 			void	process_websocket_frame();

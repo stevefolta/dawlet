@@ -9,6 +9,7 @@
 #include "AudioInterface.h"
 #include "SetTrackStateProcesses.h"
 #include "NewTrackProcess.h"
+#include "DeleteTrackProcess.h"
 #include "GetStatsProcess.h"
 #include "Logger.h"
 #include <map>
@@ -172,6 +173,34 @@ void APIHandler_track::handle_post(
 }
 
 
+bool APIHandler_track::can_delete()
+{
+	return true;
+}
+
+
+void APIHandler_track::handle_delete(std::string url_remainder, Web::Connection* connection)
+{
+	// Get the track.
+	std::string id_str = pop_url_front(&url_remainder);
+	if (id_str.empty()) {
+		connection->error_out("404 Not Found");
+		return;
+		}
+	int id = strtol(id_str.c_str(), nullptr, 0);
+	Track* track = nullptr;
+	Project* project = daw->cur_project();
+	if (id > 0 && project)
+		track = project->track_by_id(id);
+	if (track == nullptr) {
+		connection->error_out("404 Not Found");
+		return;
+		}
+
+	engine->start_process(new DeleteTrackProcess(track, connection));
+}
+
+
 
 
 void APIHandler_stats::handle(std::string url_remainder, Web::Connection* connection)
@@ -269,6 +298,24 @@ void	dispatch_top_level_api_post(
 	if (handler) {
 		if (handler->can_post())
 			handler->handle_post(url_remainder, connection);
+		else
+			connection->error_out("405 Method Not Allowed");
+		}
+	else
+		connection->error_out("404 Not Found");
+}
+
+
+void	dispatch_top_level_api_delete(
+	std::string url_remainder, Web::Connection* connection)
+{
+	initialize_handlers_map();
+
+	std::string api = pop_url_front(&url_remainder);
+	APIHandler* handler = handlers_map[api];
+	if (handler) {
+		if (handler->can_delete())
+			handler->handle_delete(url_remainder, connection);
 		else
 			connection->error_out("405 Method Not Allowed");
 		}

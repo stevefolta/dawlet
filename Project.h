@@ -39,9 +39,9 @@ class Project {
 		void	load_audio_file_info();
 
 		void	add_track_by_id(Track* track);
-		void	remove_track_by_id(int id) { tracks_by_id.erase(id); }
 		Track*	track_by_id(int id) { return tracks_by_id[id]; }
 		Track*	get_master() { return master; }
+		void	remove_track(Track* track);
 
 	protected:
 		std::string	path;
@@ -51,6 +51,7 @@ class Project {
 		std::string	dir_path;
 		int	dirfd;
 		std::map<int, Track*>	tracks_by_id;
+		std::map<int, Track*>	deleted_tracks;
 	};
 
 

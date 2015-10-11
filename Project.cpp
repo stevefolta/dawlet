@@ -27,6 +27,8 @@ Project::~Project()
 		delete files.back();
 		files.pop_back();
 		}
+	for (auto& pair: deleted_tracks)
+		delete pair.second;
 }
 
 
@@ -186,6 +188,20 @@ void Project::load_audio_file_info()
 void Project::add_track_by_id(Track* track)
 {
 	tracks_by_id[track->id] = track;
+}
+
+
+void Project::remove_track(Track* track)
+{
+	tracks_by_id.erase(track->id);
+	deleted_tracks[track->id] = track;
+
+	Track* parent = track->get_parent();
+	if (parent == nullptr) {
+		// Should never happen.
+		return;
+		}
+	parent->remove_child(track);
 }
 
 

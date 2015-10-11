@@ -32,6 +32,7 @@ class Track {
 		void	arm_armed_tracks(Recorder* recorder);
 		void	add_clip(Clip* clip);
 		void	add_child(Track* track, Track* after_child = nullptr);
+		void	remove_child(Track* track);
 
 		int	id;
 		int	max_used_id();
