@@ -25,7 +25,7 @@ SupplyReadsProcess::~SupplyReadsProcess()
 
 bool SupplyReadsProcess::is_done()
 {
-	return state = Done;
+	return state == Done;
 }
 
 
