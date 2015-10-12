@@ -32,6 +32,7 @@ class Track {
 		void	arm_armed_tracks(Recorder* recorder);
 		void	add_clip(Clip* clip);
 		void	add_child(Track* track, Track* after_child = nullptr);
+		void	add_child_before(Track* track, Track* before_child);
 		void	remove_child(Track* track);
 
 		int	id;
@@ -40,6 +41,7 @@ class Track {
 		std::string	get_name() { return name; }
 		std::string	get_input() { return input; }
 		Track*	get_parent() { return parent; }
+		Track*	child_after(Track* track);
 
 		void	set_name(std::string new_name) { name = new_name; }
 

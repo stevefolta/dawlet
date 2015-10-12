@@ -1,4 +1,4 @@
-function Track(id, parent, json, after_track) {
+function Track(id, parent, json, before_track) {
 	this.id = id;
 	this.parent = parent;
 	this.children_div = null;
@@ -42,8 +42,8 @@ function Track(id, parent, json, after_track) {
 	// We have to do this before we start dealing with widths and heights.
 	if (this.is_master())
 		document.getElementById('master').appendChild(this.div);
-	else if (after_track)
-		parent.insert_child_after(this, after_track);
+	else if (before_track)
+		parent.insert_child_before(this, before_track);
 	else if (parent.is_master()) {
 		document.getElementById('tracks').appendChild(this.div);
 		parent.children.push(this);
@@ -211,6 +211,27 @@ Track.prototype.insert_child_after = function(child, after_child) {
 		this.children.splice(index + 1, 0, child);
 	}
 
+Track.prototype.insert_child_before = function(child, before_child) {
+	var children_div = null;
+	if (this.is_master())
+		children_div = document.getElementById('tracks');
+	else {
+		if (!this.children_div) {
+			this.children_div = document.createElement('div');
+			this.children_div.setAttribute('class', 'track-children');
+			this.div.appendChild(this.children_div);
+			}
+		children_div = this.children_div;
+		}
+
+	children_div.insertBefore(child.div, before_child.div);
+	var index = this.children.indexOf(before_child);
+	if (index < 0)
+		this.children.push(child);
+	else
+		this.children.splice(index, 0, child);
+	}
+
 Track.prototype.remove_child = function(track) {
 	// Remove from the DOM.
 	var children_div = null;
@@ -224,6 +245,13 @@ Track.prototype.remove_child = function(track) {
 	var index = this.children.indexOf(track);
 	if (index >= 0)
 		this.children.splice(index, 1);
+	}
+
+Track.prototype.child_after = function(track) {
+	var index = this.children.indexOf(track);
+	if (index < 0 || index >= this.children.length - 1)
+		return null;
+	return this.children[index + 1];
 	}
 
 
@@ -583,8 +611,11 @@ NewTrackAction.prototype.do = function() {
 	if (this.after_track)
 		url += "?after=" + this.after_track.id;
 	api_post(url, function(json) {
+		var before_track = null;
+		if (action.after_track)
+			before_track = action.parent_track.child_after(action.after_track);
 		action.new_track =
-			new Track(json.id, action.parent_track, json, action.after_track);
+			new Track(json.id, action.parent_track, json, before_track);
 		});
 	}
 
@@ -602,22 +633,32 @@ NewTrackAction.prototype.undo = function() {
 
 function DeleteTrackAction(track) {
 	Action.call(this);
-	this.type = 'new-track';
+	this.type = 'delete-track';
 
 	this.track = track;
+	this.parent = track.parent;
+	this.before_track = track.parent.child_after(track);
 	}
 
 DeleteTrackAction.prototype = Object.create(Action.prototype);
 
 DeleteTrackAction.prototype.do = function() {
 	var action = this;
-	var url = "/api/track/" + this.new_track.id;
+	var url = "/api/track/" + this.track.id;
 	api_delete(url, function() {
-		action.track.parent.remove_child(track);
+		action.parent.remove_child(action.track);
 		});
 	}
 
 DeleteTrackAction.prototype.undo = function() {
-	//***
+	var action = this;
+	var url = "/api/track?restore=" + this.track.id + ";parent=" + this.parent.id;
+	if (this.before_track)
+		url += ";before=" + this.before_track.id;
+	api_post(url, function(json) {
+		action.track =
+			new Track(json.id, action.parent, json, action.before_track);
+		});
 	}
+
 

@@ -10,6 +10,7 @@
 #include "SetTrackStateProcesses.h"
 #include "NewTrackProcess.h"
 #include "DeleteTrackProcess.h"
+#include "RestoreTrackProcess.h"
 #include "GetStatsProcess.h"
 #include "Logger.h"
 #include <map>
@@ -147,29 +148,99 @@ void APIHandler_track::handle_post(
 		return;
 		}
 
-	// Get the "?after=" track, if there is one.
+	// Handle "?" parameters.
 	Track* after_track = nullptr;
+	Track* before_track = nullptr;
+	Track* restore_track = nullptr;
+	Track* parent_track = nullptr;
 	if (!url_remainder.empty()) {
 		if (url_remainder.front() != '?') {
 			connection->error_out("400 Bad Request");
 			return;
 			}
 		url_remainder.erase(0, 1);
-		if (url_remainder.find("after=") != 0) {
-			connection->error_out("400 Bad Request");
-			return;
-			}
-		url_remainder.erase(0, strlen("after="));
-		int id = strtol(url_remainder.c_str(), nullptr, 0);
-		if (id > 0)
-			after_track = project->track_by_id(id);
-		if (after_track == nullptr) {
-			connection->error_out("404 Not Found");
-			return;
+		while (!url_remainder.empty()) {
+			size_t separator_index = url_remainder.find('&');
+			if (separator_index == std::string::npos)
+				separator_index = url_remainder.find(';');
+			std::string query;
+			if (separator_index == std::string::npos) {
+				query = url_remainder;
+				url_remainder = "";
+				}
+			else {
+				query = url_remainder.substr(0, separator_index);
+				url_remainder.erase(0, separator_index + 1);
+				}
+			auto get_track = [&query, project]() -> Track* {
+				int id = strtol(query.c_str(), nullptr, 0);
+				if (id > 0)
+					return project->track_by_id(id);
+				return nullptr;
+				};
+			if (query.find("after=") == 0) {
+				query.erase(0, strlen("after="));
+				after_track = get_track();
+				if (after_track == nullptr) {
+					connection->error_out("404 Not Found");
+					return;
+					}
+				}
+			else if (query.find("before=") == 0) {
+				query.erase(0, strlen("before="));
+				before_track = get_track();
+				if (before_track == nullptr) {
+					connection->error_out("404 Not Found");
+					return;
+					}
+				}
+			else if (query.find("restore=") == 0) {
+				query.erase(0, strlen("restore="));
+				int id = strtol(query.c_str(), nullptr, 0);
+				if (id > 0)
+					restore_track = project->deleted_track_by_id(id);
+				if (restore_track == nullptr) {
+					connection->error_out("404 Not Found");
+					return;
+					}
+				}
+			else if (query.find("parent=") == 0) {
+				query.erase(0, strlen("parent="));
+				parent_track = get_track();
+				if (parent_track == nullptr) {
+					connection->error_out("404 Not Found");
+					return;
+					}
+				}
+			else {
+				connection->error_out("400 Bad Request");
+				return;
+				}
 			}
 		}
 
-	engine->start_process(new NewTrackProcess(after_track, connection));
+	if (before_track && after_track) {
+		connection->error_out("400 Bad Request");
+		return;
+		}
+	if (restore_track) {
+		if (parent_track == nullptr) {
+			connection->error_out("400 Bad Request");
+			return;
+			}
+		if (after_track)
+			before_track = parent_track->child_after(after_track);
+		engine->start_process(
+			new RestoreTrackProcess(
+				restore_track, parent_track, before_track, connection));
+		}
+	else {
+		if (before_track || parent_track) {
+			connection->error_out("501 Not Implemented");
+			return;
+			}
+		engine->start_process(new NewTrackProcess(after_track, connection));
+		}
 }
 
 

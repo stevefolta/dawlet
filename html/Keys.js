@@ -9,6 +9,7 @@ var key_bindings = {
 	"N": "change-track-name",
 	"A": "toggle-record-arm",
 	"T": "new-track",
+	"Delete": "delete-selected-item",
 	"R": "record",
 	"C-Z": "undo",
 	"C-S-Z": "redo",
@@ -28,6 +29,7 @@ var commands = {
 	"redo": function() { redo_action(); },
 	"toggle-record-arm": function() { if (selected_track) selected_track.toggle_record_arm(); },
 	"new-track": function() { do_action(new NewTrackAction()); },
+	"delete-selected-item": function() { delete_selected_item(); },
 	"record": function() { start_recording(); },
 	"toggle-stats-visibility": function() { toggle_stats_visibility(); },
 	};
@@ -69,4 +71,13 @@ function handle_key_down(event) {
 	if (handled)
 		event.preventDefault();
 	}
+
+
+function delete_selected_item() {
+	if (selected_track) {
+		do_action(new DeleteTrackAction(selected_track));
+		selected_track = null;
+		}
+	}
+
 

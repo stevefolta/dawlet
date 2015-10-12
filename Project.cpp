@@ -205,4 +205,11 @@ void Project::remove_track(Track* track)
 }
 
 
+void Project::restore_track_id(Track* track)
+{
+	deleted_tracks.erase(track->id);
+	tracks_by_id[track->id] = track;
+}
+
+
 

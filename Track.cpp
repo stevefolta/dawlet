@@ -337,6 +337,21 @@ void Track::add_child(Track* track, Track* after_child)
 }
 
 
+void Track::add_child_before(Track* track, Track* before_child)
+{
+	// Find where to put it.
+	auto before_iterator = children.end();
+	if (before_child) {
+		for (before_iterator = children.begin(); before_iterator != children.end(); ++before_iterator) {
+			if (*before_iterator == before_child)
+				break;
+			}
+		}
+
+	children.insert(before_iterator, track);
+}
+
+
 void Track::remove_child(Track* track)
 {
 	// Find the track.
@@ -370,6 +385,19 @@ int Track::total_num_tracks()
 	for (auto& child : children)
 		num_tracks += child->total_num_tracks();
 	return num_tracks;
+}
+
+
+Track* Track::child_after(Track* track)
+{
+	bool found_it = false;
+	for (auto& child: children) {
+		if (found_it)
+			return child;
+		if (child == track)
+			found_it = true;
+		}
+	return nullptr;
 }
 
 
