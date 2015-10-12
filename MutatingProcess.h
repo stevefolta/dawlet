@@ -4,7 +4,7 @@
 #include "Process.h"
 
 
-class MutatingProcess : public Process {
+class MutatingProcess : public SimpleProcess {
 	public:
 		MutatingProcess(bool really_mutating = true);
 

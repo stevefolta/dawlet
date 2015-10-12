@@ -13,21 +13,15 @@ namespace Web {
 class SetTrackStateProcess : public MutatingProcess {
 	public:
 		SetTrackStateProcess(Track* track, Web::Connection* connection, bool really_mutating = true);
-		bool	is_done();
-		void	next();
 
 	protected:
-		enum {
-			Setting,
-			Replying,
-			Done
-			};
-
 		virtual void	set() = 0;
 
-		int	state;
 		Track*	track;
 		Web::Connection*	connection;
+
+		void	in_engine();
+		void	back_in_daw();
 	};
 
 

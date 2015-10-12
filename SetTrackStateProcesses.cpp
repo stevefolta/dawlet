@@ -7,35 +7,25 @@
 SetTrackStateProcess::SetTrackStateProcess(
 	Track* track_in, Web::Connection* connection_in, bool really_mutating_in)
 	: MutatingProcess(really_mutating_in),
-	  track(track_in), connection(connection_in), state(Setting)
+	  track(track_in), connection(connection_in)
 {
 	if (connection)
 		connection->start_replying();
 }
 
 
-bool SetTrackStateProcess::is_done()
+void SetTrackStateProcess::in_engine()
 {
-	return state == Done;
+	set();
 }
 
 
-void SetTrackStateProcess::next()
+void SetTrackStateProcess::back_in_daw()
 {
-	switch (state) {
-		case Setting:
-			set();
-			state = Replying;
-			break;
-		case Replying:
-			if (connection)
-				connection->send_ok_reply();
-			mutation_done();
-			state = Done;
-			break;
-		}
+	if (connection)
+		connection->send_ok_reply();
+	mutation_done();
 }
-
 
 
 

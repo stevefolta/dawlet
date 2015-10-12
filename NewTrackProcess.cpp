@@ -7,7 +7,7 @@
 
 
 NewTrackProcess::NewTrackProcess(Track* after_track_in, Web::Connection* connection_in)
-	: after_track(after_track_in), connection(connection_in), state(InEngine)
+	: after_track(after_track_in), connection(connection_in)
 {
 	Project* project = daw->cur_project();
 
@@ -18,27 +18,6 @@ NewTrackProcess::NewTrackProcess(Track* after_track_in, Web::Connection* connect
 
 	track = new Track(project, parent, project->new_id());
 	project->add_track_by_id(track);
-}
-
-
-bool NewTrackProcess::is_done()
-{
-	return state == Done;
-}
-
-
-void NewTrackProcess::next()
-{
-	switch (state) {
-		case InEngine:
-			in_engine();
-			state = BackInDAW;
-			break;
-		case BackInDAW:
-			back_in_daw();
-			state = Done;
-			break;
-		}
 }
 
 

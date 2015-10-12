@@ -15,20 +15,10 @@ class RestoreTrackProcess: public MutatingProcess {
 			Track* track_in, Track* parent_in, Track* before_track_in,
 			Web::Connection* connection_in)
 			: track(track_in), parent(parent_in), before_track(before_track_in),
-			  connection(connection_in), state(InEngine)
+			  connection(connection_in)
 			{}
 
-		bool	is_done();
-		void	next();
-
 	protected:
-		enum {
-			InEngine,
-			BackInDAW,
-			Done
-			};
-		int state;
-
 		Track*	track;
 		Track*	parent;
 		Track*	before_track;

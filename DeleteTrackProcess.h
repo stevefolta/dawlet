@@ -12,19 +12,9 @@ namespace Web {
 class DeleteTrackProcess : public MutatingProcess {
 	public:
 		DeleteTrackProcess(Track* track_in, Web::Connection* connection_in)
-			: track(track_in), connection(connection_in), state(InEngine) {}
-
-		bool	is_done();
-		void	next();
+			: track(track_in), connection(connection_in) {}
 
 	protected:
-		enum {
-			InEngine,
-			BackInDAW,
-			Done
-			};
-		int state;
-
 		Track* track;
 		Web::Connection* connection;
 
