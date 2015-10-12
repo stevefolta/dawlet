@@ -31,6 +31,7 @@ void RestoreTrackProcess::in_engine()
 	Project* project = daw->cur_project();
 	parent->add_child_before(track, before_track);
 	project->restore_track_id(track);
+	track->prepare_to_play();
 }
 
 

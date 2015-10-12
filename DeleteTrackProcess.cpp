@@ -2,6 +2,7 @@
 #include "Project.h"
 #include "DAW.h"
 #include "web/Connection.h"
+#include "Logger.h"
 
 
 bool DeleteTrackProcess::is_done()

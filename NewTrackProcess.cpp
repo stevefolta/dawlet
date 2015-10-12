@@ -7,7 +7,7 @@
 
 
 NewTrackProcess::NewTrackProcess(Track* after_track_in, Web::Connection* connection_in)
-	: after_track(after_track_in), connection(connection_in)
+	: after_track(after_track_in), connection(connection_in), state(InEngine)
 {
 	Project* project = daw->cur_project();
 

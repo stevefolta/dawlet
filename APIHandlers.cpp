@@ -264,7 +264,9 @@ void APIHandler_track::handle_delete(std::string url_remainder, Web::Connection*
 	if (id > 0 && project)
 		track = project->track_by_id(id);
 	if (track == nullptr) {
-		connection->error_out("404 Not Found");
+		// RESTfulness requires that we allow this.
+		log("Deleting track that doesn't exist: %d.", id);
+		connection->send_ok_reply();
 		return;
 		}
 
