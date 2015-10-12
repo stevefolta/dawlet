@@ -39,6 +39,8 @@ ifdef TEST_SMALL_TESTS
 	SWITCHES += TEST_SMALL_TESTS
 endif
 
+CFLAGS += -Wall -Wno-reorder
+
 ######
 
 OBJECTS = $(foreach source,$(SOURCES),$(OBJECTS_DIR)/$(source:.cpp=.o))

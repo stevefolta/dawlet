@@ -488,7 +488,7 @@ void Connection::read_websocket_data()
 	string* out_string = is_control ? &control_frame_data : &frame_data;
 
 	int length = buffer->readable_bytes();
-	if (length > frame_length_remaining)
+	if ((uint64_t) length > frame_length_remaining)
 		length = frame_length_remaining;
 
 	// Read the frame data.

@@ -66,6 +66,8 @@ AudioEngine::AudioEngine()
 	param.sched_priority = max_priority;
 	err = pthread_attr_setschedparam(&thread_attributes, &param);
 	err = pthread_attr_setinheritsched(&thread_attributes, PTHREAD_EXPLICIT_SCHED);
+	if (err != 0)
+		log("Couldn't set thread priority/scheduling (err = %d).", err);
 	pthread_t thread;
 	pthread_create(&thread, &thread_attributes, &thread_start, this);
 	err = pthread_attr_destroy(&thread_attributes);

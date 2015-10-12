@@ -145,7 +145,7 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	snd_pcm_uframes_t actual_buffer_size = buffer_size * 2;
 	err = snd_pcm_hw_params_set_buffer_size_near(playback, hw_params, &actual_buffer_size);
 	check_err("snd_pcm_hw_params_set_buffer_size", actual_buffer_size);
-	if (actual_buffer_size != buffer_size)
+	if ((int) actual_buffer_size != buffer_size)
 		log("actual buffer size: %d", actual_buffer_size);
 	err = snd_pcm_hw_params(playback, hw_params);
 	check_err("snd_pcm_hw_params", 0);
@@ -253,7 +253,7 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 		actual_buffer_size = buffer_size * 2;
 		err = snd_pcm_hw_params_set_buffer_size_near(capture, hw_params, &actual_buffer_size);
 		check_err("snd_pcm_hw_params_set_buffer_size", actual_buffer_size);
-		if (actual_buffer_size != buffer_size)
+		if ((int) actual_buffer_size != buffer_size)
 			log("actual buffer size: %d", actual_buffer_size);
 		err = snd_pcm_hw_params(capture, hw_params);
 		check_err("snd_pcm_hw_params", 0);

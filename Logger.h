@@ -3,6 +3,7 @@
 
 class Logger {
 	public:
+		virtual ~Logger() {}
 		virtual void	log(const char* message) = 0;
 	};
 

@@ -12,7 +12,6 @@ WAVFile::WAVFile(std::string path, int dirfd)
 
 	// Find where the samples are.
 	char fourcc[4];
-	int32_t chunk_length;
 	int result = lseek(fd, 0, SEEK_SET);
 	if (result == -1)
 		throw_error();

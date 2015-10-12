@@ -210,7 +210,7 @@ void Clip::read_ahead()
 
 	// Read from the current point if needed.
 	// Hopefully we're not playing...
-	if (first_loading_frame < 0 || first_loading_frame > next_play_frame) {
+	if (first_loading_frame < 0 || (unsigned long) first_loading_frame > next_play_frame) {
 		unsigned long num_frames = engine->read_ahead_seconds * sample_rate;
 		if (first_loading_frame < 0) {
 			// We have nothing, read all the way to the read-ahead point.

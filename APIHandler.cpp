@@ -73,13 +73,13 @@ void APIHandler::send_ok_reply(Web::Connection* connection)
 std::string pop_url_front(std::string* url_remainder)
 {
 	std::string front;
-	int slash_pos = url_remainder->find('/');
+	size_t slash_pos = url_remainder->find('/');
 	if (slash_pos != std::string::npos) {
 		front = url_remainder->substr(0, slash_pos);
 		url_remainder->erase(0, slash_pos + 1);
 		}
 	else {
-		int question_pos = url_remainder->find('?');
+		size_t question_pos = url_remainder->find('?');
 		if (question_pos != std::string::npos) {
 			front = url_remainder->substr(0, question_pos);
 			url_remainder->erase(0, question_pos);
