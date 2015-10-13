@@ -13,6 +13,7 @@ function file_menu_clicked() {
 			update_project_title(name);
 			}
 		});
+	menu.add_item("Open project...", open_project);
 	menu.add_divider();
 	menu.add_item("Shut down", function() {
 		websocket.send("shutdown");

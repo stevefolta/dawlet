@@ -60,6 +60,7 @@ class DAW {
 
 
 extern DAW* daw;
+extern const char* projects_dir;
 
 
 #endif	// !DAW_h

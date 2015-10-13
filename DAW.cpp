@@ -29,7 +29,7 @@ using namespace std;
 
 DAW* daw = nullptr;
 
-static const char* projects_dir = "projects/";
+const char* projects_dir = "projects/";
 
 
 DAW::DAW(int server_port)

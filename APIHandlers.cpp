@@ -13,8 +13,13 @@
 #include "RestoreTrackProcess.h"
 #include "GetStatsProcess.h"
 #include "Logger.h"
-#include <map>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <string.h>
+#include <map>
+#include <sstream>
 
 
 std::string APIHandler_project::json_value()
@@ -294,6 +299,68 @@ void APIHandler_inputs::handle(std::string url_remainder, Web::Connection* conne
 		connection->error_out("404 Not Found");
 	else
 		send_json_reply(connection, interface->input_names_json());
+}
+
+
+
+void APIHandler_projects::handle(std::string url_remainder, Web::Connection* connection)
+{
+	std::stringstream result;
+	result << "[";
+	bool got_one = false;
+
+	DIR* dir = opendir(projects_dir);
+	if (dir) {
+		while (true) {
+			struct dirent* entry = readdir(dir);
+			if (entry == nullptr)
+				break;
+			if (entry->d_name[0] == '.')
+				continue;
+
+			// Is it a directory?
+			std::stringstream subdir_path;
+			subdir_path << projects_dir << entry->d_name;
+			struct stat stat_buf;
+			int stat_result = stat(subdir_path.str().c_str(), &stat_buf);
+			if (stat_result != 0 && !S_ISDIR(stat_buf.st_mode))
+				continue;
+
+			// Look for project files within the directory.
+			std::stringstream subdir_short_path;
+			subdir_short_path << entry->d_name << "/";
+			DIR* subdir = opendir(subdir_path.str().c_str());
+			if (subdir) {
+				while (true) {
+					entry = readdir(subdir);
+					if (entry == nullptr)
+						break;
+					if (entry->d_name[0] == '.')
+						continue;
+
+					char* extension = strrchr(entry->d_name, '.');
+					if (extension && strcmp(extension, ".json") == 0) {
+						if (got_one)
+							result << ", ";
+						else {
+							result << " ";
+							got_one = true;
+							}
+						result << '"' << subdir_short_path.str() <<  entry->d_name << '"';
+						}
+					}
+
+				closedir(subdir);
+				}
+			}
+
+		closedir(dir);
+		}
+
+	if (got_one)
+		result << " ";
+	result << "]";
+	send_json_reply(connection, result.str());
 }
 
 

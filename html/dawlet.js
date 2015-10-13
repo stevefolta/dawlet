@@ -11,6 +11,7 @@ var tracks_by_id = {};
 var selected_track = null;
 var theme_css_link = null;
 var interface_inputs = [];
+var project_is_open = false;
 
 var prefs = {
 	playhead_nudge: 0.1,
@@ -285,8 +286,16 @@ function project_loaded() {
 	}
 
 function got_project_json(json) {
+	project_is_open = true;
+
 	// Clear out any existing elements.
 	clear_project_ui();
+
+	// Need to make the project screen visible before adding the master track,
+	// otherwise it gets a bad width and doesn't display.
+	set_visible('whole-project', true);
+	set_visible('projects-screen', false);
+	set_visible('server-shut-down', false);
 
 	// Get the master track; the rest of the tracks will follow from there.
 	master_track = new Track(json.master);
@@ -311,26 +320,64 @@ function save_project() {
 	websocket.send("save-project");
 	}
 
+function title_for_path(project_path) {
+	var title = project_path;
+	var slash_pos = project_path.indexOf("/");
+	if (slash_pos >= 0) {
+		title = project_path.substr(0, slash_pos);
+		var filename = project_path.substr(slash_pos + 1);
+		if (filename != "project.json")
+			title = filename;
+		}
+	return title;
+	}
+
 function update_project_title(project_path) {
 	// Update the project title.
 	var project_title_element = document.getElementById('project-title');
-	if (project_title_element) {
-		var title = project_path;
-		var slash_pos = project_path.indexOf("/");
-		if (slash_pos >= 0) {
-			title = project_path.substr(0, slash_pos);
-			var filename = project_path.substr(slash_pos + 1);
-			if (filename != "project.json")
-				title = filename;
-			}
-		project_title_element.textContent = title;
-		}
+	if (project_title_element)
+		project_title_element.textContent = title_for_path(project_path);
 	}
 
 
+function open_project() {
+	set_visible('whole-project', false);
+	set_visible('projects-screen', true);
+
+	// Clear out anything that's there.
+	var projects_div = document.getElementById('projects');
+	while (projects_div.hasChildNodes())
+		projects_div.removeChild(projects_div.lastChild);
+
+	api_get("/api/projects", function(projects) {
+		projects.forEach(function(path) {
+			var element = document.createElement('a');
+			element.setAttribute('href', "#");
+			element.setAttribute('class', 'project');
+			element.textContent = title_for_path(path);
+			element.path = path;
+			element.onclick = function() {
+				websocket.send("open-project \"" + path + "\"");
+				update_project_title(path);
+				};
+			projects_div.appendChild(element);
+			});
+		});
+
+	set_visible('cancel-open-project-div', project_is_open);
+	if (project_is_open) {
+		var cancel_button = document.getElementById('cancel-open-project');
+		if (cancel_button)
+			cancel_button.onclick = function() {
+				set_visible('projects-screen', false);
+				set_visible('whole-project', true);
+				};
+		}
+	}
+
 function server_shut_down() {
 	set_visible('whole-project', false);
-	set_visible('no-project', true);
+	set_visible('server-shut-down', true);
 	}
 
 
@@ -377,6 +424,16 @@ function load() {
 		String.prototype.startsWith = function(searchString, position) {
 			position = position || 0;
 			return this.indexOf(searchString, position) === position;
+			};
+		}
+	if (!String.prototype.endsWith) {
+		String.prototype.endsWith = function(searchString, position) {
+			var subjectString = this.toString();
+			if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length)
+				position = subjectString.length;
+			position -= searchString.length;
+			var lastIndex = subjectString.indexOf(searchString, position);
+			return lastIndex !== -1 && lastIndex === position;
 			};
 		}
 	Math.log10 = Math.log10 || function(x) {

@@ -154,3 +154,15 @@ div.popup-menu hr {
 	}
 
 
+div#projects a.project {
+	display: block;
+	font-family: Arial Black;
+	text-decoration: none;
+	}
+div#cancel-open-project-div {
+	margin-top: 0.75em;
+	}
+a#cancel-open-project {
+	text-decoration: none;
+	}
+
