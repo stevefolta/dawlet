@@ -17,6 +17,7 @@ function file_menu_clicked() {
 	menu.add_item("Shut down", function() {
 		websocket.send("shutdown");
 		project_closed();
+		server_shut_down();
 		});
 	var rect = document.getElementById('file-menu').getBoundingClientRect();
 	menu.open(rect.left, rect.bottom);

@@ -5,6 +5,12 @@ p#start_message {
 span.hideable-span[hidden] {
 	display: none;
 	}
+div.hideable-div[hidden] {
+	display: none;
+	}
+.hideable[hidden] {
+	display: none;
+	}
 
 span#dirty {
 	color: red;

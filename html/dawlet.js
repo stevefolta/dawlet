@@ -328,6 +328,12 @@ function update_project_title(project_path) {
 	}
 
 
+function server_shut_down() {
+	set_visible('whole-project', false);
+	set_visible('no-project', true);
+	}
+
+
 function show_entered_value(value) {
 	var entered_value_element = document.getElementById("entered-value");
 	if (entered_value_element)
