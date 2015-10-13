@@ -7,7 +7,7 @@
 
 InstallProjectProcess::~InstallProjectProcess()
 {
-	delete project;
+	delete old_project;
 }
 
 
@@ -21,14 +21,14 @@ void InstallProjectProcess::next()
 {
 	switch (state) {
 		case Installing:
-			project = engine->install_project(project);
+			old_project = engine->install_project(new_project);
 			state = Reporting;
 			break;
 
 		case Reporting:
 			{
 			Web::Connection* connection = daw->websocket_connection();
-			if (connection)
+			if (connection && new_project)
 				connection->send_websocket_message("project-loaded");
 			state = Done;
 			}

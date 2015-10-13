@@ -148,7 +148,8 @@ Project* AudioEngine::install_project(Project* new_project)
 	Project* old_project = project;
 	project = new_project;
 	play_head = 0.0;
-	project->prepare_to_play();
+	if (project)
+		project->prepare_to_play();
 	return old_project;
 }
 
@@ -314,7 +315,7 @@ void AudioEngine::run()
 			else
 				missing_buffers = true;
 			}
-		if (!missing_buffers)
+		if (!missing_buffers && project)
 			project->run(out_buffers, num_channels);
 		if (playing)
 			play_head += (ProjectPosition) cur_buffer_size / cur_sample_rate;

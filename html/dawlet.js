@@ -311,6 +311,7 @@ function clear_project_ui() {
 	}
 
 function project_closed() {
+	project_is_open = false;
 	clear_project_ui();
 	}
 
@@ -373,6 +374,12 @@ function open_project() {
 				set_visible('whole-project', true);
 				};
 		}
+	}
+
+function close_project() {
+	websocket.send("close-project");
+	project_closed();
+	open_project();
 	}
 
 function server_shut_down() {

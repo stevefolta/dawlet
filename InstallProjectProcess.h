@@ -8,7 +8,7 @@ class Project;
 class InstallProjectProcess : public Process {
 	public:
 		InstallProjectProcess(Project* project_in)
-			: project(project_in), state(Installing) {}
+			: new_project(project_in), state(Installing) {}
 		~InstallProjectProcess();
 
 		bool	is_done();
@@ -21,7 +21,8 @@ class InstallProjectProcess : public Process {
 			Done,
 			};
 
-		Project*	project;
+		Project*	new_project;
+		Project*	old_project;
 		int	state;
 	};
 

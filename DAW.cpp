@@ -120,6 +120,8 @@ void DAW::handle_ui_message(std::string message, Web::Connection* connection)
 		string name = fields.next_field();
 		new_project(name);
 		}
+	else if (command == "close-project")
+		close_project();
 	else if (command == "list-interfaces") {
 		vector<string> interfaces = audio_system->list_interfaces();
 		stringstream reply;
@@ -363,6 +365,14 @@ void DAW::new_project(std::string name)
 	catch (Exception& e) {
 		delete new_project;
 		}
+}
+
+
+void DAW::close_project()
+{
+	engine->start_process(new InstallProjectProcess(nullptr));
+	this->project = nullptr;
+	recorder->project_changed();
 }
 
 
