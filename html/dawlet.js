@@ -12,6 +12,7 @@ var selected_track = null;
 var theme_css_link = null;
 var interface_inputs = [];
 var project_is_open = false;
+var in_open_project_screen = false;
 
 var prefs = {
 	playhead_nudge: 0.1,
@@ -288,14 +289,17 @@ function project_loaded() {
 function got_project_json(json) {
 	project_is_open = true;
 
-	// Clear out any existing elements.
+	// Clear out and reset the project UI.
 	clear_project_ui();
+	last_action = new SentinalAction();
+	set_visible('dirty', false);
 
 	// Need to make the project screen visible before adding the master track,
 	// otherwise it gets a bad width and doesn't display.
 	set_visible('whole-project', true);
 	set_visible('projects-screen', false);
 	set_visible('server-shut-down', false);
+	in_open_project_screen = false;
 
 	// Get the master track; the rest of the tracks will follow from there.
 	master_track = new Track(json.master);
@@ -344,6 +348,7 @@ function update_project_title(project_path) {
 function open_project() {
 	set_visible('whole-project', false);
 	set_visible('projects-screen', true);
+	in_open_project_screen = true;
 
 	// Clear out anything that's there.
 	var projects_div = document.getElementById('projects');
@@ -372,6 +377,7 @@ function open_project() {
 			cancel_button.onclick = function() {
 				set_visible('projects-screen', false);
 				set_visible('whole-project', true);
+				in_open_project_screen = false;
 				};
 		}
 	}

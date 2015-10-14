@@ -36,7 +36,7 @@ var commands = {
 
 
 function handle_key_down(event) {
-	if (event.defaultPrevented)
+	if (in_open_project_screen || !project_is_open || event.defaultPrevented)
 		return;
 
 	var handled = false;
