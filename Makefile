@@ -57,13 +57,13 @@ LINK_FLAGS += -pthread -lrt
 LINK_FLAGS += -lasound
 
 CPP := g++
-CFLAGS += -I.
-CFLAGS += $(foreach dir,$(THIRD_PARTY_INCLUDES),-I$(dir))
+CFLAGS += -I. -Isrc/
+CFLAGS += $(foreach dir,$(THIRD_PARTY_INCLUDES),-Isrc/$(dir))
 CFLAGS += -MMD
 CFLAGS += -g
 CFLAGS += $(foreach switch,$(SWITCHES),-D$(switch))
 
-$(OBJECTS_DIR)/%.o: %.cpp
+$(OBJECTS_DIR)/%.o: src/%.cpp
 	@echo Compiling $<...
 	$(QUIET) $(CPP) -c $< -g $(CFLAGS) -o $@
 

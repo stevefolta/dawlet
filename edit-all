@@ -17,14 +17,14 @@ classes+=(AudioSystem AudioInterface)
 classes+=(ALSAAudioSystem ALSAAudioInterface)
 classes+=(IndentedOStream Date)
 files=()
-files+=(main.cpp)
+files+=(src/main.cpp)
 
 for class in "${classes[@]}"; do
-	files+=(${class}.h)
-	files+=(${class}.cpp)
+	files+=(src/${class}.h)
+	files+=(src/${class}.cpp)
 	done
 
-files+=(Message.h AudioTypes.h Amp.h)
+files+=(src/Message.h src/AudioTypes.h src/Amp.h)
 files+=(html/index.html html/dawlet.css html/dawlet.js)
 js_classes=(Keys Menus Actions SVGTemplate Track Knob MouseTracker PopupMenu dB)
 js_classes+=(RecordAction)
