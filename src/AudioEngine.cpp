@@ -391,6 +391,7 @@ void AudioEngine::run()
 void AudioEngine::play()
 {
 	playing = true;
+	from->send(Message::PlayingStarted);
 }
 
 
@@ -398,6 +399,7 @@ void AudioEngine::stop()
 {
 	playing = false;
 	play_head = play_start;
+	from->send(Message::PlayingStopped);
 
 	if (recording) {
 		from->send(Message::RecordingStopped);
@@ -414,6 +416,14 @@ void AudioEngine::pause()
 {
 	playing = false;
 	play_start = play_head;
+	from->send(Message::PlayingStopped);
+
+	if (recording) {
+		from->send(Message::RecordingStopped);
+		dispose_record_buffers();
+		}
+	recording = false;
+
 	if (project)
 		project->prepare_to_play();
 }
@@ -422,6 +432,7 @@ void AudioEngine::pause()
 void AudioEngine::rewind()
 {
 	playing = false;
+	from->send(Message::PlayingStopped);
 	play_start = play_head = 0;
 	if (project)
 		project->prepare_to_play();
@@ -433,6 +444,7 @@ void AudioEngine::seek(ProjectPosition position)
 	if (position < 0)
 		position = 0;
 	playing = false;
+	from->send(Message::PlayingStopped);
 	play_start = play_head = position;
 	if (project)
 		project->prepare_to_play();

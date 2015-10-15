@@ -35,6 +35,12 @@ span.button span.larger-icon {
 span.button:hover {
 	cursor: pointer;
 	}
+span#play[playing] {
+	background: #60FF60;
+	}
+span#record[recording] {
+	background: #FF6060;
+	}
 
 div.button-row {
 	margin-bottom: 0.5em;

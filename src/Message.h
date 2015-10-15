@@ -21,6 +21,8 @@ struct Message {
 		// Engine -> DAW.
 		NeedMoreReadRequests,
 		NeedMoreMetering,
+		PlayingStarted,
+		PlayingStopped,
 		RecordingStopped,
 		Xrun,
 		Error,

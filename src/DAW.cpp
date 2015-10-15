@@ -234,8 +234,15 @@ bool DAW::handle_messages_from_engine()
 			case Message::NeedMoreMetering:
 				supply_metering(message.num);
 				break;
+			case Message::PlayingStarted:
+				send_websocket_message("playing");
+				break;
+			case Message::PlayingStopped:
+				send_websocket_message("stopped");
+				break;
 			case Message::RecordingStopped:
 				recorder->stop();
+				send_websocket_message("recording-stopped");
 				break;
 			case Message::Xrun:
 				send_websocket_message("xrun");

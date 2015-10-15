@@ -1,10 +1,11 @@
 #include "StartRecordingProcess.h"
 #include "RecordBuffers.h"
 #include "AudioEngine.h"
+#include "DAW.h"
 
 
 StartRecordingProcess::StartRecordingProcess(std::vector<RecordingClip>* recording_clips_in)
-	: recording_clips(recording_clips_in), state(Starting)
+	: recording_clips(recording_clips_in)
 {
 }
 
@@ -16,17 +17,15 @@ StartRecordingProcess::~StartRecordingProcess()
 }
 
 
-bool StartRecordingProcess::is_done()
+void StartRecordingProcess::in_engine()
 {
-	return state == Done;
+	start_recording();
 }
 
 
-void StartRecordingProcess::next()
+void StartRecordingProcess::back_in_daw()
 {
-	switch (state) {
-		case Starting: 	start_recording(); 	break;
-		}
+	daw->send_websocket_message("recording-started");
 }
 
 

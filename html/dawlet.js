@@ -236,6 +236,27 @@ function set_button_function(id, fn) {
 		button.onclick = fn;
 	}
 
+function playing_started() {
+	var play_button = document.getElementById("play");
+	if (play_button)
+		play_button.setAttribute("playing", "playing");
+	}
+function playing_stopped() {
+	var play_button = document.getElementById("play");
+	if (play_button)
+		play_button.removeAttribute("playing");
+	}
+function recording_started() {
+	var record_button = document.getElementById("record");
+	if (record_button)
+		record_button.setAttribute("recording", "recording");
+	}
+function recording_stopped() {
+	var record_button = document.getElementById("record");
+	if (record_button)
+		record_button.removeAttribute("recording");
+	}
+
 
 function find_element_by_id(element, id) {
 	var element_id = element.getAttribute('id');
@@ -529,6 +550,16 @@ function load() {
 			}
 		else if (event.data == "project-loaded")
 			project_loaded();
+		else if (event.data == "playing")
+			playing_started();
+		else if (event.data == "stopped") {
+			playing_stopped();
+			recording_stopped();
+			}
+		else if (event.data == "recording-started")
+			recording_started();
+		else if (event.data == "recording-stopped")
+			recording_stopped();
 		else if (event.data == "xrun")
 			got_xrun();
 		else if (event.data.startsWith("interface-selected "))
