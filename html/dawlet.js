@@ -472,6 +472,7 @@ function load() {
 	set_button_function("rewind", function() {
 		websocket.send("rewind");
 		});
+	set_button_function("record", start_recording);
 	set_button_function("open-project", function() {
 		websocket.send("open-project \"test/project.json\"");
 		update_project_title("test/project.json");
