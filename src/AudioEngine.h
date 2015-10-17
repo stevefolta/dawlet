@@ -69,6 +69,7 @@ class AudioEngine {
 
 		enum {
 			read_ahead_seconds = 2,
+			recording_buffers_offset = 2,
 			};
 
 	protected:
@@ -94,6 +95,7 @@ class AudioEngine {
 		// While recording:
 		RecordBuffers*	free_record_buffers;
 		std::vector<RecordingClip>*	recording_clips;
+		int	stop_recording_in_buffers;
 
 		Stats	stats;
 
@@ -103,6 +105,10 @@ class AudioEngine {
 		void	pause();
 		void	rewind();
 		static void*	thread_start(void* arg);
+
+		void	run_recording();
+		void	stop_recording();
+		void	finish_recording();
 
 		unsigned long buffers_until_metering;
 		void	run_metering();

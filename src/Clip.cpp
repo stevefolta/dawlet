@@ -65,6 +65,8 @@ void Clip::write_to_file(IndentedOStream& stream)
 	stream << ", ";
 	stream << "\"start\": " << start;
 	stream << ", ";
+	stream << "\"file-start-frame\": " << file_start_frame;
+	stream << ", ";
 	stream << "\"length\": " << length_in_frames;
 	stream << " }";
 }

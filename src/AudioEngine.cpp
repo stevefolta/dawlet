@@ -356,30 +356,7 @@ void AudioEngine::run()
 			#ifdef TIME_ENGINE
 			timer.start("recording", max_us);
 			#endif
-
-			// Send the record buffers up to the DAW thread to be written to disk.
-			RecordBuffers* record_buffers = free_record_buffers;
-			if (record_buffers) {
-				free_record_buffers = record_buffers->next_free;
-				for (int capture_channel = 0; capture_channel < num_capture_channels; ++capture_channel) {
-					if (interface->channel_is_armed(capture_channel)) {
-						record_buffers->add(capture_channel, capture_buffers[capture_channel]);
-						capture_buffers[capture_channel] = get_buffer();
-						}
-					}
-				record_buffers->start_write();
-				}
-			else {
-				log("Record-buffers exhausted.");
-				stats.exhausted_record_buffers += 1;
-				}
-
-			// Update the clips.
-			if (recording_clips) {
-				for (auto& clip: *recording_clips)
-					clip.clip->length_in_frames += cur_buffer_size;
-				}
-
+			run_recording();
 			#ifdef TIME_ENGINE
 			timer.stop();
 			#endif
@@ -401,11 +378,8 @@ void AudioEngine::stop()
 	play_head = play_start;
 	from->send(Message::PlayingStopped);
 
-	if (recording) {
-		from->send(Message::RecordingStopped);
-		dispose_record_buffers();
-		}
-	recording = false;
+	if (recording)
+		stop_recording();
 
 	if (project)
 		project->prepare_to_play();
@@ -528,6 +502,7 @@ void AudioEngine::start_recording(std::vector<RecordingClip>* recording_clips_in
 {
 	delete recording_clips;
 	recording_clips = recording_clips_in;
+	stop_recording_in_buffers = 0;
 
 	// Install the clips.
 	for (auto& clip: *recording_clips) {
@@ -537,6 +512,67 @@ void AudioEngine::start_recording(std::vector<RecordingClip>* recording_clips_in
 
 	playing = true;
 	recording = true;
+}
+
+
+void AudioEngine::run_recording()
+{
+	AudioInterface* interface = audio_system->selected_interface();
+	if (interface == nullptr)
+		return;
+	int num_capture_channels = interface->get_num_capture_channels();
+
+	// Send the record buffers up to the DAW thread to be written to disk.
+	RecordBuffers* record_buffers = free_record_buffers;
+	if (record_buffers) {
+		free_record_buffers = record_buffers->next_free;
+		for (int capture_channel = 0; capture_channel < num_capture_channels; ++capture_channel) {
+			if (interface->channel_is_armed(capture_channel)) {
+				record_buffers->add(capture_channel, capture_buffers[capture_channel]);
+				capture_buffers[capture_channel] = get_buffer();
+				}
+			}
+		record_buffers->start_write();
+		}
+	else {
+		log("Record-buffers exhausted.");
+		stats.exhausted_record_buffers += 1;
+		}
+
+	// Update the clips.
+	if (recording_clips) {
+		for (auto& clip: *recording_clips)
+			clip.clip->length_in_frames += cur_buffer_size;
+		}
+
+	// Stopping?
+	if (stop_recording_in_buffers && --stop_recording_in_buffers <= 0)
+		finish_recording();
+}
+
+
+void AudioEngine::stop_recording()
+{
+	stop_recording_in_buffers = recording_buffers_offset + 1;
+		// "+ 1" because we want the extra buffers *after* the one we're about to
+		// process.
+}
+
+
+void AudioEngine::finish_recording()
+{
+	// Update the clips.
+	if (recording_clips) {
+		for (auto& clip: *recording_clips) {
+			unsigned long offset_frames = recording_buffers_offset * cur_buffer_size;
+			clip.clip->file_start_frame += offset_frames;
+			clip.clip->length_in_frames -= offset_frames;
+			}
+		}
+
+	from->send(Message::RecordingStopped);
+	dispose_record_buffers();
+	recording = false;
 }
 
 
