@@ -14,6 +14,7 @@ var key_bindings = {
 	"C-Z": "undo",
 	"C-S-Z": "redo",
 	"S-&": "toggle-stats-visibility",
+	"C-O": "open-project",
 	};
 
 var commands = {
@@ -32,6 +33,7 @@ var commands = {
 	"delete-selected-item": function() { delete_selected_item(); },
 	"record": function() { start_recording(); },
 	"toggle-stats-visibility": function() { toggle_stats_visibility(); },
+	"open-project": open_project,
 	};
 
 
