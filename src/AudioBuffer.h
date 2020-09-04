@@ -5,7 +5,7 @@
 
 
 struct AudioBuffer {
-	AudioSample	samples[];
+	AudioSample	samples[1];
 
 	void	clear();
 	};
