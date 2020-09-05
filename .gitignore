@@ -7,4 +7,5 @@ test
 temp
 log
 local.h
+.gdbinit
 
