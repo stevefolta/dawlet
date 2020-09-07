@@ -105,6 +105,7 @@ class AudioEngine {
 		void	pause();
 		void	rewind();
 		static void*	thread_start(void* arg);
+		int	try_thread_launch(bool realtime);
 
 		void	run_recording();
 		void	stop_recording();

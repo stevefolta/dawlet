@@ -15,6 +15,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <math.h>
+#include <stdlib.h>
 #ifdef USE_LOCAL_H
 	#include "local.h"
 #endif
@@ -58,19 +59,45 @@ AudioEngine::AudioEngine()
 
 	stats.reset();
 
+	int err = try_thread_launch(true);
+	if (err != 0) {
+		fprintf(stderr, "Couldn't launch realtime thread.");
+		err = try_thread_launch(false);
+		if (err != 0) {
+			fprintf(stderr, "Couldn't launch audio thread!");
+			exit(1);
+			}
+		}
+}
+
+
+int AudioEngine::try_thread_launch(bool realtime)
+{
 	pthread_attr_t thread_attributes;
 	int err = pthread_attr_init(&thread_attributes);
-	err = pthread_attr_setschedpolicy(&thread_attributes, SCHED_FIFO);
-	int max_priority = sched_get_priority_max(SCHED_FIFO);
-	struct sched_param param;
-	param.sched_priority = max_priority;
-	err = pthread_attr_setschedparam(&thread_attributes, &param);
+	if (err != 0) {
+		log("Couldn't create thread attributes.");
+		return err;
+		}
+	if (realtime) {
+		err = pthread_attr_setschedpolicy(&thread_attributes, SCHED_FIFO);
+		if (err != 0)
+			log("Couldn't set SCHED_FIFO (err: %d).", err);
+		int max_priority = sched_get_priority_max(SCHED_FIFO);
+		int min_priority = sched_get_priority_min(SCHED_FIFO);
+		struct sched_param param;
+		param.sched_priority = (min_priority + max_priority) / 2;
+		err = pthread_attr_setschedparam(&thread_attributes, &param);
+		if (err != 0)
+			log("Couldn't set priority.");
+		}
 	err = pthread_attr_setinheritsched(&thread_attributes, PTHREAD_EXPLICIT_SCHED);
 	if (err != 0)
 		log("Couldn't set thread priority/scheduling (err = %d).", err);
 	pthread_t thread;
-	pthread_create(&thread, &thread_attributes, &thread_start, this);
-	err = pthread_attr_destroy(&thread_attributes);
+	err = pthread_create(&thread, &thread_attributes, &thread_start, this);
+	pthread_attr_destroy(&thread_attributes);
+	return err;
 }
 
 
