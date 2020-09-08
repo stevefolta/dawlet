@@ -1,0 +1,32 @@
+[2020.9.4]
+
+If you arm a track and record, and there's no input set up, it crashes.  And by default, there is no input configured, you can only set one up by editing the project's JSON file.
+
+Some interfaces (eg. Focusrite Scarlett 2i4) don't like it when we try to set the number of output channels (snd_pcm_hw_params_set_channels()).  Will need to deal with the channels we have, like we do with the input channels.
+
+pthread_attr_setschedpolicy(SCHED_FIFO) sometimes need root privileges.  We don't know find that out until pthread_create() fails and we have no AudioEngine thread running.
+
+
+[2020.9.7]
+
+sched_get_priority_max is 99 (min is 1), but /etc/security/limits.d/99-realtime-privileges.conf has "rtprio 98" for the "realtime" group.  Reaper defaults to 40.  50 works (that is, pthread_create() doesn't fail with SCHED_FIFO); before we were using 99, so that's why it failed.
+
+Scarlett 2i4 is interleaved.
+	offset: 128, frames: 128
+	area[0]: first: 0, step: 128 (16 bytes)
+	area[1]: first: 32 (4 bytes), step: 128
+	area[2]: first: 64 (8 bytes), step: 128
+	area[3]: first: 96 (12 bytes), step: 128
+	All have the same "addr".
+	S32_LE.
+HDA Intel PCH:
+	offset: 128, frames: 128
+	area[0]: first: 0, step: 64 (8 bytes)
+	area[1]: first: 32 (4 bytes), step: 64
+	Both had the same "addr".
+	S32_LE.
+
+memset()ing to clear empty channels causes bad audio on Scarlett, not on HDA.  My bad, I wasn't using "offset".  It toggles between 0 and 128 every send_data().
+
+Turning off USE_ALSA_MMAP gives continuous xruns on either interface.
+
