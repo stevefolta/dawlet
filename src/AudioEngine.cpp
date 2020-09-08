@@ -61,10 +61,10 @@ AudioEngine::AudioEngine()
 
 	int err = try_thread_launch(true);
 	if (err != 0) {
-		fprintf(stderr, "Couldn't launch realtime thread.");
+		fprintf(stderr, "Couldn't launch realtime thread.\n");
 		err = try_thread_launch(false);
 		if (err != 0) {
-			fprintf(stderr, "Couldn't launch audio thread!");
+			fprintf(stderr, "Couldn't launch audio thread!\n");
 			exit(1);
 			}
 		}
