@@ -134,8 +134,14 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 	#endif
 	err = snd_pcm_hw_params_set_rate(playback, hw_params, sample_rate, 0);
 	check_err("snd_pcm_hw_params_set_rate", sample_rate);
-	err = snd_pcm_hw_params_set_channels(playback, hw_params, num_channels);
-	check_err("snd_pcm_hw_params_set_channels", num_channels);
+	unsigned int num_playback_channels = 0;
+	snd_pcm_hw_params_get_channels_max(hw_params, &num_playback_channels);
+	if (num_playback_channels > 1024) {
+		// Dunno why this happens, or if it does for playback channels.  Assume
+		// we only have two channels.
+		num_playback_channels = 2;
+		}
+	this->num_playback_channels = num_playback_channels;
 	snd_pcm_uframes_t actual_period_size = buffer_size;
 	int dir = 0;
 	err = snd_pcm_hw_params_set_period_size_near(playback, hw_params, &actual_period_size, &dir);
@@ -243,7 +249,7 @@ void ALSAAudioInterface::setup(int num_channels, int sample_rate, int buffer_siz
 			}
 		this->num_capture_channels = num_capture_channels;
 		err = snd_pcm_hw_params_set_channels(capture, hw_params, num_capture_channels);
-		check_err("snd_pcm_hw_params_set_channels", num_channels);
+		check_err("snd_pcm_hw_params_set_channels", num_capture_channels);
 		actual_period_size = buffer_size;
 		dir = 0;
 		err = snd_pcm_hw_params_set_period_size_near(capture, hw_params, &actual_period_size, &dir);
@@ -327,6 +333,12 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 	err = snd_pcm_mmap_begin(playback, &areas, &offset, &frames);
 	check_err("snd_pcm_mmap_begin");
 
+	// Clear any channels not being used.
+	// Ass-u-me'ing there's no blank space between areas or samples.
+	int stride = areas[0].step >> 3;
+	if (num_channels < num_playback_channels)
+		memset((char*) areas[0].addr + stride * offset, 0, frames * stride);
+
 	// Copy the samples.
 	const snd_pcm_channel_area_t* area = areas;
 	for (int which_channel = 0; which_channel < num_channels; ++which_channel, ++area) {
@@ -345,9 +357,19 @@ void ALSAAudioInterface::send_data(AudioBuffer** buffers, int num_channels)
 
 	// Send the samples.
 	void* channel_buffers[num_channels];
-	for (int which_channel = 0; which_channel < num_channels; ++which_channel)
+	int which_channel = 0;
+	for (; which_channel < num_channels; ++which_channel)
 		channel_buffers[which_channel] = buffers[which_channel]->samples;
+	void* empty_channel_buffer = nullptr;
+	if (num_channels < num_playback_channels) {
+		empty_channel_buffer = malloc(buffer_size * sizeof(float));
+		memset(empty_channel_buffer, 0, buffer_size * sizeof(float));
+		for (; which_channel < num_playback_channels; ++which_channel)
+			channel_buffers[which_channel] = empty_channel_buffer;
+		}
 	int err = snd_pcm_writen(playback, channel_buffers, buffer_size);
+	if (num_channels < num_playback_channels)
+		free(empty_channel_buffer);
 	if (err == -EPIPE)
 		got_xrun("snd_pcm_writen");
 	else if (err < 0) {

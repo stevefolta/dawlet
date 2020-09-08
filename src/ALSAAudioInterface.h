@@ -41,7 +41,7 @@ class ALSAAudioInterface : public AudioInterface {
 		int	buffers_sent;
 		int	xruns;
 		bool	initialized, started, synced;
-		int	num_capture_channels;
+		int	num_playback_channels, num_capture_channels;
 		play_mover	play_move;
 		capt_mover	capture_move;
 
