@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    viewBox="0 0 500.00001 60"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
    sodipodi:docname="track.svg">
   <defs
      id="defs4" />
@@ -26,8 +24,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8284271"
-     inkscape:cx="101.34159"
-     inkscape:cy="30.480076"
+     inkscape:cx="193.62409"
+     inkscape:cy="37.904697"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,7 +34,8 @@
      inkscape:window-height="960"
      inkscape:window-x="60"
      inkscape:window-y="60"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -61,21 +60,21 @@
        height="59.384663"
        x="0.30766785"
        y="992.66986"
-       style="opacity:1;stroke:#848484;stroke-width:0.6153357;stroke-opacity:1"
+       style="opacity:1;stroke:#848484;stroke-width:0.615;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        class="background"
        attach="0011" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.73727989px;line-height:100%;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="28.300299"
        y="1014.1627"
        id="track-name"
-       sodipodi:linespacing="100%"
        inkscape:label="#text3336"><tspan
          sodipodi:role="line"
          id="tspan3338"
          x="28.300299"
-         y="1014.1627">Track Name</tspan></text>
+         y="1014.1627"
+         style="font-size:19.7373px;line-height:1">Track Name</tspan></text>
     <rect
        id="meter-track"
        y="1021.4237"
@@ -95,13 +94,13 @@
          height="23.244606"
          width="381.12885"
          id="knob-track"
-         style="opacity:1;fill:none;fill-opacity:0.16119403;stroke:#dcdcdc;stroke-width:0.8498348;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:none;fill-opacity:0.161194;stroke:#dcdcdc;stroke-width:0.849835;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
          attach="0011" />
       <g
          inkscape:label="#g4203"
          id="knob-indicator">
         <rect
-           style="fill:#a9a9a9;fill-opacity:0.16119403;stroke:#848484;stroke-width:0.54523665;stroke-linejoin:miter;stroke-opacity:1"
+           style="fill:#a9a9a9;fill-opacity:0.161194;stroke:#848484;stroke-width:0.545237;stroke-linejoin:miter;stroke-opacity:1"
            id="rect4161"
            width="7.7108107"
            height="23.132433"
@@ -110,16 +109,16 @@
            rx="1.63571"
            ry="1.63571" />
         <path
-           style="fill:none;fill-rule:evenodd;stroke:#6b6b6b;stroke-width:0.54523665px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 16.661189,1021.7228 0,22.857"
+           style="fill:none;fill-rule:evenodd;stroke:#6b6b6b;stroke-width:0.545237px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 16.661189,1021.7228 v 22.857"
            id="path4163"
            inkscape:connector-curvature="0" />
       </g>
     </g>
     <circle
-       style="opacity:1;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:0.25233645"
+       style="opacity:1;fill-opacity:1;stroke:none;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:0.252336"
        id="record-arm"
-		 class="record-armed"
+       class="record-armed"
        cx="16.440233"
        cy="1007.9911"
        r="5.833631" />
