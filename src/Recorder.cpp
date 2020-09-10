@@ -133,7 +133,8 @@ void Recorder::interface_changed()
 {
 	Project* project = daw->cur_project();
 	armed_tracks.clear();
-	project->arm_armed_tracks(this);
+	if (project)
+		project->arm_armed_tracks(this);
 }
 
 
