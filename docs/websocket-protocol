@@ -1,0 +1,53 @@
+Strings (eg. <path>, <name>, <interface>, etc.) can usually be quoted if needed.
+<position> is a float, representing project position in seconds.
+
+UI -> server
+("->" means "results in a reply of")
+=====
+ping (-> pong)
+get-play-head (-> play-head)
+open-project <path> (-> project-loaded or error)
+save-project (-> "dirty false" or error)
+new-project <name> (-> project-loaded or error)
+close-project (-> project-loaded)
+list-interfaces (-> interfaces)
+select-interface <interface> (-> interface-selected)
+play
+stop
+pause
+stop-play: Toggles between "play" and "stop".
+pause-play: Toggles between "play" and "pause".
+rewind
+record
+seek <position>
+shutdown
+
+
+Server -> UI
+("<-" means "is in reply to")
+=====
+error <error-type>: <error-type> is an unquoted hyphenated token
+dirty <bool>: Project is or isn't dirty (that is, has unsaved changes.
+pong (<- ping)
+play-head <position> (<- get-play-head)
+project-loaded (<- open-project, new-project, close-project)
+interfaces <list-of-interfaces>: <list-of-interfaces> is a JSON list of strings.  (<- list-interfaces)
+interface-selected <interface> (<- select-interface)
+recording-started <position> <clip-specs>:
+	<clip-specs> is a space-separated list of "<track>:<clip>" pairs.  Eg.
+	"recording-started 0 3:12 5:32" means the clip with ID 12 is recording on
+	the track with ID 3, and the clip with ID 32 is recording on the track with
+	ID 5.
+playing
+stopped
+recording-stopped
+xrun
+meters <peak-pairs>:
+	<peak-pairs> is a space-separated list of pairs of values, each pair being a
+	track ID followed by a float of the peak.  Multiple "meters" messages can be
+	sent per metering period, each containing only a certain number of the
+	tracks.
+
+
+
+
