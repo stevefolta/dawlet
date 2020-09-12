@@ -101,7 +101,7 @@ void Recorder::start()
 		AudioFile* audio_file = new AudioFile(project, project->new_id());
 		project->add_file(audio_file);
 		audio_file->path = file_name.str();
-		Clip* clip = new Clip(audio_file);
+		Clip* clip = new Clip(audio_file, project->new_id());
 		clip->start = 0;	// Will be filled in by the engine.
 		clip->length_in_frames = 0;	// Will be filled in by the engine.
 		recording_clips->emplace_back(track.track, clip);

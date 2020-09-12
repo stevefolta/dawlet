@@ -14,16 +14,17 @@ class IndentedOStream;
 
 class Clip {
 	public:
-		Clip(AudioFile* file_in)
-			: file(file_in) { init(); }
+		Clip(AudioFile* file_in, int id_in)
+			: id(id_in), file(file_in) { init(); }
 		Clip()
-			: file(nullptr), length_in_frames(0) { init(); }
+			: id(0), file(nullptr), length_in_frames(0) { init(); }
 		~Clip();
 
 		void	read_json(ProjectReader* reader);
 		void	build_api_json(std::stringstream& result);
 		void	write_to_file(IndentedOStream& stream);
 
+		int	id;
 		AudioFile*	file;
 		ProjectPosition	start;
 		unsigned long	file_start_frame;

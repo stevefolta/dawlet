@@ -42,6 +42,8 @@ void Clip::read_json(ProjectReader* reader)
 			length_in_frames = reader->next_int();
 		else if (field_name == "file-start-frame")
 			file_start_frame = reader->next_int();
+		else if (field_name == "id")
+			id = reader->next_int();
 		else
 			reader->ignore_value();
 		}
@@ -51,6 +53,10 @@ void Clip::read_json(ProjectReader* reader)
 void Clip::build_api_json(std::stringstream& result)
 {
 	result << "{ ";
+	if (id != 0) {
+		result << "\"id\": " << id;
+		result << ", ";
+		}
 	result << "\"start\": " << start;
 	result << ", ";
 	result << "\"length\": " << (ProjectPosition) length_in_frames / file->info.sample_rate;
@@ -61,6 +67,10 @@ void Clip::build_api_json(std::stringstream& result)
 void Clip::write_to_file(IndentedOStream& stream)
 {
 	stream << "{ ";
+	if (id != 0) {
+		stream << "\"id\": " << id;
+		stream << ", ";
+		}
 	stream << "\"file\": " << file->id;
 	stream << ", ";
 	stream << "\"start\": " << start;
