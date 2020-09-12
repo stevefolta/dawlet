@@ -2,10 +2,13 @@
 #include "RecordBuffers.h"
 #include "AudioEngine.h"
 #include "DAW.h"
+#include <sstream>
 
 
-StartRecordingProcess::StartRecordingProcess(std::vector<RecordingClip>* recording_clips_in)
-	: recording_clips(recording_clips_in)
+StartRecordingProcess::StartRecordingProcess(
+	std::vector<RecordingClip>* recording_clips_in,
+	std::string clip_specs_in)
+	: recording_clips(recording_clips_in), clip_specs(clip_specs_in)
 {
 }
 
@@ -25,7 +28,9 @@ void StartRecordingProcess::in_engine()
 
 void StartRecordingProcess::back_in_daw()
 {
-	daw->send_websocket_message("recording-started");
+	std::stringstream reply_message;
+	reply_message << "recording-started " << start_time << clip_specs;
+	daw->send_websocket_message(reply_message.str());
 }
 
 
@@ -37,6 +42,7 @@ void StartRecordingProcess::start_recording()
 
 	engine->start_recording(recording_clips);
 
+	start_time = engine->play_head;
 	state = Done;
 }
 

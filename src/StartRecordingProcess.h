@@ -3,6 +3,7 @@
 
 #include "Process.h"
 #include <vector>
+#include <string>
 
 struct RecordingClip;
 class RecordBuffers;
@@ -10,7 +11,9 @@ class RecordBuffers;
 
 class StartRecordingProcess : public SimpleProcess {
 	public:
-		StartRecordingProcess(std::vector<RecordingClip>* recording_clips_in);
+		StartRecordingProcess(
+			std::vector<RecordingClip>* recording_clips_in,
+			std::string clip_specs_in);
 		~StartRecordingProcess();
 
 		void	add_recording_buffers(RecordBuffers* new_buffers)
@@ -19,6 +22,8 @@ class StartRecordingProcess : public SimpleProcess {
 	protected:
 		std::vector<RecordingClip>*	recording_clips;
 		std::vector<RecordBuffers*>	record_bufferses;
+		std::string 	clip_specs;
+		float	start_time;
 
 		void	in_engine();
 		void	back_in_daw();

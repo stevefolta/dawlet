@@ -246,10 +246,20 @@ function playing_stopped() {
 	if (play_button)
 		play_button.removeAttribute("playing");
 	}
-function recording_started() {
+function recording_started(start_time, values) {
 	var record_button = document.getElementById("record");
 	if (record_button)
 		record_button.setAttribute("recording", "recording");
+
+	// Add all the new clips.
+	values.forEach(function(spec) {
+		if (spec.length == 0)
+			return;
+		var [track_id, clip_id] = spec.split(':').map(id => parseInt(id));
+		if (track_id == 0 || clip_id == 0)
+			return;
+		//***
+		});
 	}
 function recording_stopped() {
 	var record_button = document.getElementById("record");
@@ -556,8 +566,11 @@ function load() {
 			playing_stopped();
 			recording_stopped();
 			}
-		else if (event.data == "recording-started")
-			recording_started();
+		else if (event.data.startsWith("recording-started ")) {
+			var values = event.data.substr("recording-started ".length).trim().split(' ');
+			var start_time = parseFloat(values.shift());
+			recording_started(start_time, values);
+			}
 		else if (event.data == "recording-stopped")
 			recording_stopped();
 		else if (event.data == "xrun")

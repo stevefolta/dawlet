@@ -76,6 +76,7 @@ void Recorder::set_track_input(Track* track, std::string input, Web::Connection*
 void Recorder::start()
 {
 	std::vector<RecordingClip>* recording_clips = new std::vector<RecordingClip>;
+	std::stringstream clip_specs;
 	Project* project = daw->cur_project();
 
 	// Open the files.
@@ -105,9 +106,13 @@ void Recorder::start()
 		clip->start = 0;	// Will be filled in by the engine.
 		clip->length_in_frames = 0;	// Will be filled in by the engine.
 		recording_clips->emplace_back(track.track, clip);
+
+		// Build up the reply_message.
+		clip_specs << " " << track.track->id << ":" << clip->id;
 		}
 
-	StartRecordingProcess* process = new StartRecordingProcess(recording_clips);
+	StartRecordingProcess* process =
+		new StartRecordingProcess(recording_clips, clip_specs.str());
 
 	// Supply the engine with RecordBuffers.
 	for (int i = 0; i < num_record_buffers; ++i)
