@@ -1,0 +1,21 @@
+/socket: open WebSocket connection
+
+/api is a REST-like interface to query and manipulate the project structure.
+Replies are in JSON, but PUT values tend to be the raw body.
+-----
+GET /api/project
+GET /api/track/<track-id>
+GET /api/track/<track-id>/clips
+PUT /api/track/<track-id>/gain (float)
+PUT /api/track/<track-id>/name (string)
+PUT /api/track/<track-id>/record-arm ("true" or "false")
+PUT /api/track/<track-id>/input (string)
+PUT /api/track/<track-id>/monitor-input ("true" or "false")
+POST /api/track[?[before=<track-id>|after=<track-id>|restore=<track-id>|parent=<track-id>]]
+	Creates a new track (optionally specifying where to put it), or restores a
+	deleted track.  If "restore" is used, "parent" must also be used.  Outside
+	of "restore", specifying "before" or "parent" is not currently supported.
+GET /api/stats
+GET /api/inputs
+GET /api/projects
+
