@@ -329,6 +329,7 @@ function api_delete(url, when_done) {
 
 function project_loaded() {
 	api_get("/api/project", got_project_json);
+	hide_error();
 	}
 
 function got_project_json(json) {
