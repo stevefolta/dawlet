@@ -3,7 +3,7 @@ function Clip(track, id_or_json, start_time) {
 	if (typeof(id_or_json) === 'number') {
 		this.id = id_or_json;
 		this.start_time = start_time;
-		this.length = 0;
+		this.length = 0.1; 	// Needs to be non-zero, but there's no content yet.
 		}
 	else {
 		let json = id_or_json;
@@ -20,5 +20,10 @@ function Clip(track, id_or_json, start_time) {
 		lanes_rect.left - track_svg_rect.left + this.start_time * pixels_per_second,
 		0);
 	this.track.svg.appendChild(this.svg);
+	}
+
+
+Clip.prototype.length_changed_to = function(new_length) {
+	templates['clip'].set_width_of(this.svg, new_length);
 	}
 

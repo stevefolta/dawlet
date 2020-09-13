@@ -33,6 +33,12 @@ SVGTemplate.prototype.clone = function(new_width, new_height, x_move, y_move) {
 	}
 
 
+SVGTemplate.prototype.set_width_of = function(element, new_width) {
+	let old_width = element.getBoundingClientRect().width;
+	this.scale_svg_elements(element, new_width - old_width, 0, 0, 0);
+	}
+
+
 SVGTemplate.prototype.scale_svg_elements = function(element, width_delta, height_delta, x_move, y_move) {
 	function change_attribute(attr_name, delta) {
 		var attribute = element.getAttribute(attr_name);

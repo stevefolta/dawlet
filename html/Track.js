@@ -160,7 +160,7 @@ Track.prototype.got_clips_json = function(json) {
 	json.forEach(clip => new Clip(this, clip));
 	}
 
-Track.prototype.add_clip_at = function(id, length) {
+Track.prototype.add_clip_at = function(id, start) {
 	return new Clip(this, id, start);
 	}
 

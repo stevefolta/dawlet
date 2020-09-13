@@ -13,6 +13,8 @@ var theme_css_link = null;
 var interface_inputs = [];
 var project_is_open = false;
 var in_open_project_screen = false;
+var recording_clips = [];
+var recording_start_time = 0.0;
 
 var prefs = {
 	playhead_nudge: 0.1,
@@ -252,19 +254,31 @@ function recording_started(start_time, values) {
 		record_button.setAttribute("recording", "recording");
 
 	// Add all the new clips.
+	recording_clips = [];
+	recording_start_time = start_time;
 	values.forEach(function(spec) {
 		if (spec.length == 0)
 			return;
-		var [track_id, clip_id] = spec.split(':').map(id => parseInt(id));
+		let [track_id, clip_id] = spec.split(':').map(id => parseInt(id));
 		if (track_id == 0 || clip_id == 0)
 			return;
-		//***
+		let track = tracks_by_id[track_id];
+		if (!track)
+			return;
+		recording_clips.push(track.add_clip_at(clip_id, start_time));
 		});
 	}
 function recording_stopped() {
 	var record_button = document.getElementById("record");
 	if (record_button)
 		record_button.removeAttribute("recording");
+	recording_clips = [];
+	}
+function update_during_recording() {
+	if (recording_clips.length > 0) {
+		let new_length = (play_head - recording_start_time) * pixels_per_second;
+		recording_clips.forEach(clip => clip.length_changed_to(new_length));
+		}
 	}
 
 
@@ -550,6 +564,7 @@ function load() {
 		else if (event.data.startsWith("play-head ")) {
 			play_head = parseFloat(event.data.substr(10));
 			show_play_head(play_head);
+			update_during_recording();
 			}
 		else if (event.data.startsWith("meters "))
 			update_meters(event.data);
