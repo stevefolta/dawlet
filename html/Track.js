@@ -157,15 +157,17 @@ Track.prototype.got_json = function(json) {
 
 
 Track.prototype.got_clips_json = function(json) {
-	var track = this;
-	json.forEach(function(clip) {
-		var lanes_rect = track.lane.getBoundingClientRect();
-		var svg_rect = track.svg.getBoundingClientRect();
-		var clip_svg = templates['clip'].clone(
-			clip.length * pixels_per_second, lanes_rect.height,
-			lanes_rect.left - svg_rect.left + clip.start * pixels_per_second, 0);
-		track.svg.appendChild(clip_svg);
-		});
+	json.forEach(clip => this.add_clip_at(clip.start, clip.length));
+	}
+
+Track.prototype.add_clip_at = function(start, length) {
+	var lanes_rect = this.lane.getBoundingClientRect();
+	var svg_rect = this.svg.getBoundingClientRect();
+	var clip_svg = templates['clip'].clone(
+		length * pixels_per_second, lanes_rect.height,
+		lanes_rect.left - svg_rect.left + start * pixels_per_second, 0);
+	this.svg.appendChild(clip_svg);
+	return clip_svg;
 	}
 
 Track.prototype.is_master = function() {
