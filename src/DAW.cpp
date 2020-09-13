@@ -350,6 +350,9 @@ void DAW::new_project(std::string name)
 		}
 
 	// Make the directories.
+	mkdir(projects_dir, 0777);
+		// Ignore errors; likely we'll get EEXIST.  Any other problem will fail
+		// at the next step.
 	if (mkdir(path.c_str(), 0777) != 0) {
 		send_websocket_message("error project-creation-fail");
 		return;
