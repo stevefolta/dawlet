@@ -30,3 +30,8 @@ memset()ing to clear empty channels causes bad audio on Scarlett, not on HDA.  M
 
 Turning off USE_ALSA_MMAP gives continuous xruns on either interface.
 
+
+[2020.9.13]
+
+Getting an "invalid-wav-file" error on recording start because we're trying to read from the file we're recording to.
+
