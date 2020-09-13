@@ -79,6 +79,22 @@ void Recorder::start()
 	std::stringstream clip_specs;
 	Project* project = daw->cur_project();
 
+	// Verify that all armed tracks are assigned to capture channels.
+	AudioInterface* interface = audio_system->selected_interface();
+	for (auto& track_pair: armed_tracks) {
+		ArmedTrack& armed_track = track_pair.second;
+		if (armed_track.capture_channels == nullptr) {
+			// Give it one more try...
+			armed_track.capture_channels =
+				interface->capture_channels_for_input_name(
+					armed_track.track->get_input());
+			if (armed_track.capture_channels == nullptr) {
+				daw->send_websocket_message("error bad-input");
+				return;
+				}
+			}
+		}
+
 	// Open the files.
 	std::string date = compact_iso8601_date();
 	for (auto& track_pair: armed_tracks) {
