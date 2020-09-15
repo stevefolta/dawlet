@@ -35,3 +35,8 @@ Turning off USE_ALSA_MMAP gives continuous xruns on either interface.
 
 Getting an "invalid-wav-file" error on recording start because we're trying to read from the file we're recording to.
 
+
+[2020.9.14]
+
+Track::run() is already not running the playlist when recording.  I'm seeing "missing read"s on a different track when starting recording.  The "invalid-wav-file" is on recording stop, because it's trying to read before Recorder::ArmedTrack::finish_wav_file() has updated the sizes.
+
