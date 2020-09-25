@@ -363,6 +363,7 @@ function clear_project_ui() {
 function project_closed() {
 	project_is_open = false;
 	clear_project_ui();
+	document.cookie = "last_project_path=; max-age=31536000";
 	}
 
 function save_project() {
@@ -391,7 +392,14 @@ function update_project_title(project_path) {
 	}
 
 
-function open_project() {
+function open_project(path) {
+	websocket.send("open-project \"" + path + "\"");
+	update_project_title(path);
+	document.cookie = "last_project_path=" + path + "; max-age=31536000";
+	}
+
+
+function show_open_project_screen() {
 	set_visible('whole-project', false);
 	set_visible('projects-screen', true);
 	in_open_project_screen = true;
@@ -409,8 +417,7 @@ function open_project() {
 			element.textContent = title_for_path(path);
 			element.path = path;
 			element.onclick = function() {
-				websocket.send("open-project \"" + path + "\"");
-				update_project_title(path);
+				open_project(path);
 				};
 			projects_div.appendChild(element);
 			});
@@ -431,7 +438,7 @@ function open_project() {
 function close_project() {
 	websocket.send("close-project");
 	project_closed();
-	open_project();
+	show_open_project_screen();
 	}
 
 function server_shut_down() {
@@ -472,6 +479,24 @@ function load_theme() {
 	theme_css_link.setAttribute('rel', 'stylesheet');
 	theme_css_link.setAttribute('type', 'text/css');
 	head.appendChild(theme_css_link);
+	}
+
+
+function initial_screen() {
+	let opened = false;
+	let last_project_path_cookie =
+		document.cookie
+		.split('; ')
+		.find(row => row.startsWith('last_project_path'));
+	if (last_project_path_cookie) {
+		let path = last_project_path_cookie.split('=')[1];
+		if (path) {
+			open_project(path);
+			opened = true;
+			}
+		}
+	if (!opened)
+		show_open_project_screen();
 	}
 
 
@@ -520,15 +545,13 @@ function load() {
 		});
 	set_button_function("record", start_recording);
 	set_button_function("open-project", function() {
-		websocket.send("open-project \"test/project.json\"");
-		update_project_title("test/project.json");
+		open_project("test/project.json");
 		});
 	set_button_function("list-interfaces", function() {
 		websocket.send("list-interfaces");
 		});
 	set_button_function("go", function() {
-		websocket.send("open-project \"test/project.json\"");
-		update_project_title("test/project.json");
+		open_project("test/project.json");
 		websocket.send("play");
 		});
 	document.getElementById("interface-popup").onchange = function(event) {
@@ -600,8 +623,7 @@ function load() {
 		try {
 			websocket.send("ping");
 			websocket.send("list-interfaces");
-			websocket.send("open-project \"test/project.json\"");
-			update_project_title("test/project.json");
+			initial_screen();
 			}
 		catch (e) {
 			log("Websocket send failed!");
