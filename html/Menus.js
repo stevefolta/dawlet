@@ -7,13 +7,9 @@ function setup_menus() {
 function file_menu_clicked() {
 	var menu = new PopupMenu(false);
 	menu.add_item("New project...", function() {
-		var name = window.prompt("New project name:", "");
-		if (name) {
-			websocket.send("new-project \"" + name + "\"");
-			update_project_title(name);
-			}
+		attempt_new_project();
 		});
-	menu.add_item("Open project...", open_project);
+	menu.add_item("Open project...", show_open_project_screen);
 	menu.add_item("Close project", close_project);
 	menu.add_divider();
 	menu.add_item("Shut down", function() {

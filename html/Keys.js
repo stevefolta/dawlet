@@ -33,7 +33,7 @@ var commands = {
 	"delete-selected-item": function() { delete_selected_item(); },
 	"record": function() { start_recording(); },
 	"toggle-stats-visibility": function() { toggle_stats_visibility(); },
-	"open-project": open_project,
+	"open-project": show_open_project_screen,
 	};
 
 

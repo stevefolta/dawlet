@@ -173,6 +173,12 @@ div.popup-menu hr {
 	}
 
 
+div#new-project-div {
+	margin-bottom: 0.75em;
+	}
+a#new-project {
+	text-decoration: none;
+	}
 div#projects a.project {
 	display: block;
 	font-family: Arial Black;

@@ -398,6 +398,15 @@ function open_project(path) {
 	document.cookie = "last_project_path=" + path + "; max-age=31536000";
 	}
 
+function attempt_new_project() {
+	var name = window.prompt("New project name:", "");
+	if (name) {
+		websocket.send("new-project \"" + name + "\"");
+		update_project_title(name);
+		document.cookie = "last_project_path=" + name + "/project.json; max-age=31536000";
+		}
+	}
+
 
 function show_open_project_screen() {
 	set_visible('whole-project', false);
@@ -422,6 +431,13 @@ function show_open_project_screen() {
 			projects_div.appendChild(element);
 			});
 		});
+
+	let new_project_button = document.getElementById('new-project');
+	if (new_project_button) {
+		new_project_button.onclick = function() {
+			attempt_new_project();
+			};
+		}
 
 	set_visible('cancel-open-project-div', project_is_open);
 	if (project_is_open) {
