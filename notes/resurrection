@@ -40,3 +40,9 @@ Getting an "invalid-wav-file" error on recording start because we're trying to r
 
 Track::run() is already not running the playlist when recording.  I'm seeing "missing read"s on a different track when starting recording.  The "invalid-wav-file" is on recording stop, because it's trying to read before Recorder::ArmedTrack::finish_wav_file() has updated the sizes.
 
+
+[2020.10.2]
+
+Changing the input of an armed track doesn't do AudioInterface::set_channel_armed(), which can lead to a crash in the Recorder when it tries to write the files.  SetTrackInputProcess::set() is supposed to do that... typo: it's setting it to false instead of true.
+
+

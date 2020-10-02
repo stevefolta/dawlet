@@ -112,7 +112,7 @@ class SetTrackInputProcess : public SetTrackStateProcess {
 			if (new_capture_channels) {
 				AudioInterface* interface = audio_system->selected_interface();
 				for (int capture_channel: *new_capture_channels)
-					interface->set_channel_armed(capture_channel, false);
+					interface->set_channel_armed(capture_channel, true);
 				}
 			}
 	};
