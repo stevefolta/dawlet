@@ -27,6 +27,7 @@ class Recorder {
 
 		void	start();
 		void	stop();
+		void	checkpoint();
 
 		void	interface_changed();
 		void	project_changed();
@@ -48,6 +49,7 @@ class Recorder {
 			void	update_capture_channels();
 			void	create_wav_file(std::string file_name);
 			void	finish_wav_file();
+			void	update_wav_file_size();
 			};
 
 		std::map<int, ArmedTrack>	armed_tracks;

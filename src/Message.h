@@ -24,6 +24,7 @@ struct Message {
 		PlayingStarted,
 		PlayingStopped,
 		RecordingStopped,
+		RecordingCheckpoint,
 		Xrun,
 		Error,
 		};

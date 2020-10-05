@@ -145,7 +145,15 @@ void Recorder::stop()
 	for (auto& track_pair: armed_tracks) {
 		ArmedTrack& track = track_pair.second;
 		track.finish_wav_file();
-		/***/
+		}
+}
+
+
+void Recorder::checkpoint()
+{
+	for (auto& track_pair: armed_tracks) {
+		ArmedTrack& track = track_pair.second;
+		track.update_wav_file_size();
 		}
 }
 
@@ -306,6 +314,18 @@ void Recorder::ArmedTrack::finish_wav_file()
 	if (file == nullptr)
 		return;
 
+	update_wav_file_size();
+
+	fclose(file);
+	file = nullptr;
+}
+
+
+void Recorder::ArmedTrack::update_wav_file_size()
+{
+	if (file == nullptr)
+		return;
+
 	uint32_t samples_end = ftell(file);
 	uint32_t samples_size = samples_end - data_chunk_start - (2 * 4);
 	char data[8];
@@ -319,8 +339,8 @@ void Recorder::ArmedTrack::finish_wav_file()
 	fseek(file, 4, SEEK_SET);
 	fwrite(write_dword(riff_chunk_size, &data), 1, 4, file);
 
-	fclose(file);
-	file = nullptr;
+	// Get ready to continue recording.
+	fseek(file, samples_end, SEEK_SET);
 }
 
 

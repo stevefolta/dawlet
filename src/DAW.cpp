@@ -244,6 +244,9 @@ bool DAW::handle_messages_from_engine()
 				recorder->stop();
 				send_websocket_message("recording-stopped");
 				break;
+			case Message::RecordingCheckpoint:
+				recorder->checkpoint();
+				break;
 			case Message::Xrun:
 				send_websocket_message("xrun");
 				break;

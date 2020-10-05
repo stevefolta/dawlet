@@ -580,6 +580,7 @@ void AudioEngine::run_recording()
 
 void AudioEngine::stop_recording()
 {
+	from->send(Message::RecordingCheckpoint);
 	stop_recording_in_buffers = recording_buffers_offset + 1;
 		// "+ 1" because we want the extra buffers *after* the one we're about to
 		// process.
