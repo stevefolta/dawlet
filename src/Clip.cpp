@@ -5,6 +5,7 @@
 #include "AudioEngine.h"
 #include "IndentedOStream.h"
 #include "Logger.h"
+#include <stdint.h>
 #ifdef USE_LOCAL_H
 	#include "local.h"
 #endif
@@ -143,7 +144,7 @@ void Clip::run(AudioBuffer** buffers_out, int num_channels)
 		if (which_read < 0 || !reads[which_read]->is_playable()) {
 			// We didn't read it in time, we'll have to skip it.  Try to go to the
 			// next available read.
-			log("Missing read at %d!", play_frame);
+			log("Missing read for clip %d at %d!", id, play_frame);
 			engine->got_missing_file_read();
 			unsigned long buffer_end_frame =
 				play_frame + buffer_size - start_out_frame;
@@ -185,25 +186,26 @@ void Clip::read_ahead()
 {
 	// Free any buffers we no longer need.
 	int sample_rate = file->info.sample_rate;
-	unsigned long next_play_frame =
+	int64_t next_play_frame =
 		(engine->play_head - start) * sample_rate + file_start_frame;
-	unsigned long read_ahead_point =
+	int64_t read_ahead_point =
 		next_play_frame + engine->read_ahead_seconds * sample_rate;
-	long first_loading_frame = -1;
-	unsigned long last_loading_frame = 0;
+	int64_t first_loading_frame = -1;
+	int64_t last_loading_frame = -1;
 	for (int i = 0; i < num_reads; ++i) {
 		if (reads[i] == nullptr)
 			continue;
-		unsigned long end_frame = reads[i]->end_frame();
+		int64_t end_frame = reads[i]->end_frame();
 		bool unneeded =
 			next_play_frame > end_frame ||
-			reads[i]->start_frame > read_ahead_point;
+			(int64_t) reads[i]->start_frame > read_ahead_point;
 		if (unneeded) {
 #ifdef DEBUG_FILE_READ
 			log(
-				"Disposing read %lu -> %lu.",
+				"Disposing read %lu -> %lu for clip %d.",
 				reads[i]->start_frame,
-				reads[i]->start_frame + reads[i]->num_frames);
+				reads[i]->start_frame + reads[i]->num_frames,
+				id);
 #endif
 			reads[i]->dispose();
 			reads[i] = nullptr;
@@ -216,37 +218,26 @@ void Clip::read_ahead()
 			}
 		}
 
-	// Are we over with?
-	if (play_frame >= file_end_frame())
-		return;
-
-	// Read from the current point if needed.
-	// Hopefully we're not playing...
-	if (first_loading_frame < 0 || (unsigned long) first_loading_frame > next_play_frame) {
-		unsigned long num_frames = engine->read_ahead_seconds * sample_rate;
-		if (first_loading_frame < 0) {
-			// We have nothing, read all the way to the read-ahead point.
+	// Read whatever we need up to the read_ahead_point.
+	if (read_ahead_point >= (int64_t) file_start_frame && last_loading_frame < read_ahead_point) {
+		int64_t read_start = last_loading_frame + 1;
+		if (last_loading_frame < 0) {
+			// We don't actually have any frames yet; start the read from the
+			// current play position, or the start of the clip, whichever is sooner.
+			read_start = next_play_frame;
+			if (read_start < (int64_t) file_start_frame)
+				read_start = file_start_frame;
+			}
+		if (read_start >= (int64_t) file_end_frame()) {
+			// End of file, nothing to read.
 			}
 		else {
-			// Don't overlap the first read we already have.
-			unsigned long max_length = first_loading_frame - next_play_frame;
+			unsigned long num_frames = engine->read_ahead_seconds * sample_rate;
+			unsigned long max_length = file_end_frame() - read_start;
 			if (num_frames > max_length)
 				num_frames = max_length;
+			start_read(read_start, num_frames);
 			}
-		start_read(next_play_frame, num_frames);
-		unsigned long read_end = next_play_frame + num_frames - 1;
-		if (read_end > last_loading_frame)
-			last_loading_frame = read_end;
-		}
-
-	// Read past the read-ahead point.
-	unsigned long read_start = last_loading_frame + 1;
-	if (read_start < read_ahead_point && read_start < file_end_frame()) {
-		unsigned long num_frames = engine->read_ahead_seconds * sample_rate;
-		unsigned long max_length = file_end_frame() - read_start;
-		if (num_frames > max_length)
-			num_frames = max_length;
-		start_read(read_start, num_frames);
 		}
 }
 
@@ -254,7 +245,7 @@ void Clip::read_ahead()
 void Clip::start_read(unsigned long start_frame, unsigned long num_frames)
 {
 #ifdef DEBUG_FILE_READ
-	log("Starting read %lu -> %lu.", start_frame, start_frame + num_frames);
+	log("Starting read %lu -> %lu for clip %d.", start_frame, start_frame + num_frames, id);
 	log_read_slots();
 #endif
 

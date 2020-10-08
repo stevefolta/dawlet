@@ -46,3 +46,27 @@ Track::run() is already not running the playlist when recording.  I'm seeing "mi
 Changing the input of an armed track doesn't do AudioInterface::set_channel_armed(), which can lead to a crash in the Recorder when it tries to write the files.  SetTrackInputProcess::set() is supposed to do that... typo: it's setting it to false instead of true.
 
 
+[2020.10.5]
+
+Seeing some duplicate ids... Track::max_used_id() needs to account for clips as well.
+
+Fixed 'invalid-wav-file' on record stop.  Now debugging missing reads, which happen a lot even on playback.  Why do all clips have file-start-frame of 256 (== 2 * cur_buffer_size)?  Anyway, play_frame is a big number (eg. 18446744073709426561/0xfffffffffffe1781).  That keeps the reads from happening.  Totally unintialized?  No, prepare_to_play() sets it.  Changing play_frame to signed gave warnings and didn't fix it.  Pinning next_play_frame to zero (and using it for the kick-out) fixes it, but probably reads ahead too early.
+
+
+[2020.10.7]
+
+32-bit signed frame count at 44.1k has a range of +/- 13.5 hours.  Should be enough, nonetheless I'm going with int64_t.
+
+Clip 11 starts at 2.47873, read starts at 2.47293....
+
+Fixed reading.  Now I'm seeing the last read in a clip sometimes doesn't get disposed as after it passes -- but not always.
+
+
+[Live]
+
+Bugs to fix:
+	Missing reads.
+	Duplicate ids (Track::max_used_id() needs to check clips).
+	Why do clips have file-start-frame of 2 * cur_buffer_size?  Do we really have a bit of preroll?
+
+
