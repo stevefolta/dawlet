@@ -197,7 +197,7 @@ void Clip::read_ahead()
 			continue;
 		int64_t end_frame = reads[i]->end_frame();
 		bool unneeded =
-			next_play_frame > end_frame ||
+			next_play_frame >= end_frame ||
 			(int64_t) reads[i]->start_frame > read_ahead_point;
 		if (unneeded) {
 #ifdef DEBUG_FILE_READ

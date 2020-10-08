@@ -59,7 +59,7 @@ Fixed 'invalid-wav-file' on record stop.  Now debugging missing reads, which hap
 
 Clip 11 starts at 2.47873, read starts at 2.47293....
 
-Fixed reading.  Now I'm seeing the last read in a clip sometimes doesn't get disposed as after it passes -- but not always.
+Fixed reading.  Now I'm seeing the last read in a clip sometimes doesn't get disposed as after it passes -- but not always.  Needed "next_play_frame >= end_frame" instead of "next_play_frame = end_frame", especially since the playlist won't keep calling read_ahead() once it has gone by.
 
 
 [Live]
