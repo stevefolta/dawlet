@@ -123,4 +123,15 @@ void Playlist::run(AudioBuffer** buffers_out, int num_channels)
 }
 
 
+int Playlist::max_used_id()
+{
+	int max_id = 0;
+	for (auto& clip: clips) {
+		if (clip->id > max_id)
+			max_id = clip->id;
+		}
+	return max_id;
+}
+
+
 

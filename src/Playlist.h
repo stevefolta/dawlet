@@ -23,6 +23,7 @@ class Playlist {
 		void	run(AudioBuffer** buffers_out, int num_channels);
 
 		bool	is_empty() { return clips.empty(); }
+		int	max_used_id();
 
 		void	add_clip(Clip* clip) { clips.push_back(clip); }
 

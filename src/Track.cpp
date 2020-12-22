@@ -371,10 +371,13 @@ int Track::max_used_id()
 {
 	int max_id = id;
 	for (auto& child : children) {
-		int child_id = child->id;
+		int child_id = child->max_used_id();
 		if (child_id > max_id)
 			max_id = child_id;
 		}
+	int max_clips_id = playlist->max_used_id();
+	if (max_clips_id > max_id)
+		max_id = max_clips_id;
 	return max_id;
 }
 
