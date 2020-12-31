@@ -15,7 +15,7 @@ classes+=(MutatingProcess SetTrackStateProcesses)
 classes+=(NewTrackProcess DeleteTrackProcess RestoreTrackProcess)
 classes+=(AudioSystem AudioInterface)
 classes+=(ALSAAudioSystem ALSAAudioInterface)
-classes+=(IndentedOStream Date)
+classes+=(IndentedOStream Date List)
 files=()
 files+=(src/main.cpp)
 

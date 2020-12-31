@@ -12,6 +12,8 @@ class Send {
 
 		void	run(AudioBuffer* bufferOut);
 
+		Send*	next;
+
 	protected:
 		Track*	from;
 		Track*	to;

@@ -14,8 +14,8 @@
 
 
 Track::Track(Project* project_in, Track* parent_in, int idIn)
-	: project(project_in), parent(parent_in), playlist(nullptr), cur_peak(0.0),
-	  capture_channels(nullptr)
+	: next(nullptr), project(project_in), parent(parent_in), playlist(nullptr),
+	  cur_peak(0.0), capture_channels(nullptr)
 {
 	id = idIn >=0 ? idIn : project->new_id();
 	gain = 1.0;
@@ -28,15 +28,11 @@ Track::Track(Project* project_in, Track* parent_in, int idIn)
 
 Track::~Track()
 {
-	while (!sends.empty()) {
-		delete sends.back();
-		sends.pop_back();
-		}
+	while (!sends.empty())
+		delete sends.pop_front();
 	// Don't delete receives; their sends will do that.
-	while (!children.empty()) {
-		delete children.back();
-		children.pop_back();
-		}
+	while (!children.empty())
+		delete children.pop_front();
 	delete playlist;
 	delete capture_channels;
 }
@@ -320,50 +316,48 @@ void Track::add_clip(Clip* clip)
 }
 
 
-void Track::add_child(Track* track, Track* after_child)
+void Track::add_child(Track* new_child, Track* after_child)
 {
-	// Find where to put it.
-	auto before_iterator = children.end();
-	if (after_child) {
-		for (before_iterator = children.begin(); before_iterator != children.end(); ++before_iterator) {
-			if (*before_iterator == after_child) {
-				++before_iterator;
-				break;
-				}
-			}
+	if (after_child == nullptr || after_child == children.back())
+		children.push_back(new_child);
+	else {
+		new_child->next = after_child->next;
+		after_child->next = new_child;
 		}
-
-	children.insert(before_iterator, track);
 }
 
 
-void Track::add_child_before(Track* track, Track* before_child)
+void Track::add_child_before(Track* new_child, Track* before_child)
 {
-	// Find where to put it.
-	auto before_iterator = children.end();
-	if (before_child) {
-		for (before_iterator = children.begin(); before_iterator != children.end(); ++before_iterator) {
-			if (*before_iterator == before_child)
-				break;
+	if (before_child == nullptr) {
+		// "Before nothing" means "at the end".
+		children.push_back(new_child);
+		return;
+		}
+	else if (before_child == children.front()) {
+		children.push_front(new_child);
+		return;
+		}
+
+	// Find out where to put it.
+	Track* after_child = children.front();
+	for (; after_child; after_child = after_child->next) {
+		if (after_child->next == before_child) {
+			// Found the spot.  Insert.
+			new_child->next = before_child;
+			after_child->next = new_child;
+			return;
 			}
 		}
 
-	children.insert(before_iterator, track);
+	// Didn't find it.  Just put it in the back.
+	children.push_back(new_child);
 }
 
 
 void Track::remove_child(Track* track)
 {
-	// Find the track.
-	auto it = children.begin();
-	for (; it != children.end(); ++it) {
-		if (*it == track)
-			break;
-		}
-	if (it == children.end())
-		return;
-
-	children.erase(it);
+	children.remove(track);
 }
 
 

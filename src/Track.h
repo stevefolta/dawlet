@@ -2,6 +2,7 @@
 #define Track_h
 
 #include "AudioTypes.h"
+#include "List.h"
 #include <vector>
 #include <string>
 class Project;
@@ -45,14 +46,16 @@ class Track {
 
 		void	set_name(std::string new_name) { name = new_name; }
 
+		Track*	next;
+
 	protected:
 		Project*	project;
 		Track*	parent;
 		std::string	name;
 		Playlist*	playlist;
-		std::vector<Track*>	children;
-		std::vector<Send*>	sends;
-		std::vector<Send*>	receives;
+		List<Track>	children;
+		List<Send>	sends;
+		List<Send>	receives;
 		std::string	input;
 		float	gain;
 		bool	sends_to_parent;
