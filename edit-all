@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 classes=(DAW Project Track Playlist Clip Send)
 classes+=(AudioEngine BufferManager AudioBuffer MessageQueue)
