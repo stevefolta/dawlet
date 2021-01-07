@@ -9,10 +9,18 @@ class List {
 		class iterator {
 			public:
 				iterator(T* elementIn) : element(elementIn) {}
+				iterator() : element(nullptr) {}
+				iterator(const iterator& other) : element(other.element) {}
 
 				void	operator++() {
 					if (element)
 						element = element->next;
+					}
+				iterator	operator+(int count) {
+					T* forward_element = element;
+					for (; count > 0 && forward_element; --count)
+						forward_element = forward_element->next;
+					return iterator(forward_element);
 					}
 				T*& operator*() { return element; }
 				bool	operator==(iterator other) { return element == other.element; }

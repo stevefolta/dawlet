@@ -15,10 +15,8 @@ Playlist::Playlist()
 
 Playlist::~Playlist()
 {
-	while (!clips.empty()) {
-		delete clips.back();
-		clips.pop_back();
-		}
+	while (!clips.empty())
+		delete clips.pop_front();
 }
 
 
@@ -102,7 +100,7 @@ void Playlist::prepare_to_play()
 
 void Playlist::run(AudioBuffer** buffers_out, int num_channels)
 {
-	std::vector<Clip*>::iterator it = first_playing_clip;
+	List<Clip>::iterator it = first_playing_clip;
 	ProjectPosition read_ahead_point =
 		engine->play_head + engine->read_ahead_seconds;
 	for (; it != clips.end(); ++it) {
@@ -132,6 +130,13 @@ int Playlist::max_used_id()
 		}
 	return max_id;
 }
+
+
+void Playlist::add_clip(Clip* clip)
+{
+	clips.push_back(clip);
+}
+
 
 
 

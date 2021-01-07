@@ -26,6 +26,7 @@ class Clip {
 
 		int	id;
 		AudioFile*	file;
+		Clip*	next;
 		ProjectPosition	start;
 		unsigned long	file_start_frame;
 		unsigned long	length_in_frames;

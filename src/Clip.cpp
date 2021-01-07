@@ -13,6 +13,7 @@
 
 void Clip::init()
 {
+	next = nullptr;
 	file_start_frame = 0;
 	for (int i = 0; i < num_reads; ++i)
 		reads[i] = nullptr;

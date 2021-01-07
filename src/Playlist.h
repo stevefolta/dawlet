@@ -1,7 +1,7 @@
 #ifndef Playlist_h
 #define Playlist_h
 
-#include <vector>
+#include "List.h"
 #include <string>
 
 class Clip;
@@ -25,13 +25,13 @@ class Playlist {
 		bool	is_empty() { return clips.empty(); }
 		int	max_used_id();
 
-		void	add_clip(Clip* clip) { clips.push_back(clip); }
+		void	add_clip(Clip* clip);
 
 	protected:
-		std::vector<Clip*>	clips;
+		List<Clip>	clips;
 
 		// While playing.
-		std::vector<Clip*>::iterator	first_playing_clip;
+		List<Clip>::iterator	first_playing_clip;
 	};
 
 
