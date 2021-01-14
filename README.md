@@ -6,7 +6,10 @@ Dawlet is a toy DAW (digital audio workstation) whose interface is a webapp.  It
 When would I use it?
 -----
 
-You wouldn't.  You'd use Ardour or Reaper or Bitwig or something.  You could, in theory, record a song in it, but it lacks scrolling, waveform display, editing, plugin support, sends, exporting, MIDI, and no doubt many other things.
+You wouldn't.  You'd use Ardour or Reaper or Bitwig or something.  You could,
+in theory, record a song in it, but it lacks scrolling, waveform display,
+punching, editing, plugin support, sends, exporting, MIDI, and no doubt many
+other things.
 
 How does it work?
 -----

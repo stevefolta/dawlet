@@ -31,7 +31,7 @@ js_classes+=(RecordAction)
 for class in "${js_classes[@]}"; do
 	files+=(html/${class}.js)
 	done
-files+=(Makefile edit-all)
+files+=(Makefile edit-all README.md)
 
 $EDITOR "${files[@]}"
 
