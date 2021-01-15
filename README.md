@@ -1,7 +1,8 @@
 dawlet
 =====
 
-Dawlet is a toy DAW (digital audio workstation) whose interface is a webapp.  It's just a proof-of-concept.
+Dawlet is a toy DAW (digital audio workstation) whose interface is a webapp.
+It's just a proof-of-concept.
 
 When would I use it?
 -----
@@ -31,7 +32,7 @@ transport commands ("play", "pause", "record", etc.) from a Websocket.
 
 Both threads need to access the project data structure, mainly because only the
 DAW thread can save it to disk.  The audio thread has the responsibility of
-making changes to the project.  Lets consider what happens when a new track is
+making changes to the project.  Let's consider what happens when a new track is
 added to the project.  The DAW thread allocates the Track object, then sends it
 to the audio thread (along with information about where to put it).  The audio
 thread can make the change quickly when it gets the message (so it doesn't
@@ -39,7 +40,7 @@ jeopardize keeping the audio going), but until that happens, it's not safe for
 the DAW thread to access the project structure.  So the DAW thread keeps track
 of whether it has outstanding "mutation" requests to the audio thread, and will
 wait until they've all been performed and acknowledged before it tries to walk
-the structure to write it to disk.
+the project structure to write it to disk.
 
 
 
